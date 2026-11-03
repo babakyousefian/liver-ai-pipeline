@@ -1,0 +1,28 @@
+┌─────────────────────────────────────────────────────────────┐
+│                   GAN ULTIMATE PIPELINE                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   1. معماری جدید (StyleGAN2-lite + Residual Blocks)         │
+│     ├─ Generator: Mapping Network + Synthesis               │
+│     ├─ Discriminator: Residual + Multi-Scale                │
+│     └─ Spectral Norm + EQM (Equalized Learning Rate)        │
+│                                                             │
+│  2. Feature Matching Loss                                   │
+│     ├─ MSE on discriminator features                        │
+│     ├─ Perceptual loss                                      │
+│     └─ R1 Regularization                                    │
+│                                                             │
+│  3. Adaptive Discriminator Augmentation (ADA)               │
+│     ├─ For small datasets (G3 = 70 images)                  │
+│     ├─ Differentiable augmentation                          │
+│     └─ Adaptive p-control                                   │
+│                                                             │
+│  4. Optuna Hyperparameter Optimization                      │
+│     ├─ TPE Sampler                                          │
+│     ├─ Median Pruner                                        │
+│     └─ 30 trials × 100 epochs                               │
+│                                                             │
+│  5. EMA (Exponential Moving Average) for Generator          │
+│     └─ Smoother samples                                     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘

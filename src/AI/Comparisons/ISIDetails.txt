@@ -1,0 +1,189 @@
+number1:
+=================
+Article Name : Development of a Deep Learning Model for Classification of Hepatic Steatosis from Clinical Standard Ultrasound.
+
+Method : The frame-level model was based on a deep convolutional neural network (CNN) with weights pretrained on ImageNet [20]. Various architectures were evaluated in this phase, including ConvNeXt, MobileNetV3, Resnet, VGG and Visual Transformers, with MobileNetV3 being selected due to superior frame-level performance. The model was fitted with balanced class weights. Pooling between frame-level and patient-level was necessary to account for variations in the number of frames (instances) per patient.
+
+Total Images : A total of 403 patients with 403 US exams were included: 171 (42%) were normal (S0: MRI-PDFF <5%), 154 (38%) had mild steatosis (S1: MRI-PDFF 5–17.4%), 29 (7%) had moderate steatosis (S2: MRI-PDFF >17.4%–22.1%) and 49 (12%) had severe steatosis (S3: MRI-PDFF >22.1%).
+
+Total Class : normal -  mild steatosis - moderate steatosis - severe steatosis
+
+Accuracy : The S0 versus S1/2/3 model achieved 81.3% (95% CI 72.1–90.5) AUC, 81.1% (70.6–91.6) sensitivity, 71.4% (54.7–88.2) specificity and 76.3% (66.4–86.2) balanced accuracy. The S0/1 versus S2/3 model achieved 95.9% (89–100) AUC, 87.5% (71.3–100) sensitivity, 96.9% (92.7–100) specificity and 92.2% (83.8–100) balanced accuracy. A multi-class model achieved a sensitivity of 71.4% (54.7–88.2) for S0, 67.6% (52.5–82.7) for S1 and 87.5% (71.3–100) for S2/3; specificity for the same model was 81.1% (70.6–91.6) for S0, 77.3% (64.9–89.7) for S1 and 96.9% (92.7–100) for S2/3.
+
+AUC : The S0 versus S1/2/3 model achieved 81.3% (95% CI 72.1–90.5) AUC, 81.1% (70.6–91.6) sensitivity, 71.4% (54.7–88.2) specificity and 76.3% (66.4–86.2) balanced accuracy. The S0/1 versus S2/3 model achieved 95.9% (89–100) AUC, 87.5% (71.3–100) sensitivity, 96.9% (92.7–100) specificity and 92.2% (83.8–100) balanced accuracy. A multi-class model achieved a sensitivity of 71.4% (54.7–88.2) for S0, 67.6% (52.5–82.7) for S1 and 87.5% (71.3–100) for S2/3; specificity for the same model was 81.1% (70.6–91.6) for S0, 77.3% (64.9–89.7) for S1 and 96.9% (92.7–100) for S2/3.
+
+F1-Score : The S0 versus S1/2/3 model achieved 81.3% (95% CI 72.1–90.5) AUC, 81.1% (70.6–91.6) sensitivity, 71.4% (54.7–88.2) specificity and 76.3% (66.4–86.2) balanced accuracy. The S0/1 versus S2/3 model achieved 95.9% (89–100) AUC, 87.5% (71.3–100) sensitivity, 96.9% (92.7–100) specificity and 92.2% (83.8–100) balanced accuracy. A multi-class model achieved a sensitivity of 71.4% (54.7–88.2) for S0, 67.6% (52.5–82.7) for S1 and 87.5% (71.3–100) for S2/3; specificity for the same model was 81.1% (70.6–91.6) for S0, 77.3% (64.9–89.7) for S1 and 96.9% (92.7–100) for S2/3.
+
+Year of Published : 2025
+
+Q1
+
+=================
+number2:
+=================
+Article Name : PBCS-ConvNeXt: Convolutional Network-Based Automatic Diagnosis of Non-alcoholic Fatty Liver in Abdominal Ultrasound Images
+
+Method : This study proposes a deep learning-based computer-aided diagnosis (CAD) model, termed potent boosts channel-aware separable intent – ConvNeXt (PBCS-ConvNeXt), for automated NAFLD classification using B-mode US images.
+
+Total Images : 3000
+
+Total Class : 4
+
+Accuracy : 82%
+
+AUC : 77%
+
+F1-Score : 80%
+
+Year of Published : 2025
+
+Q1
+
+=================
+number3:
+=================
+Article Name : https://ieeexplore.ieee.org/document/11192266
+
+Method : ResNet50
+
+Total Images : 2591
+
+Total Class : 4
+
+Accuracy : 77%
+
+AUC : 80%
+
+F1-Score : 79%
+
+Year of Published : 2025
+
+Q1
+
+=================
+number4:
+=================
+Article Name : Comparison of deep learning schemes in grading non-alcoholic fatty liver disease using B-mode ultrasound hepatorenal window images with liver biopsy as the gold standard
+
+Method :  InceptionV3, MobileNetV2, ResNet50, DenseNet201, and NASNetMobile pre-trained DLS.
+
+Total Images : 112
+
+Total Class : 4
+
+Accuracy : 89.15%
+
+AUC : 82%
+
+F1-Score : 63.64%
+
+Year of Published : 2025
+
+Q2
+
+=================
+number5:
+=================
+Article Name : Ultrasound Versus Elastography in the Diagnosis of Hepatic Steatosis: Evaluation of Traditional Machine Learning Versus Deep Learning
+
+Method :  ResNet50V2 and DenseNet-201
+
+Total Images : 21855
+
+Total Class : 4
+
+Accuracy : 98.9%
+
+AUC : 99.6%
+
+F1-Score : 84%
+
+Year of Published : 2024
+
+Q1
+
+=================
+number6:
+=================
+Article Name : Adaptive Method for Exploring Deep Learning Techniques for Subtyping and Prediction of Liver Disease
+
+Method : CNN+LSTM
+
+Total Images : 5000
+
+Total Class : 4
+
+Accuracy : 98.73%
+
+AUC : 99%
+
+F1-Score : 98%
+
+Year of Published : 2024
+
+Q2
+
+=================
+number7:
+=================
+Article Name : Comparison of deep learning schemes in grading non-alcoholic fatty liver disease using B-mode ultrasound hepatorenal window images with liver biopsy as the gold standard
+
+Method :  InceptionV3, MobileNetV2, ResNet50, DenseNet201, and NASNetMobile pre-trained DLS.
+
+Total Images : 112
+
+Total Class : 4
+
+Accuracy : 89.15%
+
+AUC : 82%
+
+F1-Score : 63.64%
+
+Year of Published : 2025
+
+Q2
+
+=================
+number8:
+=================
+Article Name : Fatty liver classification via risk controlled neural networks trained on grouped ultrasound image data
+
+Method : ResNet50 - DenseNet121
+
+Total Images : 21636
+
+Total Class : 4
+
+Accuracy : 79.55%
+
+AUC : 95.3%
+
+F1-Score : 80.01%
+
+Year of Published : 2024
+
+Q1
+
+=================
+number9:
+=================
+Article Name : Neural Network Classification Algorithm Based on Self-attention Mechanism and Ensemble Learning for MASLD Ultrasound Images
+
+Method : VGG16
+
+Total Images : 9000
+
+Total Class : 4
+
+Accuracy : 91.34%
+
+AUC : 88.88%
+
+F1-Score : 89.98%
+
+Year of Published : 2024
+
+Q2
+
+=================

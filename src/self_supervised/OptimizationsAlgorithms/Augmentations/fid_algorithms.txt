@@ -1,0 +1,1 @@
+FID = ||μ_real - μ_fake||² + Tr(Σ_real + Σ_fake - 2√(Σ_real · Σ_fake))

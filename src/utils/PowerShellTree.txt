@@ -1,0 +1,62 @@
+$excludePatterns = @(
+    '\\\.git\\',
+    '\\\.idea\\',
+    '\\\.pytest_cache\\',
+    '\\\.venv\\',
+    '\\__pycache__\\',
+    '\\build\\',
+    '\\dist\\',
+    '\\htmlcov\\',
+    '\\logs\\',
+    '\\Output\\',
+    '\\settings\\',
+    '\\tests\\',
+    '\\BU\.selfSupervisedLearning\\',
+    '\\finalReports\\pngs\\',
+    '\\finalReports\\pngs_from_dcm\\',
+    '\\croppedBackups\\',
+    '\\GAN\\',
+    '\\packages\\backups\\',
+    '\\packages\\ColabCode\\',
+    '\\packages\\data\\',
+    '\\packages\\structures\\'
+)
+
+# مسیرهایی که فقط ۳ فایل اولشون نشون داده بشه
+$limit3Patterns = @(
+    '\\finalReports\\cropped\\',
+    '\\finalReports\\cropped_raw\\',
+    '\\finalReports\\newLiver_v3\\'
+)
+
+$root = (Get-Location).Path
+
+Get-ChildItem -Recurse -Force | Where-Object {
+    $full = $_.FullName
+    $rel = $full.Replace($root + '\', '')
+    
+    # Skip excluded patterns
+    $skip = $false
+    foreach ($p in $excludePatterns) {
+        if ($full -match $p) { $skip = $true; break }
+    }
+    if ($skip) { return $false }
+    
+    # Limit-3 patterns
+    foreach ($p in $limit3Patterns) {
+        if ($full -match $p) {
+            # فقط 3 فایل اول رو نگه دار
+            $dir = Split-Path $full -Parent
+            $filesInDir = Get-ChildItem -Path $dir -File -Force | Select-Object -First 3
+            if ($_.PSIsContainer) { return $true }
+            if ($filesInDir.FullName -contains $full) { return $true }
+            return $false
+        }
+    }
+    return $true
+} | ForEach-Object {
+    $rel = $_.FullName.Replace($root + '\', '')
+    if ($_.PSIsContainer) { "[DIR]  $rel" } else { "       $rel" }
+} | Out-File -Encoding UTF8 tree.txt
+
+Write-Host "Done! Check tree.txt" -ForegroundColor Green
