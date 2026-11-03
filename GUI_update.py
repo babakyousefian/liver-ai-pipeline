@@ -42,6 +42,18 @@ from core.updater import (UpdateChecker, UpdateConfig, CURRENT_VERSION, is_newer
 from gui.dialogs.update_dialog import UpdateDialog
 from gui.widgets.update_badge import UpdateBadge
 
+# ✅ Health-check imports (برای rollback خودکار)
+try:
+    from core.updater.health import (
+        check_update_pending,
+        rollback_if_needed,
+        confirm_update_success,
+    )
+except ImportError:
+    def check_update_pending(): return {}
+    def rollback_if_needed(_data): return False
+    def confirm_update_success(): pass
+
 # ================================================================
 # ✅ PyQt5 Imports
 # ================================================================
@@ -13814,6 +13826,32 @@ def load_application_fonts():
 # ================================================================
 
 def main():
+    # ============================================================
+    # ✅ STEP 1: Check for pending update (before ANY UI)
+    # ============================================================
+    pending = check_update_pending()
+    if pending:
+        print("⚠️ Pending update detected — attempting rollback")
+        rolled_back = rollback_if_needed(pending)
+        if rolled_back:
+            # Show a simple message box (QApplication not created yet, use raw)
+            try:
+                from PyQt5.QtWidgets import QApplication, QMessageBox
+                _app = QApplication(sys.argv)
+                QMessageBox.warning(
+                    None,
+                    "Update Failed",
+                    "The previous update failed to start.\n\n"
+                    "Your app has been automatically rolled back to the previous version.\n"
+                    "Please try updating again from Settings.",
+                )
+                # Don't call sys.exit here — continue to normal startup
+            except Exception as e:
+                print(f"⚠️ Failed to show rollback message: {e}")
+
+    # ============================================================
+    # ✅ STEP 2: Normal startup (High DPI + QApplication)
+    # ============================================================
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
@@ -13884,6 +13922,8 @@ def main():
     def on_splash_finished():
         try:
             main_window.show()
+            # ✅ Confirm update success after 2 seconds (UI is definitely visible)
+            QTimer.singleShot(2000, confirm_update_success)
         except Exception as e:
             print(f"⚠️ main_window.show() failed: {e}")
             # ✅ اگه main_window.error داشت، یه پیام
