@@ -1,4 +1,3 @@
-
 # 🚀 Liver AI Pipeline - CI/CD with GitHub Actions
 
 <div align="center">
@@ -144,7 +143,6 @@ nput Images → Detection Phase → Ultra Resolution → AI Resolution → Cropp
 │   ├── z_d94e8712a36af673_reportGenerator_py.html
 │   ├── z_ebeedc872dadaeb0_finalReport_py.html
 │   └── z_ebeedc872dadaeb0_reportBeforeCrop_py.html
-├── SSLAlgorithms.py
 ├── packages
 │   ├── backups
 │   │   ├── mainBackup
@@ -407,7 +405,6 @@ python3.13 -m pip install --no-cache-dir --upgrade -r ./requirements.txt
 ## ▶️ Usage
 
 ```bash
-python3.13 ./SSLAlgorithms.py
 ```
 
 ---

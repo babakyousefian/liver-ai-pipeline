@@ -42,7 +42,7 @@ class UpdateConfig:
     last_check: Optional[str] = None       # ISO timestamp
     skipped_version: str = ""              # User clicked "skip"
     source: str = "github"                # "github" | "website"
-    github_repo: str = "babakyousefian/Liver-AI-Pipeline"
+    github_repo: str = "babakyousefian/liver-ai-pipeline"
     website_url: str = "https://babakyousefian.com/api/latest.json"
     include_prerelease: bool = False
     channel: str = "stable"               # "stable" | "beta" | "alpha"
