@@ -4,9 +4,9 @@
 Small 🔴 badge overlay for the update button.
 """
 
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QLabel, QGraphicsOpacityEffect
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
-from PyQt5.QtGui import QColor, QGraphicsOpacityEffect
+from PyQt5.QtGui import QColor
 
 
 class UpdateBadge(QLabel):

@@ -13,7 +13,7 @@ from .source import make_source
 from .version import is_newer
 
 
-CURRENT_VERSION = "3.0.0"  # ← should match your app version
+CURRENT_VERSION = "3.1.0"  # ← should match your app version
 
 
 class UpdateChecker(QThread):

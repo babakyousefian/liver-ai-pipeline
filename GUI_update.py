@@ -252,6 +252,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Theme Dark Aqua-Purple",
         "theme_solarized_white": "Theme Solarized White",
         "theme_solarized_dark": "Theme Solarized Dark",
+        "theme_dark_forest": "Theme Dark Forest Green",
         "select_language": "Select Language",
         "select_theme": "Select Theme",
         "apply": "Apply",
@@ -458,6 +459,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "تم تاریک آبی-بنفش",
         "theme_solarized_white": "تم سفید سولاریزه",
         "theme_solarized_dark": "تم تیره سولاریزه",
+        "theme_dark_forest": "تم جنگل سبز تیره",
         "select_language": "انتخاب زبان",
         "select_theme": "انتخاب تم",
         "apply": "اعمال",
@@ -663,6 +665,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Theme Dark Aqua-Purple",
         "theme_solarized_white": "Theme Solarized White",
         "theme_solarized_dark": "Theme Solarized Dark",
+        "theme_dark_forest": "Theme Dark Forest Green",
         "select_language": "Select Language",
         "select_theme": "Select Theme",
         "apply": "Apply",
@@ -861,6 +864,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Thème Aqua-Violet sombre",
         "theme_solarized_white": "Thème Solarized clair",
         "theme_solarized_dark": "Thème Solarized sombre",
+        "theme_dark_forest": "Thème Forêt Verte Sombre",
         "select_language": "Choisir la langue",
         "select_theme": "Choisir le thème",
         "apply": "Appliquer",
@@ -1059,6 +1063,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Тёмная тема Aqua-Purple",
         "theme_solarized_white": "Светлая тема Solarized",
         "theme_solarized_dark": "Тёмная тема Solarized",
+        "theme_dark_forest": "Тёмная лесная зелёная тема",
         "select_language": "Выбрать язык",
         "select_theme": "Выбрать тему",
         "apply": "Применить",
@@ -1257,6 +1262,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Σκούρο θέμα Aqua-Purple",
         "theme_solarized_white": "Φωτεινό θέμα Solarized",
         "theme_solarized_dark": "Σκούρο θέμα Solarized",
+        "theme_dark_forest": "Σκούρο Πράσινο Δάσος",
         "select_language": "Επιλογή γλώσσας",
         "select_theme": "Επιλογή θέματος",
         "apply": "Εφαρμογή",
@@ -1455,6 +1461,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Dunkles Aqua-Purple-Thema",
         "theme_solarized_white": "Helles Solarized-Thema",
         "theme_solarized_dark": "Dunkles Solarized-Thema",
+        "theme_dark_forest": "Dunkles Waldgrün-Thema",
         "select_language": "Sprache auswählen",
         "select_theme": "Thema auswählen",
         "apply": "Anwenden",
@@ -1653,6 +1660,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "مظهر داكن أزرق-بنفسجي",
         "theme_solarized_white": "مظهر فاتح سولاريزد",
         "theme_solarized_dark": "مظهر داكن سولاريزد",
+        "theme_dark_forest": "مظهر الغابة الخضراء الداكن",
         "select_language": "اختر اللغة",
         "select_theme": "اختر المظهر",
         "apply": "تطبيق",
@@ -1851,6 +1859,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Темна тема Aqua-Purple",
         "theme_solarized_white": "Світла тема Solarized",
         "theme_solarized_dark": "Темна тема Solarized",
+        "theme_dark_forest": "Темна лісова зелена тема",
         "select_language": "Обрати мову",
         "select_theme": "Обрати тему",
         "apply": "Застосувати",
@@ -2049,6 +2058,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Tema scuro Aqua-Purple",
         "theme_solarized_white": "Tema chiaro Solarized",
         "theme_solarized_dark": "Tema scuro Solarized",
+        "theme_dark_forest": "Tema Foresta Verde Scuro",
         "select_language": "Seleziona lingua",
         "select_theme": "Seleziona tema",
         "apply": "Applica",
@@ -2247,6 +2257,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "深色水蓝-紫色主题",
         "theme_solarized_white": "Solarized 浅色主题",
         "theme_solarized_dark": "Solarized 深色主题",
+        "theme_dark_forest": "深林绿色主题",
         "select_language": "选择语言",
         "select_theme": "选择主题",
         "apply": "应用",
@@ -2445,6 +2456,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "ダークアクアパープルテーマ",
         "theme_solarized_white": "ソラリゼッドホワイトテーマ",
         "theme_solarized_dark": "ソラリゼッドダークテーマ",
+        "theme_dark_forest": "ダークフォレストグリーンテーマ",
         "select_language": "言語を選択",
         "select_theme": "テーマを選択",
         "apply": "適用",
@@ -2643,6 +2655,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "다크 아쿠아-퍼플 테마",
         "theme_solarized_white": "솔라라이즈드 화이트 테마",
         "theme_solarized_dark": "솔라라이즈드 다크 테마",
+        "theme_dark_forest": "다크 포레스트 그린 테마",
         "select_language": "언어 선택",
         "select_theme": "테마 선택",
         "apply": "적용",
@@ -2841,6 +2854,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "어두운 아쿠아-보라 테마",
         "theme_solarized_white": "솔라리제드 흰색 테마",
         "theme_solarized_dark": "솔라리제드 어두운 테마",
+        "theme_dark_forest": "어두운 숲 초록 테마",
         "select_language": "언어 선택",
         "select_theme": "테마 선택",
         "apply": "적용",
@@ -3039,6 +3053,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "डार्क एक्वा-पर्पल थीम",
         "theme_solarized_white": "सोलराइज़्ड व्हाइट थीम",
         "theme_solarized_dark": "सोलराइज़्ड डार्क थीम",
+        "theme_dark_forest": "डार्क फॉरेस्ट ग्रीन थीम",
         "select_language": "भाषा चुनें",
         "select_theme": "थीम चुनें",
         "apply": "लागू करें",
@@ -3237,6 +3252,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Tema Escuro Aqua-Roxo",
         "theme_solarized_white": "Tema Solarized Claro",
         "theme_solarized_dark": "Tema Solarized Escuro",
+        "theme_dark_forest": "Tema Floresta Verde Escuro",
         "select_language": "Selecionar idioma",
         "select_theme": "Selecionar tema",
         "apply": "Aplicar",
@@ -3435,6 +3451,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Tema Escuro Aqua-Roxo",
         "theme_solarized_white": "Tema Solarized Claro",
         "theme_solarized_dark": "Tema Solarized Escuro",
+        "theme_dark_forest": "Tema Floresta Verde Escuro",
         "select_language": "Selecionar idioma",
         "select_theme": "Selecionar tema",
         "apply": "Aplicar",
@@ -3633,6 +3650,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Tema Oscuro Aqua-Púrpura",
         "theme_solarized_white": "Tema Solarized Claro",
         "theme_solarized_dark": "Tema Solarized Oscuro",
+        "theme_dark_forest": "Tema Bosque Verde Oscuro",
         "select_language": "Seleccionar idioma",
         "select_theme": "Seleccionar tema",
         "apply": "Aplicar",
@@ -3831,6 +3849,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "مظهر داكن أزرق-بنفسجي",
         "theme_solarized_white": "مظهر فاتح سولاريزد",
         "theme_solarized_dark": "مظهر داكن سولاريزد",
+        "theme_dark_forest": "مظهر الغابة الخضراء الداكن",
         "select_language": "اختر اللغة",
         "select_theme": "اختر المظهر",
         "apply": "تطبيق",
@@ -4029,6 +4048,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Koyu Aqua-Mor Tema",
         "theme_solarized_white": "Solarized Açık Tema",
         "theme_solarized_dark": "Solarized Koyu Tema",
+        "theme_dark_forest": "Koyu Orman Yeşili Tema",
         "select_language": "Dil Seç",
         "select_theme": "Tema Seç",
         "apply": "Uygula",
@@ -4227,6 +4247,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Dunkles Aqua-Purple-Thema",
         "theme_solarized_white": "Helles Solarized-Thema",
         "theme_solarized_dark": "Dunkles Solarized-Thema",
+        "theme_dark_forest": "Dunkles Waldgrün-Thema",
         "select_language": "Sprache auswählen",
         "select_theme": "Thema auswählen",
         "apply": "Anwenden",
@@ -4425,6 +4446,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Mörkt Aqua-Lila-tema",
         "theme_solarized_white": "Ljust Solarized-tema",
         "theme_solarized_dark": "Mörkt Solarized-tema",
+        "theme_dark_forest": "Mörkt Skogsgrönt Tema",
         "select_language": "Välj språk",
         "select_theme": "Välj tema",
         "apply": "Tillämpa",
@@ -4623,6 +4645,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Thema Dywyll Aqua-Porffor",
         "theme_solarized_white": "Thema Solarized Golau",
         "theme_solarized_dark": "Thema Solarized Tywyll",
+        "theme_dark_forest": "Thema Coedwig Werdd Tywyll",
         "select_language": "Dewis Iaith",
         "select_theme": "Dewis Thema",
         "apply": "Cymhwyso",
@@ -4821,6 +4844,7 @@ TRANSLATIONS = {
         "theme_dark_aqua": "Donker Aqua-Paars thema",
         "theme_solarized_white": "Licht Solarized thema",
         "theme_solarized_dark": "Donker Solarized thema",
+        "theme_dark_forest": "Donker Bosgroen Thema",
         "select_language": "Taal selecteren",
         "select_theme": "Thema selecteren",
         "apply": "Toepassen",
@@ -5377,6 +5401,29 @@ THEMES = {
         "danger": "#dc322f",
         "shadow": "rgba(42, 161, 152, 0.4)",
     },
+    "theme_dark_forest": {
+        "name": "Dark Forest Green",
+        "bg_gradient_start": "#0a1f0a",  # سبز خیلی تیره
+        "bg_gradient_mid": "#0d3318",  # سبز لجنی تیره
+        "bg_gradient_end": "#06120a",  # سبز تقریباً سیاه
+        "primary": "#4ade80",  # سبز روشن (نئون)
+        "secondary": "#16a34a",  # سبز متوسط
+        "accent": "#84cc16",  # سبز-زیتونی
+        "text": "#dcfce7",  # سبز خیلی روشن (متن)
+        "text_dim": "#86efac",  # سبز ملایم (متن کم‌رنگ)
+        "button_bg": "#4ade80",
+        "button_text": "#0a1f0a",
+        "button_hover": "#86efac",
+        "input_bg": "rgba(13, 51, 24, 0.85)",  # سبز لجنی شفاف
+        "input_border": "#4ade80",
+        "glass_bg": "rgba(10, 31, 10, 0.30)",
+        "glass_border": "rgba(74, 222, 128, 0.40)",
+        "glass_highlight": "rgba(74, 222, 128, 0.12)",
+        "success": "#22c55e",
+        "warning": "#eab308",
+        "danger": "#ef4444",
+        "shadow": "rgba(74, 222, 128, 0.5)",
+    },
 }
 
 LANGUAGE_ORDER = [
@@ -5392,6 +5439,7 @@ THEME_ORDER = [
     "theme_dark_aqua",
     "theme_solarized_white",
     "theme_solarized_dark",
+    "theme_dark_forest",   # ← تم جدید
 ]
 
 
@@ -11045,7 +11093,8 @@ class SettingsDialog(QDialog):
         self.current_glassmorphism = glassmorphism
 
         self.setWindowTitle(tr(current_lang, "settings"))
-        self.setFixedSize(520, 480)
+        self.setFixedSize(560, 720)   # ← بزرگ‌تر شد
+        self.setMinimumSize(560, 600)  # ← حداقل ارتفاع
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
@@ -11062,17 +11111,37 @@ class SettingsDialog(QDialog):
         self.container.setObjectName("container")
         main_layout.addWidget(self.container)
 
-        layout = QVBoxLayout(self.container)
-        layout.setContentsMargins(40, 40, 40, 40)
-        layout.setSpacing(15)
+        # ============================================================
+        # ✅ Container layout: close button + scroll area
+        # ============================================================
+        container_layout = QVBoxLayout(self.container)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(0)
 
+        # ✅ ScrollArea (تا اگه محتوا بیشتر از ارتفاع شد، اسکرول بشه)
+        self.scroll = QScrollArea()
+        self.scroll.setObjectName("settings_scroll")
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.NoFrame)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        self.scroll_content = QWidget()
+        self.scroll_content.setObjectName("settings_scroll_content")
+
+        layout = QVBoxLayout(self.scroll_content)
+        layout.setContentsMargins(40, 40, 40, 40)
+        layout.setSpacing(14)
+
+        # ---------- Title ----------
         self.title_label = QLabel(tr(self.current_lang, "settings"))
         self.title_label.setObjectName("title")
         self.title_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.title_label)
 
-        layout.addSpacing(15)
+        layout.addSpacing(10)
 
+        # ---------- Language ----------
         self.lang_label = QLabel(tr(self.current_lang, "change_language"))
         self.lang_label.setObjectName("label")
         layout.addWidget(self.lang_label)
@@ -11087,8 +11156,9 @@ class SettingsDialog(QDialog):
             self.lang_combo.setCurrentIndex(idx)
         layout.addWidget(self.lang_combo)
 
-        layout.addSpacing(10)
+        layout.addSpacing(8)
 
+        # ---------- Theme ----------
         self.theme_label = QLabel(tr(self.current_lang, "change_theme"))
         self.theme_label.setObjectName("label")
         layout.addWidget(self.theme_label)
@@ -11104,9 +11174,9 @@ class SettingsDialog(QDialog):
             self.theme_combo.setCurrentIndex(idx)
         layout.addWidget(self.theme_combo)
 
-        layout.addSpacing(10)
+        layout.addSpacing(8)
 
-        # ✅ Follow System Theme checkbox
+        # ---------- Follow System Theme ----------
         self.follow_system_checkbox = QCheckBox(
             tr(self.current_lang, "follow_system_theme")
         )
@@ -11117,9 +11187,9 @@ class SettingsDialog(QDialog):
         )
         layout.addWidget(self.follow_system_checkbox)
 
-        layout.addSpacing(10)
+        layout.addSpacing(8)
 
-        # ✅ Glassmorphism checkbox
+        # ---------- Glassmorphism ----------
         self.glassmorphism_checkbox = QCheckBox("Glassmorphism (blur)")
         self.glassmorphism_checkbox.setObjectName("checkbox")
         self.glassmorphism_checkbox.setChecked(self.current_glassmorphism)
@@ -11128,58 +11198,131 @@ class SettingsDialog(QDialog):
         )
         layout.addWidget(self.glassmorphism_checkbox)
 
-        layout.addSpacing(20)
+        layout.addSpacing(14)
 
+        # ============================================================
+        # ✅ Update section
+        # ============================================================
+        update_separator = QFrame()
+        update_separator.setObjectName("update_separator")
+        update_separator.setFixedHeight(1)
+        layout.addWidget(update_separator)
+
+        layout.addSpacing(10)
+
+        update_title = QLabel("🔄 " + tr(self.current_lang, "check_for_updates"))
+        update_title.setObjectName("label")
+        layout.addWidget(update_title)
+
+        self.check_update_btn = QPushButton(
+            "🔍 " + tr(self.current_lang, "check_for_updates")
+        )
+        self.check_update_btn.setObjectName("primary_btn")
+        self.check_update_btn.setCursor(Qt.PointingHandCursor)
+        self.check_update_btn.setMinimumHeight(42)
+        self.check_update_btn.clicked.connect(self._check_for_updates)
+        attach_sound(self.check_update_btn, "simpleClick")
+        layout.addWidget(self.check_update_btn)
+
+        layout.addSpacing(16)
+
+        # ---------- Action buttons ----------
         btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(10)
+
         self.apply_btn = QPushButton("✓ " + tr(self.current_lang, "apply"))
         self.apply_btn.setObjectName("primary_btn")
+        self.apply_btn.setMinimumHeight(42)
         self.apply_btn.clicked.connect(self._apply_settings)
         attach_sound(self.apply_btn, "ok_sound")
         btn_layout.addWidget(self.apply_btn)
 
         self.cancel_btn = QPushButton("✕ " + tr(self.current_lang, "cancel"))
         self.cancel_btn.setObjectName("secondary_btn")
+        self.cancel_btn.setMinimumHeight(42)
         self.cancel_btn.clicked.connect(self.reject)
         attach_sound(self.cancel_btn, "simpleClick")
         btn_layout.addWidget(self.cancel_btn)
 
         layout.addLayout(btn_layout)
 
+        layout.addStretch()
+
+        # ✅ Set scroll content
+        self.scroll.setWidget(self.scroll_content)
+        container_layout.addWidget(self.scroll)
+
+        # ✅ Close button (روی container، نه روی scroll)
         close_btn = QPushButton("✕")
         close_btn.setObjectName("close_btn")
         close_btn.setFixedSize(30, 30)
         close_btn.clicked.connect(self.reject)
         attach_sound(close_btn, "simpleClick")
         close_btn.setParent(self.container)
-        close_btn.move(480, 10)
+        close_btn.move(525, 10)  # ← موقعیت جدید برای عرض ۵۶۰
+        close_btn.raise_()
 
     def _apply_theme(self):
         t = THEMES.get(self.current_theme, THEMES["theme_dark_aqua"])
+
+        # ✅ Style container (border + close button)
         self.container.setStyleSheet(f"""
             QFrame#container {{
                 background: {t['glass_bg']};
                 border: 2px solid {t['glass_border']};
                 border-radius: 20px;
             }}
+            QPushButton#close_btn {{
+                background: transparent;
+                color: {t['text_dim']};
+                border: none;
+                font-size: 18px;
+                font-weight: bold;
+            }}
+            QPushButton#close_btn:hover {{
+                color: {t['danger']};
+            }}
+        """)
+
+        # ✅ ScrollArea transparent
+        self.scroll.setStyleSheet("""
+            QScrollArea#settings_scroll {
+                background: transparent;
+                border: none;
+            }
+            QScrollArea#settings_scroll > QWidget > QWidget {
+                background: transparent;
+            }
+        """)
+
+        # ✅ Style scroll_content (همه‌ی widgetهای داخلش)
+        self.scroll_content.setStyleSheet(f"""
+            QWidget#settings_scroll_content {{
+                background: transparent;
+            }}
             QLabel#title {{
                 font-size: 28px;
                 font-weight: bold;
                 color: {t['primary']};
                 background: transparent;
+                padding-bottom: 6px;
             }}
             QLabel#label {{
                 font-size: 14px;
                 font-weight: bold;
                 color: {t['text']};
                 background: transparent;
+                padding-top: 4px;
+                padding-bottom: 2px;
             }}
             QComboBox#combo {{
                 background: {t['input_bg']};
                 border: 2px solid {t['input_border']};
                 border-radius: 10px;
-                padding: 10px;
+                padding: 10px 12px;
                 font-size: 13px;
                 color: {t['text']};
+                min-height: 24px;
             }}
             QComboBox#combo::drop-down {{
                 border: none;
@@ -11194,9 +11337,14 @@ class SettingsDialog(QDialog):
             }}
             QCheckBox#checkbox {{
                 color: {t['text']};
-                font-size: 12px;
+                font-size: 13px;
                 background: transparent;
                 spacing: 8px;
+                padding: 4px 0px;
+            }}
+            QFrame#update_separator {{
+                background: {t['glass_border']};
+                border: none;
             }}
             QPushButton#primary_btn {{
                 background: qlineargradient(
@@ -11228,17 +11376,83 @@ class SettingsDialog(QDialog):
                 background: {t['primary']};
                 color: {t['button_text']};
             }}
-            QPushButton#close_btn {{
+            QScrollBar:vertical {{
                 background: transparent;
-                color: {t['text_dim']};
+                width: 6px;
                 border: none;
-                font-size: 18px;
-                font-weight: bold;
             }}
-            QPushButton#close_btn:hover {{
-                color: {t['danger']};
+            QScrollBar::handle:vertical {{
+                background: {t['glass_border']};
+                border-radius: 3px;
+                min-height: 20px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {t['primary']};
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                height: 0px;
             }}
         """)
+
+    def _check_for_updates(self):
+        """One-click update flow with user confirmation."""
+        try:
+            from core.updater import CURRENT_VERSION
+            from core.updater.models import UpdateConfig
+            from gui.dialogs.update_dialog import run_update_flow
+            import json
+            import os
+
+            # ✅ Load current update config from settings.json
+            settings_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "settings.json"
+            )
+            config = UpdateConfig()
+            if os.path.exists(settings_path):
+                try:
+                    with open(settings_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    if "update" in data:
+                        config = UpdateConfig.from_dict(data["update"])
+                except Exception:
+                    pass
+
+            # ✅ Run the full flow
+            self.check_update_btn.setEnabled(False)
+            self.check_update_btn.setText("⏳ " + tr(self.current_lang, "downloading"))
+
+            try:
+                installed = run_update_flow(
+                    parent=self,
+                    config=config,
+                    current_version=CURRENT_VERSION,
+                    theme=self.theme if hasattr(self, "theme") else THEMES.get(
+                        self.current_theme, THEMES["theme_dark_aqua"]
+                    ),
+                    lang=self.current_lang,
+                )
+            finally:
+                try:
+                    self.check_update_btn.setEnabled(True)
+                    self.check_update_btn.setText(
+                        "🔍 " + tr(self.current_lang, "check_for_updates")
+                    )
+                except Exception:
+                    pass
+
+        except Exception as e:
+            print(f"⚠️ _check_for_updates failed: {e}")
+            import traceback
+            traceback.print_exc()
+            try:
+                show_message(
+                    self, "critical",
+                    tr(self.current_lang, "error"),
+                    f"Update check failed:\n{e}",
+                )
+            except Exception:
+                pass
+
 
     def _apply_settings(self):
         new_lang = self.lang_combo.currentData()
@@ -13836,7 +14050,7 @@ def main():
         if rolled_back:
             # Show a simple message box (QApplication not created yet, use raw)
             try:
-                from PyQt5.QtWidgets import QApplication, QMessageBox
+                # ⚠️ QApplication و QMessageBox از global import میان — دوباره import نکن!
                 _app = QApplication(sys.argv)
                 QMessageBox.warning(
                     None,
