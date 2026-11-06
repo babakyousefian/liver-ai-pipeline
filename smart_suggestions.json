@@ -1,0 +1,39 @@
+{
+    "users": {
+        "mobidik": {
+            "shown": [
+                "pdf_ready",
+                "gradcam_hint",
+                "repeated_grid",
+                "history_hint",
+                "image_ready",
+                "settings_hint",
+                "idle_help",
+                "dashboard_hint"
+            ],
+            "ignored": [],
+            "last_seen": "2026-11-06T05:59:05.682298"
+        },
+        "bobby": {
+            "shown": [
+                "pdf_ready",
+                "gradcam_hint",
+                "history_hint",
+                "dashboard_hint",
+                "repeated_grid",
+                "image_ready",
+                "idle_help",
+                "settings_hint"
+            ],
+            "ignored": [
+                "pdf_ready",
+                "history_hint",
+                "dashboard_hint",
+                "repeated_grid",
+                "idle_help",
+                "settings_hint"
+            ],
+            "last_seen": "2026-11-06T11:37:38.904506"
+        }
+    }
+}

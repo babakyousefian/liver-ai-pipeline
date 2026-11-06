@@ -42,6 +42,12 @@ from core.updater import (UpdateChecker, UpdateConfig, CURRENT_VERSION, is_newer
 from gui.dialogs.update_dialog import UpdateDialog
 from gui.widgets.update_badge import UpdateBadge
 
+# ✅ Password strength (optional)
+try:
+    from core.security import calculate_strength
+except Exception:
+    calculate_strength = None
+
 # ✅ Health-check imports (برای rollback خودکار)
 try:
     from core.updater.health import (
@@ -53,6 +59,114 @@ except ImportError:
     def check_update_pending(): return {}
     def rollback_if_needed(_data): return False
     def confirm_update_success(): pass
+
+# ✅ Preprocessing
+try:
+    from core.preprocessing.medical_preprocessor import (
+        preprocess_medical_image,
+        PreprocessResult,
+    )
+    HAS_PREPROCESSOR = True
+    print("✅ Medical Preprocessor available")
+except Exception as e:
+    print(f"⚠️ Medical Preprocessor not available: {e}")
+    HAS_PREPROCESSOR = False
+    preprocess_medical_image = None
+    PreprocessResult = None
+
+# ✅ Audit log
+try:
+    from core.audit import audit_log
+except Exception as e:
+    print(f"⚠️ audit_log import failed: {e}")
+    audit_log = None
+
+from core.ui.smart_suggestions import (
+    SuggestionStorage, Suggestion, SuggestionContext,
+    SuggestionEngine, SmartSuggestionBar,
+)
+
+from core.ui.onboarding import (
+    OnboardingStorage, OnboardingStep, OnboardingTour,
+    TOUR_STEPS_GUEST, TOUR_STEPS_FULL,
+)
+
+from core.ui.empty_state import (
+    make_empty_state_html, EmptyStateWidget,
+    EMPTY_STATE_STYLES, EmptyStateStyle,
+)
+
+from core.ui.micro_interactions import (
+    MotionSettings, shake_widget, add_focus_glow,
+    show_success_check, animate_count_up, button_press_scale,
+    smooth_scroll_to, bounce_in, color_pulse, page_transition_in,
+    decorate_input, decorate_button_press,
+    highlight_widget_error, highlight_widget_success,
+)
+
+from core.ui.confetti import (
+    ConfettiOverlay,
+    celebrate,
+    get_pattern_for,
+    CELEBRATION_PATTERNS,
+)
+
+# ✅ Voice Feedback
+try:
+    from core.ui.voice_feedback import VoiceManager
+    HAS_VOICE = True
+    print("✅ Voice Feedback available")
+except Exception as e:
+    print(f"⚠️ Voice Feedback not available: {e}")
+    VoiceManager = None
+    HAS_VOICE = False
+
+# ✅ Image Guard — Out-of-Distribution Detection
+try:
+    from core.security.image_guard import (
+        analyze_image as guard_analyze_image,
+        is_confident_result as guard_is_confident_result,
+        MIN_LIVER_SCORE,
+        MIN_MODEL_CONFIDENCE,
+    )
+    HAS_IMAGE_GUARD = True
+    print("✅ Image Guard available")
+except Exception as e:
+    print(f"⚠️ Image Guard not available: {e}")
+    HAS_IMAGE_GUARD = False
+    guard_analyze_image = None
+    guard_is_confident_result = None
+    MIN_LIVER_SCORE = 0.55
+    MIN_MODEL_CONFIDENCE = 0.55
+
+from core.ui.font_manager import (
+    FontSettings, FontManager,
+    load_font_settings, save_font_settings,
+    list_available_fonts, display_name_for,
+    DEFAULT_FAMILY, DEFAULT_SIZE, DEFAULT_SCALE,
+    MIN_SIZE, MAX_SIZE, MIN_SCALE, MAX_SCALE,
+)
+
+# ✅ Preprocessing (v1.3)
+try:
+    from core.preprocessing.medical_preprocessor import (
+        preprocess_medical_image,
+        PreprocessResult,
+    )
+    HAS_PREPROCESSOR = True
+    print("✅ Medical Preprocessor available")
+except Exception as e:
+    print(f"⚠️ Medical Preprocessor not available: {e}")
+    HAS_PREPROCESSOR = False
+    preprocess_medical_image = None
+    PreprocessResult = None
+
+from core.updater import (UpdateChecker, UpdateConfig, CURRENT_VERSION, is_newer,)
+from core.security.auto_lock import (
+    AutoLockConfig, AutoLockManager,
+    load_config as load_auto_lock_config,
+    save_config as save_auto_lock_config,
+)
 
 # ================================================================
 # ✅ PyQt5 Imports
@@ -70,13 +184,13 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import (
     Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect, QSize,
     QPoint, pyqtSignal, QParallelAnimationGroup, QSequentialAnimationGroup,
-    QThread, QMimeData, QObject, QRectF,
+    QThread, QMimeData, QObject, QRectF, QRegExp,
 )
 from PyQt5.QtGui import (
     QPixmap, QIcon, QFont, QColor, QPalette, QPainter, QBrush,
     QLinearGradient, QRadialGradient, QPen, QFontDatabase, QTransform,
     QDragEnterEvent, QDropEvent, QImage, QWheelEvent, QMouseEvent,
-    QKeySequence, QPainterPath, QCursor, QRegion, QPainterPath,
+    QKeySequence, QPainterPath, QCursor, QRegion, QPainterPath, QRegExpValidator,
 )
 from PyQt5.QtWidgets import QAction  # ✅ در PyQt5 اینجاست
 
@@ -405,6 +519,203 @@ TRANSLATIONS = {
         "install_failed": "Installation failed. Your old version is safe.",
         "download_failed": "Download failed.",
         "source_update_requires_zip": "Source update requires a .zip file.",
+        "session_locked": "Session Locked",
+        "locked_for_user": "Locked for {user}",
+        "unlock": "Unlock",
+        "session_unlocked": "Session unlocked",
+        "auto_lock_notice": "Session will lock after 2 minutes of inactivity.",
+        "audit_log_title": "Audit Log",
+        "audit_export": "Export",
+        "audit_exported": "Exported successfully",
+        "audit_export_failed": "Export failed",
+        "audit_search_placeholder": "Search actions or details...",
+        "audit_col_time": "Time",
+        "audit_col_level": "Level",
+        "audit_col_category": "Category",
+        "audit_col_action": "Action",
+        "audit_col_user": "User",
+        "audit_details_title": "Event Details",
+        "audit_status": "Showing {count} of {total} events",
+        # Level labels
+        "strength_very_weak": "Very Weak",
+        "strength_weak": "Weak",
+        "strength_medium": "Medium",
+        "strength_strong": "Strong",
+        "strength_very_strong": "Very Strong",
+
+        # Rules checklist
+        "strength_rule_length": "8-16 characters",
+        "strength_rule_lowercase": "Lowercase letter",
+        "strength_rule_uppercase": "Uppercase letter",
+        "strength_rule_digits": "Digits",
+        "strength_rule_special": "Special characters",
+
+        # Feedback
+        "strength_add_chars": "Add {n} more characters",
+        "strength_remove_chars": "Remove {n} characters",
+        "strength_need_digits": "Add {n} more digit(s)",
+        "strength_need_special": "Add {n} more special character(s)",
+        "strength_common_pattern": "Avoid common words",
+        "strength_common_year": "Avoid common years",
+        "strength_has_sequence": "Avoid sequences (1234, abcd)",
+        "strength_has_repeats": "Avoid repeats (aaaa, 1111)",
+
+        # Match indicator
+        "passwords_match": "Passwords match",
+        # (passwords_dont_match already exists)
+        "2fa_setup_title": "Enable Two-Factor Authentication",
+        "2fa_setup_subtitle": "Scan the QR code with Google Authenticator, Authy, or Microsoft Authenticator.",
+        "2fa_manual_secret": "Or enter this code manually:",
+        "2fa_enter_code": "Enter the 6-digit code from your app:",
+        "2fa_verify_btn": "Verify",
+        "2fa_backup_codes_title": "Save these backup codes!",
+        "2fa_backup_codes_hint": "Each code can be used once. Store them somewhere safe.",
+        "2fa_done_btn": "Done",
+        "2fa_secret_copied": "Secret copied to clipboard",
+        "2fa_invalid_code": "Invalid code. Please try again.",
+        "2fa_invalid_code_format": "Code must be 6 digits.",
+        "2fa_verify_title": "Two-Factor Authentication",
+        "2fa_verify_subtitle": "Enter the 6-digit code from your authenticator app.",
+        "2fa_enter_code_hint": "Please enter a code.",
+        "2fa_use_backup_code": "Use a backup code instead",
+        "2fa_use_totp_code": "Use authenticator code instead",
+        "2fa_enter_backup_code": "Enter one of your backup codes.",
+        "2fa_section_title": "Security",
+        "2fa_enabled_status": "Two-Factor Authentication is enabled",
+        "2fa_disabled_status": "Two-Factor Authentication is disabled",
+        "2fa_enable_btn": "Enable 2FA",
+        "2fa_disable_btn": "Disable 2FA",
+        "2fa_disable_title": "Disable 2FA",
+        "2fa_disable_confirm": "Are you sure? Your account will be less secure.",
+        "2fa_disabled_success": "Two-Factor Authentication disabled",
+        "2fa_enabled_success": "Two-Factor Authentication enabled",
+        "2fa_hint_title": "How to use this QR code",
+        "2fa_hint_step1": "Install an authenticator app: Google Authenticator, Microsoft Authenticator, or Authy.",
+        "2fa_hint_step2": "Open the app and tap the \"+\" button, then choose \"Scan QR code\".",
+        "2fa_hint_step3": "Point your phone's camera at the QR code above (use the app's camera, not your phone's camera app).",
+        "2fa_hint_step4": "The app will show a 6-digit code. Enter it in the box below.",
+        "2fa_manual_secret_hint": "Can't scan? Copy the key below and add it manually in your app (\"Enter a setup key\").",
+        "auto_lock_section_title": "Auto-Lock",
+        "auto_lock_enable": "Lock after inactivity",
+        "auto_lock_timeout_label": "Lock after:",
+        "auto_lock_warning_title": "Auto-Lock Warning",
+        "auto_lock_warning_body": "Your session will be locked in {seconds} seconds due to inactivity.",
+        "lock_now": "Lock Now",
+        "font_section_title": "Font",
+        "font_family_label": "Font family",
+        "font_size_label": "Base size",
+        "font_scale_label": "Display scale",
+        "font_scale_small": "Small",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Large",
+        "font_scale_xlarge": "Extra Large",
+        "font_scale_xxlarge": "Huge",
+        "font_preview_text": "The quick brown fox jumps over the lazy dog — 1234567890",
+        "font_reset": "Reset to Default",
+        "motion_section_title": "Motion & Animations",
+        "reduce_motion_label": "Reduce motion",
+        "reduce_motion_hint": "Disable animations if they make you uncomfortable.",
+        # ============================================================
+        # ✅ EMPTY STATE KEYS
+        # ============================================================
+        "empty_history_empty_title": "No history yet",
+        "empty_history_empty_subtitle": "Process your first image to see it here",
+        "empty_history_empty_hint": "Each result is saved automatically",
+        "empty_history_no_user_title": "Sign in to view history",
+        "empty_history_no_user_subtitle": "Your saved results will appear here",
+        "empty_history_no_user_hint": "History is private to each account",
+        "empty_dash_no_results_title": "No results yet",
+        "empty_dash_no_results_subtitle": "Your recent analyses will appear here",
+        "empty_dash_no_results_hint": "Process an image to get started",
+        "empty_dash_no_dist_title": "No distribution data",
+        "empty_dash_no_dist_subtitle": "Stats will populate as you process images",
+        "empty_dash_no_dist_hint": "Every analysis counts",
+        "empty_image_empty_title": "No image inserted",
+        "empty_image_empty_subtitle": "Drag & drop an image here, or click Insert",
+        "empty_image_empty_hint": "Supports PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Drop to analyze",
+        "empty_image_drop_hint_subtitle": "Release the image to load it",
+        "empty_image_drop_hint_hint": "We'll auto-detect the format",
+        "empty_processing_wait_title": "Processing...",
+        "empty_processing_wait_subtitle": "AI is analyzing your image",
+        "empty_processing_wait_hint": "This usually takes a few seconds",
+        # ============================================================
+        # ✅ ONBOARDING TOUR KEYS
+        # ============================================================
+        "tour_show_again": "Show Tour Again",
+        "tour_completed_msg": "Tour completed! You're ready to go.",
+        "tour_skipped_msg": "Tour skipped. You can replay it from Account menu.",
+        "tour_btn_next": "Next",
+        "tour_btn_prev": "Back",
+        "tour_btn_skip": "Skip",
+        "tour_btn_finish": "Finish ✓",
+        # Guest tour (2 steps)
+        "tour_guest_login_title": "Sign In",
+        "tour_guest_login_subtitle": "Click here to sign in to your account and unlock the full experience.",
+        "tour_guest_signup_title": "Create an Account",
+        "tour_guest_signup_subtitle": "New here? Click here to create an account in seconds.",
+        # Full tour
+        "tour_insert_title": "Insert Image",
+        "tour_insert_subtitle": "Load a sono image from disk, or drag & drop it anywhere on the window.",
+        "tour_process_title": "Process Image",
+        "tour_process_subtitle": "Run the AI analysis on the loaded image. Results appear in a few seconds.",
+        "tour_export_title": "Export PDF",
+        "tour_export_subtitle": "Save the current result as a professional PDF medical report.",
+        "tour_gradcam_title": "Attention Heatmap",
+        "tour_gradcam_subtitle": "Visualize where the AI is looking — a heatmap over the analyzed image.",
+        "tour_dashboard_title": "Dashboard",
+        "tour_dashboard_subtitle": "Toggle the stats panel: total images, average confidence, and grade distribution.",
+        "tour_history_title": "History",
+        "tour_history_subtitle": "Browse your last 20 analyzed images. Click any thumbnail to reload its result.",
+        "tour_visit_title": "Visit Webpage",
+        "tour_visit_subtitle": "Open the project's GitHub page in your browser for docs and updates.",
+        "tour_mute_title": "Mute Music",
+        "tour_mute_subtitle": "Pause or resume the background music at any time.",
+        "tour_zoom_title": "Zoom Controls",
+        "tour_zoom_subtitle": "Use the mouse wheel to zoom, drag to pan, and double-click to reset.",
+        "tour_account_title": "Account Menu",
+        "tour_account_subtitle": "Click here to access Settings, Account Info, Audit Log, and more.",
+        # ✅ Smart Suggestions
+        "suggestion_image_ready":      "Image loaded — ready to process",
+        "suggestion_image_ready_sub":  "Click Process to run the AI analysis.",
+        "suggestion_pdf_ready":        "Result ready — export as PDF?",
+        "suggestion_pdf_ready_sub":    "Save a professional medical report in one click.",
+        "suggestion_gradcam_hint":     "Curious what the AI saw?",
+        "suggestion_gradcam_hint_sub": "See the attention heatmap over the image.",
+        "suggestion_repeated_grid":    "You keep getting {grid}",
+        "suggestion_repeated_grid_sub":"Open the dashboard to see the distribution.",
+        "suggestion_history_hint":     "Your history is building up",
+        "suggestion_history_hint_sub": "Browse your last 20 analyzed images.",
+        "suggestion_dashboard_hint":   "Your dashboard has interesting stats",
+        "suggestion_dashboard_hint_sub":"See totals, averages, and distribution at a glance.",
+        "suggestion_settings_hint":    "Personalize the app",
+        "suggestion_settings_hint_sub":"Change language, theme, font, and enable 2FA.",
+        "suggestion_idle_help":        "Need a quick guide?",
+        "suggestion_idle_help_sub":    "Replay the onboarding tour anytime.",
+        "image_not_liver_warning": "This image does not look like a liver ultrasound.\n\nPlease insert a proper liver ultrasound image.",
+        "result_not_confident": "The AI could not confidently identify this image as a liver ultrasound.\n\nPlease insert a proper liver ultrasound image and try again.",
+        "not_liver_title": "Not a Liver Ultrasound",
+        "not_liver_hint": "Please use a proper liver ultrasound (sonogram) image",
+        # ✅ Voice Feedback keys
+        "voice_welcome": "Welcome, {user}",
+        "voice_goodbye": "Goodbye",
+        "voice_logged_out": "Logged out successfully",
+        "voice_image_loaded": "Image loaded successfully",
+        "voice_image_rejected": "This is not a liver ultrasound image",
+        "voice_inference_result": "{grid_name}, confidence {conf} percent",
+        "voice_pdf_saved": "PDF report saved successfully",
+        "voice_error": "An error occurred",
+        "voice_settings_applied": "Settings applied",
+        "voice_language_changed": "Language changed to {lang}",
+        "voice_theme_changed": "Theme changed",
+        "voice_2fa_enabled": "Two factor authentication enabled",
+        "voice_2fa_disabled": "Two factor authentication disabled",
+        "voice_locked": "Session locked",
+        "voice_unlocked": "Session unlocked",
+        "voice_processing": "Processing image",
+        "voice_processing_done": "Processing complete",
+        "voice_voice_enabled": "Voice feedback enabled",
+        "voice_voice_disabled": "Voice feedback disabled",
     },
     "Persian": {
         "app_title": "هوش مصنوعی کبد، بابک",
@@ -611,6 +922,198 @@ TRANSLATIONS = {
         "install_failed": "نصب ناموفق بود. نسخه‌ی قبلی شما سالم است.",
         "download_failed": "دانلود ناموفق بود.",
         "source_update_requires_zip": "به‌روزرسانی منبع نیاز به فایل .zip دارد.",
+        "session_locked": "نشست قفل شد",
+        "locked_for_user": "قفل شده برای {user}",
+        "unlock": "باز کردن قفل",
+        "session_unlocked": "نشست باز شد",
+        "auto_lock_notice": "نشست بعد از ۲ دقیقه بی‌تحرکی قفل می‌شود.",
+        "audit_log_title": "گزارش فعالیت‌ها",
+        "audit_export": "خروجی",
+        "audit_exported": "با موفقیت صادر شد",
+        "audit_export_failed": "خروجی ناموفق بود",
+        "audit_search_placeholder": "جستجو در فعالیت‌ها یا جزئیات...",
+        "audit_col_time": "زمان",
+        "audit_col_level": "سطح",
+        "audit_col_category": "دسته",
+        "audit_col_action": "فعالیت",
+        "audit_col_user": "کاربر",
+        "audit_details_title": "جزئیات رویداد",
+        "audit_status": "نمایش {count} از {total} رویداد",
+        "strength_very_weak": "خیلی ضعیف",
+        "strength_weak": "ضعیف",
+        "strength_medium": "متوسط",
+        "strength_strong": "قوی",
+        "strength_very_strong": "خیلی قوی",
+
+        "strength_rule_length": "۸ تا ۱۶ کاراکتر",
+        "strength_rule_lowercase": "حرف کوچک",
+        "strength_rule_uppercase": "حرف بزرگ",
+        "strength_rule_digits": "عدد",
+        "strength_rule_special": "کاراکتر خاص",
+
+        "strength_add_chars": "{n} کاراکتر دیگر اضافه کنید",
+        "strength_remove_chars": "{n} کاراکتر حذف کنید",
+        "strength_need_digits": "{n} عدد دیگر اضافه کنید",
+        "strength_need_special": "{n} کاراکتر خاص دیگر اضافه کنید",
+        "strength_common_pattern": "از کلمات رایج اجتناب کنید",
+        "strength_common_year": "از سال‌های رایج اجتناب کنید",
+        "strength_has_sequence": "از دنباله‌ها (1234، abcd) اجتناب کنید",
+        "strength_has_repeats": "از تکرارها (aaaa، 1111) اجتناب کنید",
+
+        "passwords_match": "رمزهای عبور مطابقت دارند",
+        "2fa_setup_title": "فعال‌سازی احراز هویت دو مرحله‌ای",
+        "2fa_setup_subtitle": "کد QR را با Google Authenticator، Authy یا Microsoft Authenticator اسکن کنید.",
+        "2fa_manual_secret": "یا این کد را دستی وارد کنید:",
+        "2fa_enter_code": "کد ۶ رقمی برنامه را وارد کنید:",
+        "2fa_verify_btn": "تأیید",
+        "2fa_backup_codes_title": "این کدهای پشتیبان را ذخیره کنید!",
+        "2fa_backup_codes_hint": "هر کد فقط یک‌بار قابل استفاده است. آن‌ها را جای امنی نگه دارید.",
+        "2fa_done_btn": "تمام",
+        "2fa_secret_copied": "کد در کلیپ‌بورد کپی شد",
+        "2fa_invalid_code": "کد نامعتبر است. دوباره تلاش کنید.",
+        "2fa_invalid_code_format": "کد باید ۶ رقم باشد.",
+        "2fa_verify_title": "احراز هویت دو مرحله‌ای",
+        "2fa_verify_subtitle": "کد ۶ رقمی برنامه Authenticator را وارد کنید.",
+        "2fa_enter_code_hint": "لطفاً یک کد وارد کنید.",
+        "2fa_use_backup_code": "استفاده از کد پشتیبان",
+        "2fa_use_totp_code": "استفاده از کد Authenticator",
+        "2fa_enter_backup_code": "یکی از کدهای پشتیبان را وارد کنید.",
+        "2fa_section_title": "امنیت",
+        "2fa_enabled_status": "احراز هویت دو مرحله‌ای فعال است",
+        "2fa_disabled_status": "احراز هویت دو مرحله‌ای غیرفعال است",
+        "2fa_enable_btn": "فعال‌سازی 2FA",
+        "2fa_disable_btn": "غیرفعال‌سازی 2FA",
+        "2fa_disable_title": "غیرفعال‌سازی 2FA",
+        "2fa_disable_confirm": "آیا مطمئنید؟ حساب شما کمتر امن خواهد بود.",
+        "2fa_disabled_success": "احراز هویت دو مرحله‌ای غیرفعال شد",
+        "2fa_enabled_success": "احراز هویت دو مرحله‌ای فعال شد",
+        "2fa_hint_title": "نحوه استفاده از این QR Code",
+        "2fa_hint_step1": "یه اپلیکیشن Authenticator نصب کن: Google Authenticator، Microsoft Authenticator، یا Authy.",
+        "2fa_hint_step2": "اپ رو باز کن، روی دکمه‌ی \"+\" بزن، بعد \"Scan QR code\" رو انتخاب کن.",
+        "2fa_hint_step3": "دوربین گوشی رو بگیر سمت QR Code بالا (از دوربین خود اپ استفاده کن، نه دوربین پیش‌فرض گوشی).",
+        "2fa_hint_step4": "اپ یه کد ۶ رقمی نشون می‌ده. اون رو توی کادر زیر وارد کن.",
+        "2fa_manual_secret_hint": "نمی‌تونی اسکن کنی؟ کد زیر رو کپی کن و دستی توی اپ اضافه کن (\"Enter a setup key\").",
+        "auto_lock_section_title": "قفل خودکار",
+        "auto_lock_enable": "قفل کردن بعد از بی‌تحرکی",
+        "auto_lock_timeout_label": "قفل کردن بعد از:",
+        "auto_lock_warning_title": "هشدار قفل خودکار",
+        "auto_lock_warning_body": "نشست شما به دلیل بی‌تحرکی تا {seconds} ثانیه‌ی دیگر قفل می‌شود.",
+        "lock_now": "قفل کردن فوری",
+        "font_section_title": "فونت",
+        "font_family_label": "نوع فونت",
+        "font_size_label": "اندازه‌ی پایه",
+        "font_scale_label": "مقیاس نمایش",
+        "font_scale_small": "کوچک",
+        "font_scale_normal": "معمولی",
+        "font_scale_large": "بزرگ",
+        "font_scale_xlarge": "خیلی بزرگ",
+        "font_scale_xxlarge": "عظیم",
+        "font_preview_text": "این یک متن نمونه برای پیش‌نمایش فونت است — ۱۲۳۴۵۶۷۸۹۰",
+        "font_reset": "بازگشت به پیش‌فرض",
+        "font_applied": "فونت به‌روزرسانی شد",
+        "motion_section_title": "حرکت و انیمیشن",
+        "reduce_motion_label": "کاهش حرکت",
+        "reduce_motion_hint": "اگه انیمیشن‌ها باعث ناراحتی می‌شن، خاموششون کن.",
+        # ============================================================
+        # ✅ EMPTY STATE KEYS
+        # ============================================================
+        "empty_history_empty_title": "هنوز تاریخچه‌ای نیست",
+        "empty_history_empty_subtitle": "اولین تصویرت رو پردازش کن تا اینجا ببینی",
+        "empty_history_empty_hint": "هر نتیجه به‌صورت خودکار ذخیره می‌شه",
+        "empty_history_no_user_title": "برای دیدن تاریخچه وارد شو",
+        "empty_history_no_user_subtitle": "نتایج ذخیره‌شده‌ت اینجا ظاهر می‌شن",
+        "empty_history_no_user_hint": "تاریخچه برای هر حساب خصوصیه",
+        "empty_dash_no_results_title": "هنوز نتیجه‌ای نیست",
+        "empty_dash_no_results_subtitle": "تحلیل‌های اخیرت اینجا نمایش داده می‌شن",
+        "empty_dash_no_results_hint": "برای شروع یه تصویر پردازش کن",
+        "empty_dash_no_dist_title": "داده‌ی توزیعی نیست",
+        "empty_dash_no_dist_subtitle": "با پردازش تصاویر، آمار پر می‌شه",
+        "empty_dash_no_dist_hint": "هر تحلیل مهمه",
+        "empty_image_empty_title": "تصویری وارد نشده",
+        "empty_image_empty_subtitle": "تصویر رو اینجا رها کن، یا روی «درج تصویر» کلیک کن",
+        "empty_image_empty_hint": "پشتیبانی از PNG، JPG، JPEG، BMP، DCM",
+        "empty_image_drop_hint_title": "برای تحلیل رها کن",
+        "empty_image_drop_hint_subtitle": "تصویر رو رها کن تا لود بشه",
+        "empty_image_drop_hint_hint": "فرمت به‌صورت خودکار تشخیص داده می‌شه",
+        "empty_processing_wait_title": "در حال پردازش...",
+        "empty_processing_wait_subtitle": "هوش مصنوعی در حال تحلیل تصویره",
+        "empty_processing_wait_hint": "معمولاً چند ثانیه طول می‌کشه",
+        # ============================================================
+        # ✅ ONBOARDING TOUR KEYS
+        # ============================================================
+        "tour_show_again": "نمایش مجدد تور",
+        "tour_completed_msg": "تور کامل شد! آماده‌ای برای شروع.",
+        "tour_skipped_msg": "تور رد شد. می‌تونی از منوی حساب دوباره ببینیش.",
+        "tour_btn_next": "بعدی",
+        "tour_btn_prev": "قبلی",
+        "tour_btn_skip": "رد کردن",
+        "tour_btn_finish": "پایان ✓",
+        # Guest tour (2 steps)
+        "tour_guest_login_title": "ورود به حساب",
+        "tour_guest_login_subtitle": "برای ورود به حسابت و دسترسی به همه‌ی امکانات، اینجا کلیک کن.",
+        "tour_guest_signup_title": "ساخت حساب جدید",
+        "tour_guest_signup_subtitle": "تازه‌واردی؟ اینجا کلیک کن تا در چند ثانیه حساب بسازی.",
+        # Full tour
+        "tour_insert_title": "درج تصویر",
+        "tour_insert_subtitle": "یه تصویر سونوگرافی از دیسک بارگذاری کن، یا هر جای پنجره رهاش کن.",
+        "tour_process_title": "پردازش تصویر",
+        "tour_process_subtitle": "تحلیل هوش مصنوعی روی تصویر بارگذاری‌شده رو اجرا کن. نتیجه در چند ثانیه ظاهر می‌شه.",
+        "tour_export_title": "خروجی PDF",
+        "tour_export_subtitle": "نتیجه‌ی فعلی رو به‌صورت یه گزارش PDF پزشکی حرفه‌ای ذخیره کن.",
+        "tour_gradcam_title": "نقشه‌ی توجه",
+        "tour_gradcam_subtitle": "ببین هوش مصنوعی کجای تصویر رو نگاه می‌کنه — یه نقشه‌ی حرارتی روی تصویر.",
+        "tour_dashboard_title": "داشبورد",
+        "tour_dashboard_subtitle": "پنل آمار رو باز/بسته کن: کل تصاویر، میانگین اطمینان، و توزیع درجات.",
+        "tour_history_title": "تاریخچه",
+        "tour_history_subtitle": "۲۰ تصویر آخر تحلیل‌شده رو مرور کن. روی هر thumbnail کلیک کن تا نتیجه‌ش رو دوباره ببینی.",
+        "tour_visit_title": "مشاهده وب‌سایت",
+        "tour_visit_subtitle": "صفحه‌ی GitHub پروژه رو در مرورگر باز کن برای مستندات و آپدیت‌ها.",
+        "tour_mute_title": "بی‌صدا کردن موسیقی",
+        "tour_mute_subtitle": "هر زمان خواستی موسیقی پس‌زمینه رو متوقف یا از سر بگیر.",
+        "tour_zoom_title": "کنترل زوم",
+        "tour_zoom_subtitle": "با چرخ ماوس زوم کن، با درگ جابه‌جا کن، و با دابل‌کلیک ریست کن.",
+        "tour_account_title": "منوی حساب",
+        "tour_account_subtitle": "اینجا کلیک کن تا به تنظیمات، اطلاعات حساب، گزارش فعالیت‌ها، و بیشتر دسترسی داشته باشی.",
+        # ✅ Smart Suggestions
+        "suggestion_image_ready":      "تصویر آماده‌ست، پردازش کن؟",
+        "suggestion_image_ready_sub":  "روی پردازش بزن تا تحلیل AI اجرا بشه.",
+        "suggestion_pdf_ready":        "خروجی PDF بگیر؟",
+        "suggestion_pdf_ready_sub":    "گزارش پزشکی حرفه‌ای رو با یه کلیک ذخیره کن.",
+        "suggestion_gradcam_hint":     "نقشه‌ی توجه رو ببین؟",
+        "suggestion_gradcam_hint_sub": "ببین AI کجای تصویر رو نگاه کرده.",
+        "suggestion_repeated_grid":    "همیشه {grid} می‌گیری",
+        "suggestion_repeated_grid_sub":"داشبورد رو باز کن تا توزیع رو ببینی.",
+        "suggestion_history_hint":     "تاریخچه‌ت رو ببین",
+        "suggestion_history_hint_sub": "۲۰ تصویر آخر تحلیل‌شده‌ت رو مرور کن.",
+        "suggestion_dashboard_hint":   "داشبورد آمار جالبی داره",
+        "suggestion_dashboard_hint_sub":"مجموع، میانگین و توزیع رو یه نگاه ببین.",
+        "suggestion_settings_hint":    "تنظیمات رو شخصی‌سازی کن",
+        "suggestion_settings_hint_sub":"زبان، تم، فونت رو عوض کن و 2FA رو فعال کن.",
+        "suggestion_idle_help":        "راهنمای سریع می‌خوای؟",
+        "suggestion_idle_help_sub":    "هر وقت خواستی تور آنبوردینگ رو دوباره ببین.",
+        "image_not_liver_warning": "این تصویر شبیه سونوگرافی کبد نیست.\n\nلطفاً یک تصویر سونوگرافی کبد وارد کنید.",
+        "result_not_confident": "هوش مصنوعی نتوانست با اطمینان این تصویر را به عنوان سونوگرافی کبد شناسایی کند.\n\nلطفاً یک تصویر سونوگرافی کبد وارد کنید و دوباره تلاش کنید.",
+        "not_liver_title": "سونوگرافی کبد نیست",
+        "not_liver_hint": "لطفاً از یک تصویر سونوگرافی کبد استفاده کنید",
+        "voice_welcome": "خوش آمدی، {user}",
+        "voice_goodbye": "خداحافظ",
+        "voice_logged_out": "با موفقیت خارج شدید",
+        "voice_image_loaded": "تصویر با موفقیت بارگذاری شد",
+        "voice_image_rejected": "این تصویر سونوگرافی کبد نیست",
+        "voice_inference_result": "{grid_name}، اطمینان {conf} درصد",
+        "voice_pdf_saved": "گزارش PDF با موفقیت ذخیره شد",
+        "voice_error": "خطایی رخ داد",
+        "voice_settings_applied": "تنظیمات اعمال شد",
+        "voice_language_changed": "زبان به {lang} تغییر کرد",
+        "voice_theme_changed": "تم تغییر کرد",
+        "voice_2fa_enabled": "احراز هویت دو مرحله‌ای فعال شد",
+        "voice_2fa_disabled": "احراز هویت دو مرحله‌ای غیرفعال شد",
+        "voice_locked": "نشست قفل شد",
+        "voice_unlocked": "نشست باز شد",
+        "voice_processing": "در حال پردازش تصویر",
+        "voice_processing_done": "پردازش کامل شد",
+        "voice_voice_enabled": "صداگذاری فعال شد",
+        "voice_voice_disabled": "صداگذاری غیرفعال شد",
     },
     "USA": {
         "app_title": "Liver AI-babak",
@@ -810,6 +1313,187 @@ TRANSLATIONS = {
         "install_failed": "Installation failed. Your old version is safe.",
         "download_failed": "Download failed.",
         "source_update_requires_zip": "Source update requires a .zip file.",
+        "session_locked": "Session Locked",
+        "locked_for_user": "Locked for {user}",
+        "unlock": "Unlock",
+        "session_unlocked": "Session unlocked",
+        "auto_lock_notice": "Session will lock after 2 minutes of inactivity.",
+        "audit_log_title": "Audit Log",
+        "audit_export": "Export",
+        "audit_exported": "Exported successfully",
+        "audit_export_failed": "Export failed",
+        "audit_search_placeholder": "Search actions or details...",
+        "audit_col_time": "Time",
+        "audit_col_level": "Level",
+        "audit_col_category": "Category",
+        "audit_col_action": "Action",
+        "audit_col_user": "User",
+        "audit_details_title": "Event Details",
+        "audit_status": "Showing {count} of {total} events",
+        "strength_very_weak": "Very Weak",
+        "strength_weak": "Weak",
+        "strength_medium": "Medium",
+        "strength_strong": "Strong",
+        "strength_very_strong": "Very Strong",
+        "strength_rule_length": "8-16 characters",
+        "strength_rule_lowercase": "Lowercase letter",
+        "strength_rule_uppercase": "Uppercase letter",
+        "strength_rule_digits": "Digits",
+        "strength_rule_special": "Special characters",
+        "strength_add_chars": "Add {n} more characters",
+        "strength_remove_chars": "Remove {n} characters",
+        "strength_need_digits": "Add {n} more digit(s)",
+        "strength_need_special": "Add {n} more special character(s)",
+        "strength_common_pattern": "Avoid common words",
+        "strength_common_year": "Avoid common years",
+        "strength_has_sequence": "Avoid sequences (1234, abcd)",
+        "strength_has_repeats": "Avoid repeats (aaaa, 1111)",
+        "passwords_match": "Passwords match",
+        "2fa_setup_title": "Enable Two-Factor Authentication",
+        "2fa_setup_subtitle": "Scan the QR code with Google Authenticator, Authy, or Microsoft Authenticator.",
+        "2fa_manual_secret": "Or enter this code manually:",
+        "2fa_enter_code": "Enter the 6-digit code from your app:",
+        "2fa_verify_btn": "Verify",
+        "2fa_backup_codes_title": "Save these backup codes!",
+        "2fa_backup_codes_hint": "Each code can be used once. Store them somewhere safe.",
+        "2fa_done_btn": "Done",
+        "2fa_secret_copied": "Secret copied to clipboard",
+        "2fa_invalid_code": "Invalid code. Please try again.",
+        "2fa_invalid_code_format": "Code must be 6 digits.",
+        "2fa_verify_title": "Two-Factor Authentication",
+        "2fa_verify_subtitle": "Enter the 6-digit code from your authenticator app.",
+        "2fa_enter_code_hint": "Please enter a code.",
+        "2fa_use_backup_code": "Use a backup code instead",
+        "2fa_use_totp_code": "Use authenticator code instead",
+        "2fa_enter_backup_code": "Enter one of your backup codes.",
+        "2fa_section_title": "Security",
+        "2fa_enabled_status": "Two-Factor Authentication is enabled",
+        "2fa_disabled_status": "Two-Factor Authentication is disabled",
+        "2fa_enable_btn": "Enable 2FA",
+        "2fa_disable_btn": "Disable 2FA",
+        "2fa_disable_title": "Disable 2FA",
+        "2fa_disable_confirm": "Are you sure? Your account will be less secure.",
+        "2fa_disabled_success": "Two-Factor Authentication disabled",
+        "2fa_enabled_success": "Two-Factor Authentication enabled",
+        "2fa_hint_title": "How to use this QR code",
+        "2fa_hint_step1": "Install an authenticator app: Google Authenticator, Microsoft Authenticator, or Authy.",
+        "2fa_hint_step2": "Open the app and tap the \"+\" button, then choose \"Scan QR code\".",
+        "2fa_hint_step3": "Point your phone's camera at the QR code above (use the app's camera, not your phone's camera app).",
+        "2fa_hint_step4": "The app will show a 6-digit code. Enter it in the box below.",
+        "2fa_manual_secret_hint": "Can't scan? Copy the key below and add it manually in your app (\"Enter a setup key\").",
+        "auto_lock_section_title": "Auto-Lock",
+        "auto_lock_enable": "Lock after inactivity",
+        "auto_lock_timeout_label": "Lock after:",
+        "auto_lock_warning_title": "Auto-Lock Warning",
+        "auto_lock_warning_body": "Your session will be locked in {seconds} seconds due to inactivity.",
+        "lock_now": "Lock Now",
+        "font_section_title": "Font",
+        "font_family_label": "Font family",
+        "font_size_label": "Base size",
+        "font_scale_label": "Display scale",
+        "font_scale_small": "Small",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Large",
+        "font_scale_xlarge": "Extra Large",
+        "font_scale_xxlarge": "Huge",
+        "font_preview_text": "The quick brown fox jumps over the lazy dog — 1234567890",
+        "font_reset": "Reset to Default",
+        "font_applied": "Font updated",
+        "motion_section_title": "Motion & Animations",
+        "reduce_motion_label": "Reduce motion",
+        "reduce_motion_hint": "Disable animations if they make you uncomfortable.",
+        "empty_history_empty_title": "No history yet",
+        "empty_history_empty_subtitle": "Process your first image to see it here",
+        "empty_history_empty_hint": "Each result is saved automatically",
+        "empty_history_no_user_title": "Sign in to view history",
+        "empty_history_no_user_subtitle": "Your saved results will appear here",
+        "empty_history_no_user_hint": "History is private to each account",
+        "empty_dash_no_results_title": "No results yet",
+        "empty_dash_no_results_subtitle": "Your recent analyses will appear here",
+        "empty_dash_no_results_hint": "Process an image to get started",
+        "empty_dash_no_dist_title": "No distribution data",
+        "empty_dash_no_dist_subtitle": "Stats will populate as you process images",
+        "empty_dash_no_dist_hint": "Every analysis counts",
+        "empty_image_empty_title": "No image inserted",
+        "empty_image_empty_subtitle": "Drag & drop an image here, or click Insert",
+        "empty_image_empty_hint": "Supports PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Drop to analyze",
+        "empty_image_drop_hint_subtitle": "Release the image to load it",
+        "empty_image_drop_hint_hint": "We'll auto-detect the format",
+        "empty_processing_wait_title": "Processing...",
+        "empty_processing_wait_subtitle": "AI is analyzing your image",
+        "empty_processing_wait_hint": "This usually takes a few seconds",
+        "tour_show_again": "Show Tour Again",
+        "tour_completed_msg": "Tour completed! You're ready to go.",
+        "tour_skipped_msg": "Tour skipped. You can replay it from Account menu.",
+        "tour_btn_next": "Next",
+        "tour_btn_prev": "Back",
+        "tour_btn_skip": "Skip",
+        "tour_btn_finish": "Finish ✓",
+        "tour_guest_login_title": "Sign In",
+        "tour_guest_login_subtitle": "Click here to sign in to your account and unlock the full experience.",
+        "tour_guest_signup_title": "Create an Account",
+        "tour_guest_signup_subtitle": "New here? Click here to create an account in seconds.",
+        "tour_insert_title": "Insert Image",
+        "tour_insert_subtitle": "Load a sono image from disk, or drag & drop it anywhere on the window.",
+        "tour_process_title": "Process Image",
+        "tour_process_subtitle": "Run the AI analysis on the loaded image. Results appear in a few seconds.",
+        "tour_export_title": "Export PDF",
+        "tour_export_subtitle": "Save the current result as a professional PDF medical report.",
+        "tour_gradcam_title": "Attention Heatmap",
+        "tour_gradcam_subtitle": "Visualize where the AI is looking — a heatmap over the analyzed image.",
+        "tour_dashboard_title": "Dashboard",
+        "tour_dashboard_subtitle": "Toggle the stats panel: total images, average confidence, and grade distribution.",
+        "tour_history_title": "History",
+        "tour_history_subtitle": "Browse your last 20 analyzed images. Click any thumbnail to reload its result.",
+        "tour_visit_title": "Visit Webpage",
+        "tour_visit_subtitle": "Open the project's GitHub page in your browser for docs and updates.",
+        "tour_mute_title": "Mute Music",
+        "tour_mute_subtitle": "Pause or resume the background music at any time.",
+        "tour_zoom_title": "Zoom Controls",
+        "tour_zoom_subtitle": "Use the mouse wheel to zoom, drag to pan, and double-click to reset.",
+        "tour_account_title": "Account Menu",
+        "tour_account_subtitle": "Click here to access Settings, Account Info, Audit Log, and more.",
+        "suggestion_image_ready":      "Image loaded — ready to process",
+        "suggestion_image_ready_sub":  "Click Process to run the AI analysis.",
+        "suggestion_pdf_ready":        "Result ready — export as PDF?",
+        "suggestion_pdf_ready_sub":    "Save a professional medical report in one click.",
+        "suggestion_gradcam_hint":     "Curious what the AI saw?",
+        "suggestion_gradcam_hint_sub": "See the attention heatmap over the image.",
+        "suggestion_repeated_grid":    "You keep getting {grid}",
+        "suggestion_repeated_grid_sub":"Open the dashboard to see the distribution.",
+        "suggestion_history_hint":     "Your history is building up",
+        "suggestion_history_hint_sub": "Browse your last 20 analyzed images.",
+        "suggestion_dashboard_hint":   "Your dashboard has interesting stats",
+        "suggestion_dashboard_hint_sub":"See totals, averages, and distribution at a glance.",
+        "suggestion_settings_hint":    "Personalize the app",
+        "suggestion_settings_hint_sub":"Change language, theme, font, and enable 2FA.",
+        "suggestion_idle_help":        "Need a quick guide?",
+        "suggestion_idle_help_sub":    "Replay the onboarding tour anytime.",
+        "image_not_liver_warning": "This image does not look like a liver ultrasound.\n\nPlease insert a proper liver ultrasound image.",
+        "result_not_confident": "The AI could not confidently identify this image as a liver ultrasound.\n\nPlease insert a proper liver ultrasound image and try again.",
+        "not_liver_title": "Not a Liver Ultrasound",
+        "not_liver_hint": "Please use a proper liver ultrasound (sonogram) image",
+        # ✅ Voice Feedback keys
+        "voice_welcome": "Welcome, {user}",
+        "voice_goodbye": "Goodbye",
+        "voice_logged_out": "Logged out successfully",
+        "voice_image_loaded": "Image loaded successfully",
+        "voice_image_rejected": "This is not a liver ultrasound image",
+        "voice_inference_result": "{grid_name}, confidence {conf} percent",
+        "voice_pdf_saved": "PDF report saved successfully",
+        "voice_error": "An error occurred",
+        "voice_settings_applied": "Settings applied",
+        "voice_language_changed": "Language changed to {lang}",
+        "voice_theme_changed": "Theme changed",
+        "voice_2fa_enabled": "Two factor authentication enabled",
+        "voice_2fa_disabled": "Two factor authentication disabled",
+        "voice_locked": "Session locked",
+        "voice_unlocked": "Session unlocked",
+        "voice_processing": "Processing image",
+        "voice_processing_done": "Processing complete",
+        "voice_voice_enabled": "Voice feedback enabled",
+        "voice_voice_disabled": "Voice feedback disabled",
     },
     "France": {
         "app_title": "Pipeline IA du Foie",
@@ -1009,6 +1693,186 @@ TRANSLATIONS = {
         "install_failed": "L'installation a échoué. Votre ancienne version est intacte.",
         "download_failed": "Le téléchargement a échoué.",
         "source_update_requires_zip": "La mise à jour source nécessite un fichier .zip.",
+        "session_locked": "Session Verrouillée",
+        "locked_for_user": "Verrouillée pour {user}",
+        "unlock": "Déverrouiller",
+        "session_unlocked": "Session déverrouillée",
+        "auto_lock_notice": "La session se verrouillera après 2 minutes d'inactivité.",
+        "audit_log_title": "Journal d'audit",
+        "audit_export": "Exporter",
+        "audit_exported": "Exporté avec succès",
+        "audit_export_failed": "Échec de l'exportation",
+        "audit_search_placeholder": "Rechercher des actions ou des détails...",
+        "audit_col_time": "Heure",
+        "audit_col_level": "Niveau",
+        "audit_col_category": "Catégorie",
+        "audit_col_action": "Action",
+        "audit_col_user": "Utilisateur",
+        "audit_details_title": "Détails de l'événement",
+        "audit_status": "Affichage de {count} sur {total} événements",
+        "strength_very_weak": "Très faible",
+        "strength_weak": "Faible",
+        "strength_medium": "Moyen",
+        "strength_strong": "Fort",
+        "strength_very_strong": "Très fort",
+        "strength_rule_length": "8-16 caractères",
+        "strength_rule_lowercase": "Lettre minuscule",
+        "strength_rule_uppercase": "Lettre majuscule",
+        "strength_rule_digits": "Chiffres",
+        "strength_rule_special": "Caractères spéciaux",
+        "strength_add_chars": "Ajoutez {n} caractère(s) de plus",
+        "strength_remove_chars": "Retirez {n} caractère(s)",
+        "strength_need_digits": "Ajoutez {n} chiffre(s) de plus",
+        "strength_need_special": "Ajoutez {n} caractère(s) spécial(aux) de plus",
+        "strength_common_pattern": "Évitez les mots courants",
+        "strength_common_year": "Évitez les années courantes",
+        "strength_has_sequence": "Évitez les séquences (1234, abcd)",
+        "strength_has_repeats": "Évitez les répétitions (aaaa, 1111)",
+        "passwords_match": "Les mots de passe correspondent",
+        "2fa_setup_title": "Activer l'authentification à deux facteurs",
+        "2fa_setup_subtitle": "Scannez le code QR avec Google Authenticator, Authy ou Microsoft Authenticator.",
+        "2fa_manual_secret": "Ou saisissez ce code manuellement :",
+        "2fa_enter_code": "Saisissez le code à 6 chiffres de votre application :",
+        "2fa_verify_btn": "Vérifier",
+        "2fa_backup_codes_title": "Enregistrez ces codes de secours !",
+        "2fa_backup_codes_hint": "Chaque code ne peut être utilisé qu'une seule fois. Conservez-les en lieu sûr.",
+        "2fa_done_btn": "Terminé",
+        "2fa_secret_copied": "Code secret copié dans le presse-papiers",
+        "2fa_invalid_code": "Code invalide. Veuillez réessayer.",
+        "2fa_invalid_code_format": "Le code doit comporter 6 chiffres.",
+        "2fa_verify_title": "Authentification à deux facteurs",
+        "2fa_verify_subtitle": "Saisissez le code à 6 chiffres de votre application d'authentification.",
+        "2fa_enter_code_hint": "Veuillez saisir un code.",
+        "2fa_use_backup_code": "Utiliser un code de secours",
+        "2fa_use_totp_code": "Utiliser le code de l'application",
+        "2fa_enter_backup_code": "Saisissez l'un de vos codes de secours.",
+        "2fa_section_title": "Sécurité",
+        "2fa_enabled_status": "L'authentification à deux facteurs est activée",
+        "2fa_disabled_status": "L'authentification à deux facteurs est désactivée",
+        "2fa_enable_btn": "Activer 2FA",
+        "2fa_disable_btn": "Désactiver 2FA",
+        "2fa_disable_title": "Désactiver 2FA",
+        "2fa_disable_confirm": "Êtes-vous sûr ? Votre compte sera moins sécurisé.",
+        "2fa_disabled_success": "Authentification à deux facteurs désactivée",
+        "2fa_enabled_success": "Authentification à deux facteurs activée",
+        "2fa_hint_title": "Comment utiliser ce QR code",
+        "2fa_hint_step1": "Installez une application d'authentification : Google Authenticator, Microsoft Authenticator ou Authy.",
+        "2fa_hint_step2": "Ouvrez l'application, appuyez sur le bouton « + », puis choisissez « Scanner le QR code ».",
+        "2fa_hint_step3": "Pointez la caméra de votre téléphone vers le QR code ci-dessus (utilisez la caméra de l'application, pas celle de votre téléphone).",
+        "2fa_hint_step4": "L'application affichera un code à 6 chiffres. Saisissez-le dans la case ci-dessous.",
+        "2fa_manual_secret_hint": "Vous ne pouvez pas scanner ? Copiez la clé ci-dessous et ajoutez-la manuellement dans votre application (« Saisir une clé de configuration »).",
+        "auto_lock_section_title": "Verrouillage automatique",
+        "auto_lock_enable": "Verrouiller après inactivité",
+        "auto_lock_timeout_label": "Verrouiller après :",
+        "auto_lock_warning_title": "Avertissement de verrouillage",
+        "auto_lock_warning_body": "Votre session sera verrouillée dans {seconds} secondes en raison d'inactivité.",
+        "lock_now": "Verrouiller maintenant",
+        "font_section_title": "Police",
+        "font_family_label": "Famille de police",
+        "font_size_label": "Taille de base",
+        "font_scale_label": "Échelle d'affichage",
+        "font_scale_small": "Petite",
+        "font_scale_normal": "Normale",
+        "font_scale_large": "Grande",
+        "font_scale_xlarge": "Très grande",
+        "font_scale_xxlarge": "Énorme",
+        "font_preview_text": "Portez ce vieux whisky au juge blond qui fume — 1234567890",
+        "font_reset": "Réinitialiser",
+        "font_applied": "Police mise à jour",
+        "motion_section_title": "Mouvement et animations",
+        "reduce_motion_label": "Réduire les animations",
+        "reduce_motion_hint": "Désactivez les animations si elles vous mettent mal à l'aise.",
+        "empty_history_empty_title": "Aucun historique pour l'instant",
+        "empty_history_empty_subtitle": "Traitez votre première image pour la voir ici",
+        "empty_history_empty_hint": "Chaque résultat est enregistré automatiquement",
+        "empty_history_no_user_title": "Connectez-vous pour voir l'historique",
+        "empty_history_no_user_subtitle": "Vos résultats enregistrés apparaîtront ici",
+        "empty_history_no_user_hint": "L'historique est privé pour chaque compte",
+        "empty_dash_no_results_title": "Aucun résultat pour l'instant",
+        "empty_dash_no_results_subtitle": "Vos analyses récentes apparaîtront ici",
+        "empty_dash_no_results_hint": "Traitez une image pour commencer",
+        "empty_dash_no_dist_title": "Aucune donnée de distribution",
+        "empty_dash_no_dist_subtitle": "Les statistiques se rempliront au fur et à mesure",
+        "empty_dash_no_dist_hint": "Chaque analyse compte",
+        "empty_image_empty_title": "Aucune image insérée",
+        "empty_image_empty_subtitle": "Glissez-déposez une image ici, ou cliquez sur Insérer",
+        "empty_image_empty_hint": "Prend en charge PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Déposez pour analyser",
+        "empty_image_drop_hint_subtitle": "Relâchez l'image pour la charger",
+        "empty_image_drop_hint_hint": "Le format sera détecté automatiquement",
+        "empty_processing_wait_title": "Traitement...",
+        "empty_processing_wait_subtitle": "L'IA analyse votre image",
+        "empty_processing_wait_hint": "Cela prend généralement quelques secondes",
+        "tour_show_again": "Revoir la visite guidée",
+        "tour_completed_msg": "Visite terminée ! Vous êtes prêt.",
+        "tour_skipped_msg": "Visite ignorée. Vous pouvez la revoir depuis le menu Compte.",
+        "tour_btn_next": "Suivant",
+        "tour_btn_prev": "Retour",
+        "tour_btn_skip": "Ignorer",
+        "tour_btn_finish": "Terminer ✓",
+        "tour_guest_login_title": "Connexion",
+        "tour_guest_login_subtitle": "Cliquez ici pour vous connecter et débloquer toutes les fonctionnalités.",
+        "tour_guest_signup_title": "Créer un compte",
+        "tour_guest_signup_subtitle": "Nouveau ici ? Cliquez ici pour créer un compte en quelques secondes.",
+        "tour_insert_title": "Insérer une image",
+        "tour_insert_subtitle": "Chargez une image d'écho depuis le disque, ou glissez-déposez-la n'importe où sur la fenêtre.",
+        "tour_process_title": "Traiter l'image",
+        "tour_process_subtitle": "Lancez l'analyse IA sur l'image chargée. Les résultats apparaissent en quelques secondes.",
+        "tour_export_title": "Exporter PDF",
+        "tour_export_subtitle": "Enregistrez le résultat actuel sous forme de rapport médical PDF professionnel.",
+        "tour_gradcam_title": "Carte de chaleur d'attention",
+        "tour_gradcam_subtitle": "Visualisez où l'IA regarde — une carte de chaleur sur l'image analysée.",
+        "tour_dashboard_title": "Tableau de bord",
+        "tour_dashboard_subtitle": "Affichez/masquez le panneau de statistiques : total d'images, confiance moyenne, distribution des grades.",
+        "tour_history_title": "Historique",
+        "tour_history_subtitle": "Parcourez vos 20 dernières images analysées. Cliquez sur une vignette pour recharger son résultat.",
+        "tour_visit_title": "Visiter le site",
+        "tour_visit_subtitle": "Ouvrez la page GitHub du projet dans votre navigateur pour la documentation et les mises à jour.",
+        "tour_mute_title": "Couper la musique",
+        "tour_mute_subtitle": "Mettez en pause ou reprenez la musique de fond à tout moment.",
+        "tour_zoom_title": "Contrôles de zoom",
+        "tour_zoom_subtitle": "Utilisez la molette pour zoomer, faites glisser pour déplacer, et double-cliquez pour réinitialiser.",
+        "tour_account_title": "Menu du compte",
+        "tour_account_subtitle": "Cliquez ici pour accéder aux Paramètres, Infos du compte, Journal d'audit, et plus.",
+        "suggestion_image_ready": "Image chargée — prêt à traiter ?",
+        "suggestion_image_ready_sub": "Cliquez sur Traiter pour lancer l'analyse IA.",
+        "suggestion_pdf_ready": "Résultat prêt — exporter en PDF ?",
+        "suggestion_pdf_ready_sub": "Enregistrez un rapport médical professionnel en un clic.",
+        "suggestion_gradcam_hint": "Curieux de voir ce que l'IA a regardé ?",
+        "suggestion_gradcam_hint_sub": "Voyez la carte de chaleur d'attention sur l'image.",
+        "suggestion_repeated_grid": "Vous obtenez toujours {grid}",
+        "suggestion_repeated_grid_sub": "Ouvrez le tableau de bord pour voir la répartition.",
+        "suggestion_history_hint": "Votre historique s'enrichit",
+        "suggestion_history_hint_sub": "Parcourez vos 20 dernières images analysées.",
+        "suggestion_dashboard_hint": "Votre tableau de bord a des stats intéressantes",
+        "suggestion_dashboard_hint_sub": "Totaux, moyennes et répartition en un coup d'œil.",
+        "suggestion_settings_hint": "Personnalisez l'application",
+        "suggestion_settings_hint_sub": "Changez la langue, le thème, la police et activez la 2FA.",
+        "suggestion_idle_help": "Besoin d'un guide rapide ?",
+        "suggestion_idle_help_sub": "Rejouez la visite guidée à tout moment.",
+        "image_not_liver_warning": "Cette image ne ressemble pas à une échographie du foie.\n\nVeuillez insérer une image d'échographie du foie appropriée.",
+        "result_not_confident": "L'IA n'a pas pu identifier avec certitude cette image comme une échographie du foie.\n\nVeuillez insérer une image d'échographie du foie appropriée et réessayer.",
+        "not_liver_title": "Pas une échographie du foie",
+        "not_liver_hint": "Veuillez utiliser une image d'échographie (sonogramme) du foie appropriée",
+        "voice_welcome": "Bienvenue, {user}",
+        "voice_goodbye": "Au revoir",
+        "voice_logged_out": "Déconnexion réussie",
+        "voice_image_loaded": "Image chargée avec succès",
+        "voice_image_rejected": "Ce n'est pas une échographie du foie",
+        "voice_inference_result": "{grid_name}, confiance {conf} pour cent",
+        "voice_pdf_saved": "Rapport PDF enregistré avec succès",
+        "voice_error": "Une erreur est survenue",
+        "voice_settings_applied": "Paramètres appliqués",
+        "voice_language_changed": "Langue changée en {lang}",
+        "voice_theme_changed": "Thème changé",
+        "voice_2fa_enabled": "Authentification à deux facteurs activée",
+        "voice_2fa_disabled": "Authentification à deux facteurs désactivée",
+        "voice_locked": "Session verrouillée",
+        "voice_unlocked": "Session déverrouillée",
+        "voice_processing": "Traitement de l'image",
+        "voice_processing_done": "Traitement terminé",
+        "voice_voice_enabled": "Retour vocal activé",
+        "voice_voice_disabled": "Retour vocal désactivé",
     },
     "Russian": {
         "app_title": "Конвейер ИИ печени",
@@ -1208,6 +2072,186 @@ TRANSLATIONS = {
         "install_failed": "Установка не удалась. Ваша старая версия в безопасности.",
         "download_failed": "Загрузка не удалась.",
         "source_update_requires_zip": "Обновление исходного кода требует файла .zip.",
+        "session_locked": "Сессия заблокирована",
+        "locked_for_user": "Заблокировано для {user}",
+        "unlock": "Разблокировать",
+        "session_unlocked": "Сессия разблокирована",
+        "auto_lock_notice": "Сессия заблокируется через 2 минуты бездействия.",
+        "audit_log_title": "Журнал аудита",
+        "audit_export": "Экспорт",
+        "audit_exported": "Успешно экспортировано",
+        "audit_export_failed": "Ошибка экспорта",
+        "audit_search_placeholder": "Поиск действий или деталей...",
+        "audit_col_time": "Время",
+        "audit_col_level": "Уровень",
+        "audit_col_category": "Категория",
+        "audit_col_action": "Действие",
+        "audit_col_user": "Пользователь",
+        "audit_details_title": "Детали события",
+        "audit_status": "Показано {count} из {total} событий",
+        "strength_very_weak": "Очень слабый",
+        "strength_weak": "Слабый",
+        "strength_medium": "Средний",
+        "strength_strong": "Сильный",
+        "strength_very_strong": "Очень сильный",
+        "strength_rule_length": "8-16 символов",
+        "strength_rule_lowercase": "Строчная буква",
+        "strength_rule_uppercase": "Заглавная буква",
+        "strength_rule_digits": "Цифры",
+        "strength_rule_special": "Специальные символы",
+        "strength_add_chars": "Добавьте ещё {n} символ(ов)",
+        "strength_remove_chars": "Уберите {n} символ(ов)",
+        "strength_need_digits": "Добавьте ещё {n} цифр(ы)",
+        "strength_need_special": "Добавьте ещё {n} специальных символ(ов)",
+        "strength_common_pattern": "Избегайте распространённых слов",
+        "strength_common_year": "Избегайте распространённых годов",
+        "strength_has_sequence": "Избегайте последовательностей (1234, abcd)",
+        "strength_has_repeats": "Избегайте повторов (aaaa, 1111)",
+        "passwords_match": "Пароли совпадают",
+        "2fa_setup_title": "Включить двухфакторную аутентификацию",
+        "2fa_setup_subtitle": "Отсканируйте QR-код с помощью Google Authenticator, Authy или Microsoft Authenticator.",
+        "2fa_manual_secret": "Или введите этот код вручную:",
+        "2fa_enter_code": "Введите 6-значный код из приложения:",
+        "2fa_verify_btn": "Подтвердить",
+        "2fa_backup_codes_title": "Сохраните эти резервные коды!",
+        "2fa_backup_codes_hint": "Каждый код можно использовать только один раз. Храните их в надёжном месте.",
+        "2fa_done_btn": "Готово",
+        "2fa_secret_copied": "Секретный код скопирован в буфер обмена",
+        "2fa_invalid_code": "Неверный код. Попробуйте снова.",
+        "2fa_invalid_code_format": "Код должен состоять из 6 цифр.",
+        "2fa_verify_title": "Двухфакторная аутентификация",
+        "2fa_verify_subtitle": "Введите 6-значный код из приложения-аутентификатора.",
+        "2fa_enter_code_hint": "Пожалуйста, введите код.",
+        "2fa_use_backup_code": "Использовать резервный код",
+        "2fa_use_totp_code": "Использовать код приложения",
+        "2fa_enter_backup_code": "Введите один из ваших резервных кодов.",
+        "2fa_section_title": "Безопасность",
+        "2fa_enabled_status": "Двухфакторная аутентификация включена",
+        "2fa_disabled_status": "Двухфакторная аутентификация отключена",
+        "2fa_enable_btn": "Включить 2FA",
+        "2fa_disable_btn": "Отключить 2FA",
+        "2fa_disable_title": "Отключить 2FA",
+        "2fa_disable_confirm": "Вы уверены? Ваш аккаунт станет менее защищённым.",
+        "2fa_disabled_success": "Двухфакторная аутентификация отключена",
+        "2fa_enabled_success": "Двухфакторная аутентификация включена",
+        "2fa_hint_title": "Как использовать этот QR-код",
+        "2fa_hint_step1": "Установите приложение-аутентификатор: Google Authenticator, Microsoft Authenticator или Authy.",
+        "2fa_hint_step2": "Откройте приложение, нажмите кнопку «+» и выберите «Сканировать QR-код».",
+        "2fa_hint_step3": "Наведите камеру телефона на QR-код выше (используйте камеру приложения, а не камеру телефона).",
+        "2fa_hint_step4": "Приложение покажет 6-значный код. Введите его в поле ниже.",
+        "2fa_manual_secret_hint": "Не можете отсканировать? Скопируйте ключ ниже и добавьте его вручную в приложении («Ввести ключ настройки»).",
+        "auto_lock_section_title": "Автоблокировка",
+        "auto_lock_enable": "Блокировать после бездействия",
+        "auto_lock_timeout_label": "Блокировать через:",
+        "auto_lock_warning_title": "Предупреждение об автоблокировке",
+        "auto_lock_warning_body": "Ваша сессия будет заблокирована через {seconds} секунд из-за бездействия.",
+        "lock_now": "Заблокировать сейчас",
+        "font_section_title": "Шрифт",
+        "font_family_label": "Семейство шрифтов",
+        "font_size_label": "Базовый размер",
+        "font_scale_label": "Масштаб отображения",
+        "font_scale_small": "Маленький",
+        "font_scale_normal": "Обычный",
+        "font_scale_large": "Большой",
+        "font_scale_xlarge": "Очень большой",
+        "font_scale_xxlarge": "Огромный",
+        "font_preview_text": "Съешь же ещё этих мягких французских булок — 1234567890",
+        "font_reset": "Сбросить по умолчанию",
+        "font_applied": "Шрифт обновлён",
+        "motion_section_title": "Движение и анимации",
+        "reduce_motion_label": "Уменьшить движение",
+        "reduce_motion_hint": "Отключите анимации, если они вызывают у вас дискомфорт.",
+        "empty_history_empty_title": "Пока нет истории",
+        "empty_history_empty_subtitle": "Обработайте первое изображение, чтобы увидеть его здесь",
+        "empty_history_empty_hint": "Каждый результат сохраняется автоматически",
+        "empty_history_no_user_title": "Войдите, чтобы увидеть историю",
+        "empty_history_no_user_subtitle": "Ваши сохранённые результаты появятся здесь",
+        "empty_history_no_user_hint": "История приватна для каждого аккаунта",
+        "empty_dash_no_results_title": "Пока нет результатов",
+        "empty_dash_no_results_subtitle": "Ваши недавние анализы появятся здесь",
+        "empty_dash_no_results_hint": "Обработайте изображение, чтобы начать",
+        "empty_dash_no_dist_title": "Нет данных о распределении",
+        "empty_dash_no_dist_subtitle": "Статистика будет заполняться по мере обработки",
+        "empty_dash_no_dist_hint": "Каждый анализ важен",
+        "empty_image_empty_title": "Изображение не вставлено",
+        "empty_image_empty_subtitle": "Перетащите изображение сюда или нажмите «Вставить»",
+        "empty_image_empty_hint": "Поддерживаются PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Отпустите для анализа",
+        "empty_image_drop_hint_subtitle": "Отпустите изображение, чтобы загрузить",
+        "empty_image_drop_hint_hint": "Формат определится автоматически",
+        "empty_processing_wait_title": "Обработка...",
+        "empty_processing_wait_subtitle": "ИИ анализирует ваше изображение",
+        "empty_processing_wait_hint": "Обычно это занимает несколько секунд",
+        "tour_show_again": "Показать тур снова",
+        "tour_completed_msg": "Тур завершён! Всё готово.",
+        "tour_skipped_msg": "Тур пропущен. Вы можете повторить его из меню аккаунта.",
+        "tour_btn_next": "Далее",
+        "tour_btn_prev": "Назад",
+        "tour_btn_skip": "Пропустить",
+        "tour_btn_finish": "Готово ✓",
+        "tour_guest_login_title": "Вход",
+        "tour_guest_login_subtitle": "Нажмите здесь, чтобы войти в аккаунт и открыть все возможности.",
+        "tour_guest_signup_title": "Создать аккаунт",
+        "tour_guest_signup_subtitle": "Впервые здесь? Нажмите здесь, чтобы создать аккаунт за секунды.",
+        "tour_insert_title": "Вставить изображение",
+        "tour_insert_subtitle": "Загрузите сонограмму с диска или перетащите её в любое место окна.",
+        "tour_process_title": "Обработать изображение",
+        "tour_process_subtitle": "Запустите ИИ-анализ загруженного изображения. Результаты появятся через несколько секунд.",
+        "tour_export_title": "Экспорт PDF",
+        "tour_export_subtitle": "Сохраните текущий результат в виде профессионального медицинского PDF-отчёта.",
+        "tour_gradcam_title": "Тепловая карта внимания",
+        "tour_gradcam_subtitle": "Посмотрите, куда смотрит ИИ — тепловая карта поверх анализируемого изображения.",
+        "tour_dashboard_title": "Панель управления",
+        "tour_dashboard_subtitle": "Показать/скрыть панель статистики: всего изображений, средняя уверенность, распределение по степеням.",
+        "tour_history_title": "История",
+        "tour_history_subtitle": "Просмотрите последние 20 проанализированных изображений. Нажмите на миниатюру, чтобы загрузить результат заново.",
+        "tour_visit_title": "Посетить сайт",
+        "tour_visit_subtitle": "Откройте страницу GitHub проекта в браузере для документации и обновлений.",
+        "tour_mute_title": "Выключить музыку",
+        "tour_mute_subtitle": "Приостановите или возобновите фоновую музыку в любой момент.",
+        "tour_zoom_title": "Управление масштабом",
+        "tour_zoom_subtitle": "Колесо мыши — масштаб, перетаскивание — панорама, двойной клик — сброс.",
+        "tour_account_title": "Меню аккаунта",
+        "tour_account_subtitle": "Нажмите здесь, чтобы открыть Настройки, Информацию об аккаунте, Журнал аудита и другое.",
+        "suggestion_image_ready": "Изображение загружено — готово к обработке",
+        "suggestion_image_ready_sub": "Cliquez sur Traiter pour lancer l'analyse IA.",
+        "suggestion_pdf_ready": "Résultat prêt — exporter en PDF ?",
+        "suggestion_pdf_ready_sub": "Enregistrez un rapport médical professionnel en un clic.",
+        "suggestion_gradcam_hint": "Curieux de voir ce que l'IA a regardé ?",
+        "suggestion_gradcam_hint_sub": "Voyez la carte de chaleur d'attention sur l'image.",
+        "suggestion_repeated_grid": "Vous obtenez toujours {grid}",
+        "suggestion_repeated_grid_sub": "Ouvrez le tableau de bord pour voir la répartition.",
+        "suggestion_history_hint": "Votre historique s'enrichit",
+        "suggestion_history_hint_sub": "Parcourez vos 20 dernières images analysées.",
+        "suggestion_dashboard_hint": "Votre tableau de bord a des stats intéressantes",
+        "suggestion_dashboard_hint_sub": "Totaux, moyennes et répartition en un coup d'œil.",
+        "suggestion_settings_hint": "Personnalisez l'application",
+        "suggestion_settings_hint_sub": "Changez la langue, le thème, la police et activez la 2FA.",
+        "suggestion_idle_help": "Besoin d'un guide rapide ?",
+        "suggestion_idle_help_sub": "Rejouez la visite guidée à tout moment.",
+        "image_not_liver_warning": "Это изображение не похоже на УЗИ печени.\n\nПожалуйста, вставьте подходящее изображение УЗИ печени.",
+        "result_not_confident": "ИИ не смог уверенно определить это изображение как УЗИ печени.\n\nПожалуйста, вставьте подходящее изображение УЗИ печени и попробуйте снова.",
+        "not_liver_title": "Не УЗИ печени",
+        "not_liver_hint": "Пожалуйста, используйте подходящее изображение УЗИ (сонограмму) печени",
+        "voice_welcome": "Добро пожаловать, {user}",
+        "voice_goodbye": "До свидания",
+        "voice_logged_out": "Выход выполнен успешно",
+        "voice_image_loaded": "Изображение успешно загружено",
+        "voice_image_rejected": "Это не УЗИ печени",
+        "voice_inference_result": "{grid_name}, уверенность {conf} процентов",
+        "voice_pdf_saved": "PDF-отчёт успешно сохранён",
+        "voice_error": "Произошла ошибка",
+        "voice_settings_applied": "Настройки применены",
+        "voice_language_changed": "Язык изменён на {lang}",
+        "voice_theme_changed": "Тема изменена",
+        "voice_2fa_enabled": "Двухфакторная аутентификация включена",
+        "voice_2fa_disabled": "Двухфакторная аутентификация отключена",
+        "voice_locked": "Сессия заблокирована",
+        "voice_unlocked": "Сессия разблокирована",
+        "voice_processing": "Обработка изображения",
+        "voice_processing_done": "Обработка завершена",
+        "voice_voice_enabled": "Голосовая связь включена",
+        "voice_voice_disabled": "Голосовая связь отключена",
     },
     "Greece": {
         "app_title": "Σωλήνας AI Ήπατος",
@@ -1407,6 +2451,186 @@ TRANSLATIONS = {
         "install_failed": "Η εγκατάσταση απέτυχε. Η παλιά σας έκδοση είναι ασφαλής.",
         "download_failed": "Η λήψη απέτυχε.",
         "source_update_requires_zip": "Η ενημέρωση πηγαίου κώδικα απαιτεί αρχείο .zip.",
+        "session_locked": "Κλειδωμένη Συνεδρία",
+        "locked_for_user": "Κλειδωμένη για {user}",
+        "unlock": "Ξεκλείδωμα",
+        "session_unlocked": "Η συνεδρία ξεκλειδώθηκε",
+        "auto_lock_notice": "Η συνεδρία θα κλειδωθεί μετά από 2 λεπτά αδράνειας.",
+        "audit_log_title": "Αρχείο Ελέγχου",
+        "audit_export": "Εξαγωγή",
+        "audit_exported": "Εξήχθη με επιτυχία",
+        "audit_export_failed": "Η εξαγωγή απέτυχε",
+        "audit_search_placeholder": "Αναζήτηση ενεργειών ή λεπτομερειών...",
+        "audit_col_time": "Ώρα",
+        "audit_col_level": "Επίπεδο",
+        "audit_col_category": "Κατηγορία",
+        "audit_col_action": "Ενέργεια",
+        "audit_col_user": "Χρήστης",
+        "audit_details_title": "Λεπτομέρειες Συμβάντος",
+        "audit_status": "Εμφάνιση {count} από {total} συμβάντων",
+        "strength_very_weak": "Πολύ αδύναμος",
+        "strength_weak": "Αδύναμος",
+        "strength_medium": "Μέτριος",
+        "strength_strong": "Ισχυρός",
+        "strength_very_strong": "Πολύ ισχυρός",
+        "strength_rule_length": "8-16 χαρακτήρες",
+        "strength_rule_lowercase": "Πεζό γράμμα",
+        "strength_rule_uppercase": "Κεφαλαίο γράμμα",
+        "strength_rule_digits": "Ψηφία",
+        "strength_rule_special": "Ειδικοί χαρακτήρες",
+        "strength_add_chars": "Προσθέστε {n} ακόμη χαρακτήρα(-ες)",
+        "strength_remove_chars": "Αφαιρέστε {n} χαρακτήρα(-ες)",
+        "strength_need_digits": "Προσθέστε {n} ακόμη ψηφίο(-α)",
+        "strength_need_special": "Προσθέστε {n} ακόμη ειδικό(-ούς) χαρακτήρα(-ες)",
+        "strength_common_pattern": "Αποφύγετε κοινές λέξεις",
+        "strength_common_year": "Αποφύγετε κοινές χρονιές",
+        "strength_has_sequence": "Αποφύγετε ακολουθίες (1234, abcd)",
+        "strength_has_repeats": "Αποφύγετε επαναλήψεις (aaaa, 1111)",
+        "passwords_match": "Οι κωδικοί ταιριάζουν",
+        "2fa_setup_title": "Ενεργοποίηση ελέγχου ταυτότητας δύο παραγόντων",
+        "2fa_setup_subtitle": "Σαρώστε τον κωδικό QR με το Google Authenticator, το Authy ή το Microsoft Authenticator.",
+        "2fa_manual_secret": "Ή εισαγάγετε αυτόν τον κωδικό χειροκίνητα:",
+        "2fa_enter_code": "Εισαγάγετε τον 6ψήφιο κωδικό από την εφαρμογή σας:",
+        "2fa_verify_btn": "Επαλήθευση",
+        "2fa_backup_codes_title": "Αποθηκεύστε αυτούς τους εφεδρικούς κωδικούς!",
+        "2fa_backup_codes_hint": "Κάθε κωδικός μπορεί να χρησιμοποιηθεί μόνο μία φορά. Φυλάξτε τους σε ασφαλές μέρος.",
+        "2fa_done_btn": "Τέλος",
+        "2fa_secret_copied": "Ο μυστικός κωδικός αντιγράφηκε στο πρόχειρο",
+        "2fa_invalid_code": "Μη έγκυρος κωδικός. Δοκιμάστε ξανά.",
+        "2fa_invalid_code_format": "Ο κωδικός πρέπει να έχει 6 ψηφία.",
+        "2fa_verify_title": "Έλεγχος ταυτότητας δύο παραγόντων",
+        "2fa_verify_subtitle": "Εισαγάγετε τον 6ψήφιο κωδικό από την εφαρμογή ελέγχου ταυτότητας.",
+        "2fa_enter_code_hint": "Παρακαλώ εισαγάγετε έναν κωδικό.",
+        "2fa_use_backup_code": "Χρήση εφεδρικού κωδικού",
+        "2fa_use_totp_code": "Χρήση κωδικού εφαρμογής",
+        "2fa_enter_backup_code": "Εισαγάγετε έναν από τους εφεδρικούς κωδικούς σας.",
+        "2fa_section_title": "Ασφάλεια",
+        "2fa_enabled_status": "Ο έλεγχος ταυτότητας δύο παραγόντων είναι ενεργός",
+        "2fa_disabled_status": "Ο έλεγχος ταυτότητας δύο παραγόντων είναι ανενεργός",
+        "2fa_enable_btn": "Ενεργοποίηση 2FA",
+        "2fa_disable_btn": "Απενεργοποίηση 2FA",
+        "2fa_disable_title": "Απενεργοποίηση 2FA",
+        "2fa_disable_confirm": "Είστε σίγουροι; Ο λογαριασμός σας θα είναι λιγότερο ασφαλής.",
+        "2fa_disabled_success": "Ο έλεγχος ταυτότητας δύο παραγόντων απενεργοποιήθηκε",
+        "2fa_enabled_success": "Ο έλεγχος ταυτότητας δύο παραγόντων ενεργοποιήθηκε",
+        "2fa_hint_title": "Πώς να χρησιμοποιήσετε αυτόν τον κωδικό QR",
+        "2fa_hint_step1": "Εγκαταστήστε μια εφαρμογή ελέγχου ταυτότητας: Google Authenticator, Microsoft Authenticator ή Authy.",
+        "2fa_hint_step2": "Ανοίξτε την εφαρμογή, πατήστε το κουμπί «+» και επιλέξτε «Σάρωση κωδικού QR».",
+        "2fa_hint_step3": "Στρέψτε την κάμερα του τηλεφώνου σας στον κωδικό QR παραπάνω (χρησιμοποιήστε την κάμερα της εφαρμογής, όχι της κάμερας του τηλεφώνου).",
+        "2fa_hint_step4": "Η εφαρμογή θα εμφανίσει έναν 6ψήφιο κωδικό. Εισαγάγετέ τον στο παρακάτω πλαίσιο.",
+        "2fa_manual_secret_hint": "Δεν μπορείτε να σαρώσετε; Αντιγράψτε το κλειδί παρακάτω και προσθέστε το χειροκίνητα στην εφαρμογή («Εισαγωγή κλειδιού ρύθμισης»).",
+        "auto_lock_section_title": "Αυτόματο Κλείδωμα",
+        "auto_lock_enable": "Κλείδωμα μετά από αδράνεια",
+        "auto_lock_timeout_label": "Κλείδωμα μετά από:",
+        "auto_lock_warning_title": "Προειδοποίηση Αυτόματου Κλειδώματος",
+        "auto_lock_warning_body": "Η συνεδρία σας θα κλειδωθεί σε {seconds} δευτερόλεπτα λόγω αδράνειας.",
+        "lock_now": "Κλείδωμα τώρα",
+        "font_section_title": "Γραμματοσειρά",
+        "font_family_label": "Οικογένεια γραμματοσειράς",
+        "font_size_label": "Βασικό μέγεθος",
+        "font_scale_label": "Κλίμακα εμφάνισης",
+        "font_scale_small": "Μικρή",
+        "font_scale_normal": "Κανονική",
+        "font_scale_large": "Μεγάλη",
+        "font_scale_xlarge": "Πολύ μεγάλη",
+        "font_scale_xxlarge": "Τεράστια",
+        "font_preview_text": "Ξεσκεπάζω την ψυχοφθόρα βδελυγμία — 1234567890",
+        "font_reset": "Επαναφορά προεπιλογής",
+        "font_applied": "Η γραμματοσειρά ενημερώθηκε",
+        "motion_section_title": "Κίνηση και Κινούμενα Σχέδια",
+        "reduce_motion_label": "Μείωση κίνησης",
+        "reduce_motion_hint": "Απενεργοποιήστε τα κινούμενα σχέδια αν σας προκαλούν δυσφορία.",
+        "empty_history_empty_title": "Δεν υπάρχει ιστορικό ακόμα",
+        "empty_history_empty_subtitle": "Επεξεργαστείτε την πρώτη σας εικόνα για να τη δείτε εδώ",
+        "empty_history_empty_hint": "Κάθε αποτέλεσμα αποθηκεύεται αυτόματα",
+        "empty_history_no_user_title": "Συνδεθείτε για να δείτε το ιστορικό",
+        "empty_history_no_user_subtitle": "Τα αποθηκευμένα αποτελέσματά σας θα εμφανιστούν εδώ",
+        "empty_history_no_user_hint": "Το ιστορικό είναι ιδιωτικό για κάθε λογαριασμό",
+        "empty_dash_no_results_title": "Δεν υπάρχουν αποτελέσματα ακόμα",
+        "empty_dash_no_results_subtitle": "Οι πρόσφατες αναλύσεις σας θα εμφανιστούν εδώ",
+        "empty_dash_no_results_hint": "Επεξεργαστείτε μια εικόνα για να ξεκινήσετε",
+        "empty_dash_no_dist_title": "Δεν υπάρχουν δεδομένα κατανομής",
+        "empty_dash_no_dist_subtitle": "Τα στατιστικά θα συμπληρώνονται καθώς επεξεργάζεστε εικόνες",
+        "empty_dash_no_dist_hint": "Κάθε ανάλυση μετράει",
+        "empty_image_empty_title": "Δεν έχει εισαχθεί εικόνα",
+        "empty_image_empty_subtitle": "Σύρετε και αφήστε μια εικόνα εδώ ή πατήστε Εισαγωγή",
+        "empty_image_empty_hint": "Υποστηρίζει PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Αφήστε για ανάλυση",
+        "empty_image_drop_hint_subtitle": "Αφήστε την εικόνα για να φορτωθεί",
+        "empty_image_drop_hint_hint": "Η μορφή θα ανιχνευθεί αυτόματα",
+        "empty_processing_wait_title": "Επεξεργασία...",
+        "empty_processing_wait_subtitle": "Το AI αναλύει την εικόνα σας",
+        "empty_processing_wait_hint": "Αυτό συνήθως διαρκεί λίγα δευτερόλεπτα",
+        "tour_show_again": "Εμφάνιση ξανά της περιήγησης",
+        "tour_completed_msg": "Η περιήγηση ολοκληρώθηκε! Είστε έτοιμοι.",
+        "tour_skipped_msg": "Η περιήγηση παραλείφθηκε. Μπορείτε να την επαναλάβετε από το μενού Λογαριασμού.",
+        "tour_btn_next": "Επόμενο",
+        "tour_btn_prev": "Πίσω",
+        "tour_btn_skip": "Παράλειψη",
+        "tour_btn_finish": "Τέλος ✓",
+        "tour_guest_login_title": "Σύνδεση",
+        "tour_guest_login_subtitle": "Κάντε κλικ εδώ για να συνδεθείτε και να ξεκλειδώσετε όλες τις λειτουργίες.",
+        "tour_guest_signup_title": "Δημιουργία λογαριασμού",
+        "tour_guest_signup_subtitle": "Νέος εδώ; Κάντε κλικ εδώ για να δημιουργήσετε λογαριασμό σε δευτερόλεπτα.",
+        "tour_insert_title": "Εισαγωγή εικόνας",
+        "tour_insert_subtitle": "Φορτώστε μια εικόνα υπερήχου από τον δίσκο ή σύρετε και αφήστε την οπουδήποτε στο παράθυρο.",
+        "tour_process_title": "Επεξεργασία εικόνας",
+        "tour_process_subtitle": "Εκτελέστε ανάλυση AI στη φορτωμένη εικόνα. Τα αποτελέσματα εμφανίζονται σε λίγα δευτερόλεπτα.",
+        "tour_export_title": "Εξαγωγή PDF",
+        "tour_export_subtitle": "Αποθηκεύστε το τρέχον αποτέλεσμα ως επαγγελματική ιατρική αναφορά PDF.",
+        "tour_gradcam_title": "Χάρτης θερμότητας προσοχής",
+        "tour_gradcam_subtitle": "Δείτε πού κοιτάει το AI — έναν χάρτη θερμότητας πάνω στην αναλυόμενη εικόνα.",
+        "tour_dashboard_title": "Πίνακας ελέγχου",
+        "tour_dashboard_subtitle": "Εμφάνιση/απόκρυψη του πίνακα στατιστικών: σύνολο εικόνων, μέση βεβαιότητα, κατανομή βαθμών.",
+        "tour_history_title": "Ιστορικό",
+        "tour_history_subtitle": "Περιηγηθείτε στις τελευταίες 20 αναλυμένες εικόνες. Κάντε κλικ σε μια μικρογραφία για επαναφόρτωση.",
+        "tour_visit_title": "Επισκεφθείτε την ιστοσελίδα",
+        "tour_visit_subtitle": "Ανοίξτε τη σελίδα GitHub του έργου στον browser για τεκμηρίωση και ενημερώσεις.",
+        "tour_mute_title": "Σίγαση μουσικής",
+        "tour_mute_subtitle": "Παύση ή συνέχιση της μουσικής υποβάθρου ανά πάσα στιγμή.",
+        "tour_zoom_title": "Έλεγχοι μεγέθυνσης",
+        "tour_zoom_subtitle": "Χρησιμοποιήστε τον τροχό για μεγέθυνση, σύρετε για μετακίνηση, διπλό κλικ για επαναφορά.",
+        "tour_account_title": "Μενού λογαριασμού",
+        "tour_account_subtitle": "Κάντε κλικ εδώ για πρόσβαση σε Ρυθμίσεις, Πληροφορίες λογαριασμού, Αρχείο ελέγχου και άλλα.",
+        "suggestion_image_ready": "Η εικόνα φορτώθηκε — έτοιμη για επεξεργασία",
+        "suggestion_image_ready_sub": "Πατήστε Επεξεργασία για να ξεκινήσει η ανάλυση AI.",
+        "suggestion_pdf_ready": "Το αποτέλεσμα είναι έτοιμο — εξαγωγή σε PDF;",
+        "suggestion_pdf_ready_sub": "Αποθηκεύστε μια επαγγελματική ιατρική αναφορά με ένα κλικ.",
+        "suggestion_gradcam_hint": "Περίεργος τι κοίταξε το AI;",
+        "suggestion_gradcam_hint_sub": "Δείτε τον χάρτη θερμότητας προσοχής πάνω στην εικόνα.",
+        "suggestion_repeated_grid": "Παίρνετε πάντα {grid}",
+        "suggestion_repeated_grid_sub": "Ανοίξτε τον πίνακα για να δείτε την κατανομή.",
+        "suggestion_history_hint": "Το ιστορικό σας μεγαλώνει",
+        "suggestion_history_hint_sub": "Περιηγηθείτε στις τελευταίες 20 αναλυμένες εικόνες.",
+        "suggestion_dashboard_hint": "Ο πίνακας σας έχει ενδιαφέροντα στατιστικά",
+        "suggestion_dashboard_hint_sub": "Σύνολα, μέσοι όροι και κατανομή με μια ματιά.",
+        "suggestion_settings_hint": "Προσαρμόστε την εφαρμογή",
+        "suggestion_settings_hint_sub": "Αλλάξτε γλώσσα, θέμα, γραμματοσειρά και ενεργοποιήστε 2FA.",
+        "suggestion_idle_help": "Χρειάζεστε έναν γρήγορο οδηγό;",
+        "suggestion_idle_help_sub": "Επαναλάβετε την ξενάγηση οποιαδήποτε στιγμή.",
+        "image_not_liver_warning": "Αυτή η εικόνα δεν μοιάζει με υπερηχογράφημα ήπατος.\n\nΠαρακαλώ εισάγετε μια κατάλληλη εικόνα υπερηχογραφήματος ήπατος.",
+        "result_not_confident": "Το AI δεν μπόρεσε να αναγνωρίσει με βεβαιότητα αυτή την εικόνα ως υπερηχογράφημα ήπατος.\n\nΠαρακαλώ εισάγετε μια κατάλληλη εικόνα υπερηχογραφήματος ήπατος και δοκιμάστε ξανά.",
+        "not_liver_title": "Δεν είναι υπερηχογράφημα ήπατος",
+        "not_liver_hint": "Παρακαλώ χρησιμοποιήστε μια κατάλληλη εικόνα υπερηχογραφήματος (υπερήχου) ήπατος",
+        "voice_welcome": "Καλώς ήρθες, {user}",
+        "voice_goodbye": "Αντίο",
+        "voice_logged_out": "Αποσυνδεθήκατε με επιτυχία",
+        "voice_image_loaded": "Η εικόνα φορτώθηκε με επιτυχία",
+        "voice_image_rejected": "Αυτό δεν είναι υπερηχογράφημα ήπατος",
+        "voice_inference_result": "{grid_name}, βεβαιότητα {conf} τοις εκατό",
+        "voice_pdf_saved": "Η αναφορά PDF αποθηκεύτηκε με επιτυχία",
+        "voice_error": "Παρουσιάστηκε σφάλμα",
+        "voice_settings_applied": "Οι ρυθμίσεις εφαρμόστηκαν",
+        "voice_language_changed": "Η γλώσσα άλλαξε σε {lang}",
+        "voice_theme_changed": "Το θέμα άλλαξε",
+        "voice_2fa_enabled": "Ο έλεγχος ταυτότητας δύο παραγόντων ενεργοποιήθηκε",
+        "voice_2fa_disabled": "Ο έλεγχος ταυτότητας δύο παραγόντων απενεργοποιήθηκε",
+        "voice_locked": "Η συνεδρία κλειδώθηκε",
+        "voice_unlocked": "Η συνεδρία ξεκλειδώθηκε",
+        "voice_processing": "Επεξεργασία εικόνας",
+        "voice_processing_done": "Η επεξεργασία ολοκληρώθηκε",
+        "voice_voice_enabled": "Η φωνητική ανάδραση ενεργοποιήθηκε",
+        "voice_voice_disabled": "Η φωνητική ανάδραση απενεργοποιήθηκε",
     },
     "Germany": {
         "app_title": "Leber KI-Pipeline",
@@ -1606,6 +2830,186 @@ TRANSLATIONS = {
         "install_failed": "Installation fehlgeschlagen. Ihre alte Version ist sicher.",
         "download_failed": "Download fehlgeschlagen.",
         "source_update_requires_zip": "Quellcode-Update erfordert eine .zip-Datei.",
+        "session_locked": "Sitzung gesperrt",
+        "locked_for_user": "Gesperrt für {user}",
+        "unlock": "Entsperren",
+        "session_unlocked": "Sitzung entsperrt",
+        "auto_lock_notice": "Die Sitzung wird nach 2 Minuten Inaktivität gesperrt.",
+        "audit_log_title": "Audit-Protokoll",
+        "audit_export": "Exportieren",
+        "audit_exported": "Erfolgreich exportiert",
+        "audit_export_failed": "Export fehlgeschlagen",
+        "audit_search_placeholder": "Aktionen oder Details durchsuchen...",
+        "audit_col_time": "Zeit",
+        "audit_col_level": "Stufe",
+        "audit_col_category": "Kategorie",
+        "audit_col_action": "Aktion",
+        "audit_col_user": "Benutzer",
+        "audit_details_title": "Ereignisdetails",
+        "audit_status": "Zeige {count} von {total} Ereignissen",
+        "strength_very_weak": "Sehr schwach",
+        "strength_weak": "Schwach",
+        "strength_medium": "Mittel",
+        "strength_strong": "Stark",
+        "strength_very_strong": "Sehr stark",
+        "strength_rule_length": "8-16 Zeichen",
+        "strength_rule_lowercase": "Kleinbuchstabe",
+        "strength_rule_uppercase": "Großbuchstabe",
+        "strength_rule_digits": "Ziffern",
+        "strength_rule_special": "Sonderzeichen",
+        "strength_add_chars": "Fügen Sie {n} weitere Zeichen hinzu",
+        "strength_remove_chars": "Entfernen Sie {n} Zeichen",
+        "strength_need_digits": "Fügen Sie {n} weitere Ziffer(n) hinzu",
+        "strength_need_special": "Fügen Sie {n} weitere Sonderzeichen hinzu",
+        "strength_common_pattern": "Vermeiden Sie häufige Wörter",
+        "strength_common_year": "Vermeiden Sie häufige Jahreszahlen",
+        "strength_has_sequence": "Vermeiden Sie Sequenzen (1234, abcd)",
+        "strength_has_repeats": "Vermeiden Sie Wiederholungen (aaaa, 1111)",
+        "passwords_match": "Passwörter stimmen überein",
+        "2fa_setup_title": "Zwei-Faktor-Authentifizierung aktivieren",
+        "2fa_setup_subtitle": "Scannen Sie den QR-Code mit Google Authenticator, Authy oder Microsoft Authenticator.",
+        "2fa_manual_secret": "Oder geben Sie diesen Code manuell ein:",
+        "2fa_enter_code": "Geben Sie den 6-stelligen Code aus Ihrer App ein:",
+        "2fa_verify_btn": "Bestätigen",
+        "2fa_backup_codes_title": "Speichern Sie diese Backup-Codes!",
+        "2fa_backup_codes_hint": "Jeder Code kann nur einmal verwendet werden. Bewahren Sie sie an einem sicheren Ort auf.",
+        "2fa_done_btn": "Fertig",
+        "2fa_secret_copied": "Geheimcode in die Zwischenablage kopiert",
+        "2fa_invalid_code": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+        "2fa_invalid_code_format": "Der Code muss 6 Ziffern haben.",
+        "2fa_verify_title": "Zwei-Faktor-Authentifizierung",
+        "2fa_verify_subtitle": "Geben Sie den 6-stelligen Code aus Ihrer Authentifizierungs-App ein.",
+        "2fa_enter_code_hint": "Bitte geben Sie einen Code ein.",
+        "2fa_use_backup_code": "Backup-Code verwenden",
+        "2fa_use_totp_code": "App-Code verwenden",
+        "2fa_enter_backup_code": "Geben Sie einen Ihrer Backup-Codes ein.",
+        "2fa_section_title": "Sicherheit",
+        "2fa_enabled_status": "Zwei-Faktor-Authentifizierung ist aktiviert",
+        "2fa_disabled_status": "Zwei-Faktor-Authentifizierung ist deaktiviert",
+        "2fa_enable_btn": "2FA aktivieren",
+        "2fa_disable_btn": "2FA deaktivieren",
+        "2fa_disable_title": "2FA deaktivieren",
+        "2fa_disable_confirm": "Sind Sie sicher? Ihr Konto wird weniger sicher sein.",
+        "2fa_disabled_success": "Zwei-Faktor-Authentifizierung deaktiviert",
+        "2fa_enabled_success": "Zwei-Faktor-Authentifizierung aktiviert",
+        "2fa_hint_title": "So verwenden Sie diesen QR-Code",
+        "2fa_hint_step1": "Installieren Sie eine Authentifizierungs-App: Google Authenticator, Microsoft Authenticator oder Authy.",
+        "2fa_hint_step2": "Öffnen Sie die App, tippen Sie auf die Schaltfläche „+“ und wählen Sie „QR-Code scannen“.",
+        "2fa_hint_step3": "Richten Sie die Kamera Ihres Telefons auf den QR-Code oben (verwenden Sie die Kamera der App, nicht die Kamera-App Ihres Telefons).",
+        "2fa_hint_step4": "Die App zeigt einen 6-stelligen Code an. Geben Sie ihn im Feld unten ein.",
+        "2fa_manual_secret_hint": "Können Sie nicht scannen? Kopieren Sie den Schlüssel unten und fügen Sie ihn manuell in Ihrer App hinzu („Einrichtungsschlüssel eingeben“).",
+        "auto_lock_section_title": "Automatische Sperre",
+        "auto_lock_enable": "Nach Inaktivität sperren",
+        "auto_lock_timeout_label": "Sperren nach:",
+        "auto_lock_warning_title": "Warnung: Automatische Sperre",
+        "auto_lock_warning_body": "Ihre Sitzung wird in {seconds} Sekunden aufgrund von Inaktivität gesperrt.",
+        "lock_now": "Jetzt sperren",
+        "font_section_title": "Schriftart",
+        "font_family_label": "Schriftfamilie",
+        "font_size_label": "Basisgröße",
+        "font_scale_label": "Anzeigeskalierung",
+        "font_scale_small": "Klein",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Groß",
+        "font_scale_xlarge": "Sehr groß",
+        "font_scale_xxlarge": "Riesig",
+        "font_preview_text": "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern — 1234567890",
+        "font_reset": "Auf Standard zurücksetzen",
+        "font_applied": "Schriftart aktualisiert",
+        "motion_section_title": "Bewegung & Animationen",
+        "reduce_motion_label": "Bewegung reduzieren",
+        "reduce_motion_hint": "Deaktivieren Sie Animationen, wenn sie Ihnen unangenehm sind.",
+        "empty_history_empty_title": "Noch kein Verlauf",
+        "empty_history_empty_subtitle": "Verarbeiten Sie Ihr erstes Bild, um es hier zu sehen",
+        "empty_history_empty_hint": "Jedes Ergebnis wird automatisch gespeichert",
+        "empty_history_no_user_title": "Melden Sie sich an, um den Verlauf zu sehen",
+        "empty_history_no_user_subtitle": "Ihre gespeicherten Ergebnisse erscheinen hier",
+        "empty_history_no_user_hint": "Der Verlauf ist für jedes Konto privat",
+        "empty_dash_no_results_title": "Noch keine Ergebnisse",
+        "empty_dash_no_results_subtitle": "Ihre letzten Analysen erscheinen hier",
+        "empty_dash_no_results_hint": "Verarbeiten Sie ein Bild, um zu beginnen",
+        "empty_dash_no_dist_title": "Keine Verteilungsdaten",
+        "empty_dash_no_dist_subtitle": "Statistiken füllen sich, während Sie Bilder verarbeiten",
+        "empty_dash_no_dist_hint": "Jede Analyse zählt",
+        "empty_image_empty_title": "Kein Bild eingefügt",
+        "empty_image_empty_subtitle": "Ziehen Sie ein Bild hierher oder klicken Sie auf Einfügen",
+        "empty_image_empty_hint": "Unterstützt PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Zum Analysieren ablegen",
+        "empty_image_drop_hint_subtitle": "Lassen Sie das Bild los, um es zu laden",
+        "empty_image_drop_hint_hint": "Das Format wird automatisch erkannt",
+        "empty_processing_wait_title": "Verarbeitung...",
+        "empty_processing_wait_subtitle": "Die KI analysiert Ihr Bild",
+        "empty_processing_wait_hint": "Dies dauert normalerweise ein paar Sekunden",
+        "tour_show_again": "Tour erneut anzeigen",
+        "tour_completed_msg": "Tour abgeschlossen! Sie sind bereit.",
+        "tour_skipped_msg": "Tour übersprungen. Sie können sie im Kontomenü wiederholen.",
+        "tour_btn_next": "Weiter",
+        "tour_btn_prev": "Zurück",
+        "tour_btn_skip": "Überspringen",
+        "tour_btn_finish": "Fertig ✓",
+        "tour_guest_login_title": "Anmelden",
+        "tour_guest_login_subtitle": "Klicken Sie hier, um sich anzumelden und alle Funktionen freizuschalten.",
+        "tour_guest_signup_title": "Konto erstellen",
+        "tour_guest_signup_subtitle": "Neu hier? Klicken Sie hier, um in Sekunden ein Konto zu erstellen.",
+        "tour_insert_title": "Bild einfügen",
+        "tour_insert_subtitle": "Laden Sie ein Sono-Bild von der Festplatte oder ziehen Sie es an eine beliebige Stelle im Fenster.",
+        "tour_process_title": "Bild verarbeiten",
+        "tour_process_subtitle": "Starten Sie die KI-Analyse des geladenen Bildes. Ergebnisse erscheinen in wenigen Sekunden.",
+        "tour_export_title": "PDF exportieren",
+        "tour_export_subtitle": "Speichern Sie das aktuelle Ergebnis als professionellen medizinischen PDF-Bericht.",
+        "tour_gradcam_title": "Aufmerksamkeits-Heatmap",
+        "tour_gradcam_subtitle": "Sehen Sie, wohin die KI schaut — eine Heatmap über dem analysierten Bild.",
+        "tour_dashboard_title": "Übersicht",
+        "tour_dashboard_subtitle": "Statistik-Panel ein-/ausblenden: Gesamtbilder, Durchschnittskonfidenz, Gradeverteilung.",
+        "tour_history_title": "Verlauf",
+        "tour_history_subtitle": "Durchsuchen Sie Ihre letzten 20 analysierten Bilder. Klicken Sie auf eine Miniatur, um das Ergebnis neu zu laden.",
+        "tour_visit_title": "Webseite besuchen",
+        "tour_visit_subtitle": "Öffnen Sie die GitHub-Seite des Projekts im Browser für Dokumentation und Updates.",
+        "tour_mute_title": "Musik stumm",
+        "tour_mute_subtitle": "Pausieren oder setzen Sie die Hintergrundmusik jederzeit fort.",
+        "tour_zoom_title": "Zoom-Steuerung",
+        "tour_zoom_subtitle": "Mausrad zum Zoomen, Ziehen zum Verschieben, Doppelklick zum Zurücksetzen.",
+        "tour_account_title": "Kontomenü",
+        "tour_account_subtitle": "Klicken Sie hier für Einstellungen, Kontoinformationen, Audit-Protokoll und mehr.",
+        "suggestion_image_ready": "Bild geladen — bereit zur Verarbeitung",
+        "suggestion_image_ready_sub": "Klicken Sie auf Verarbeiten, um die KI-Analyse zu starten.",
+        "suggestion_pdf_ready": "Ergebnis bereit — als PDF exportieren?",
+        "suggestion_pdf_ready_sub": "Speichern Sie einen professionellen medizinischen Bericht mit einem Klick.",
+        "suggestion_gradcam_hint": "Neugierig, was die KI gesehen hat?",
+        "suggestion_gradcam_hint_sub": "Sehen Sie die Aufmerksamkeits-Heatmap über dem Bild.",
+        "suggestion_repeated_grid": "Sie erhalten immer {grid}",
+        "suggestion_repeated_grid_sub": "Öffnen Sie die Übersicht, um die Verteilung zu sehen.",
+        "suggestion_history_hint": "Ihr Verlauf wächst",
+        "suggestion_history_hint_sub": "Durchsuchen Sie Ihre letzten 20 analysierten Bilder.",
+        "suggestion_dashboard_hint": "Ihre Übersicht hat interessante Statistiken",
+        "suggestion_dashboard_hint_sub": "Gesamtwerte, Durchschnitte und Verteilung auf einen Blick.",
+        "suggestion_settings_hint": "Personalisieren Sie die App",
+        "suggestion_settings_hint_sub": "Ändern Sie Sprache, Thema, Schriftart und aktivieren Sie 2FA.",
+        "suggestion_idle_help": "Brauchen Sie eine kurze Anleitung?",
+        "suggestion_idle_help_sub": "Wiederholen Sie die Einführung jederzeit.",
+        "image_not_liver_warning": "Dieses Bild sieht nicht wie ein Leber-Ultraschall aus.\n\nBitte fügen Sie ein korrektes Leber-Ultraschallbild ein.",
+        "result_not_confident": "Die KI konnte dieses Bild nicht sicher als Leber-Ultraschall identifizieren.\n\nBitte fügen Sie ein korrektes Leber-Ultraschallbild ein und versuchen Sie es erneut.",
+        "not_liver_title": "Kein Leber-Ultraschall",
+        "not_liver_hint": "Bitte verwenden Sie ein korrektes Leber-Ultraschallbild (Sonogramm)",
+        "voice_welcome": "Willkommen, {user}",
+        "voice_goodbye": "Auf Wiedersehen",
+        "voice_logged_out": "Erfolgreich abgemeldet",
+        "voice_image_loaded": "Bild erfolgreich geladen",
+        "voice_image_rejected": "Dies ist kein Leber-Ultraschall",
+        "voice_inference_result": "{grid_name}, Konfidenz {conf} Prozent",
+        "voice_pdf_saved": "PDF-Bericht erfolgreich gespeichert",
+        "voice_error": "Ein Fehler ist aufgetreten",
+        "voice_settings_applied": "Einstellungen angewendet",
+        "voice_language_changed": "Sprache geändert auf {lang}",
+        "voice_theme_changed": "Thema geändert",
+        "voice_2fa_enabled": "Zwei-Faktor-Authentifizierung aktiviert",
+        "voice_2fa_disabled": "Zwei-Faktor-Authentifizierung deaktiviert",
+        "voice_locked": "Sitzung gesperrt",
+        "voice_unlocked": "Sitzung entsperrt",
+        "voice_processing": "Bild wird verarbeitet",
+        "voice_processing_done": "Verarbeitung abgeschlossen",
+        "voice_voice_enabled": "Sprachfeedback aktiviert",
+        "voice_voice_disabled": "Sprachfeedback deaktiviert",
     },
     "Arabic": {
         "app_title": "خط أنابيب الذكاء الاصطناعي للكبد",
@@ -1805,6 +3209,181 @@ TRANSLATIONS = {
         "install_failed": "فشل التثبيت. إصدارك القديم آمن.",
         "download_failed": "فشل التنزيل.",
         "source_update_requires_zip": "تحديث المصدر يتطلب ملف .zip.",
+        "session_locked": "الجلسة مقفلة",
+        "locked_for_user": "مقفلة لـ {user}",
+        "unlock": "إلغاء القفل",
+        "session_unlocked": "تم إلغاء قفل الجلسة",
+        "auto_lock_notice": "سيتم قفل الجلسة بعد دقيقتين من عدم النشاط.",
+        "audit_log_title": "سجل التدقيق",
+        "audit_export": "تصدير",
+        "audit_exported": "تم التصدير بنجاح",
+        "audit_export_failed": "فشل التصدير",
+        "audit_search_placeholder": "البحث في الإجراءات أو التفاصيل...",
+        "audit_col_time": "الوقت",
+        "audit_col_level": "المستوى",
+        "audit_col_category": "الفئة",
+        "audit_col_action": "الإجراء",
+        "audit_col_user": "المستخدم",
+        "audit_details_title": "تفاصيل الحدث",
+        "audit_status": "عرض {count} من {total} حدثاً",
+        "strength_very_weak": "ضعيف جداً",
+        "strength_weak": "ضعيف",
+        "strength_medium": "متوسط",
+        "strength_strong": "قوي",
+        "strength_very_strong": "قوي جداً",
+        "strength_rule_length": "8-16 حرفاً",
+        "strength_rule_lowercase": "حرف صغير",
+        "strength_rule_uppercase": "حرف كبير",
+        "strength_rule_digits": "أرقام",
+        "strength_rule_special": "رموز خاصة",
+        "strength_add_chars": "أضف {n} حرفاً آخر",
+        "strength_remove_chars": "احذف {n} حرفاً",
+        "strength_need_digits": "أضف {n} رقماً آخر",
+        "strength_need_special": "أضف {n} رمزاً خاصاً آخر",
+        "strength_common_pattern": "تجنب الكلمات الشائعة",
+        "strength_common_year": "تجنب السنوات الشائعة",
+        "strength_has_sequence": "تجنب التسلسلات (1234، abcd)",
+        "strength_has_repeats": "تجنب التكرارات (aaaa، 1111)",
+        "passwords_match": "كلمتا المرور متطابقتان",
+        "2fa_setup_title": "تفعيل المصادقة الثنائية",
+        "2fa_setup_subtitle": "امسح رمز QR باستخدام Google Authenticator أو Authy أو Microsoft Authenticator.",
+        "2fa_manual_secret": "أو أدخل هذا الرمز يدويًا:",
+        "2fa_enter_code": "أدخل الرمز المكوّن من 6 أرقام من تطبيقك:",
+        "2fa_verify_btn": "تحقق",
+        "2fa_backup_codes_title": "احفظ رموز النسخ الاحتياطي هذه!",
+        "2fa_backup_codes_hint": "يمكن استخدام كل رمز مرة واحدة فقط. احفظها في مكان آمن.",
+        "2fa_done_btn": "تم",
+        "2fa_secret_copied": "تم نسخ الرمز السري إلى الحافظة",
+        "2fa_invalid_code": "رمز غير صالح. يرجى المحاولة مرة أخرى.",
+        "2fa_invalid_code_format": "يجب أن يتكون الرمز من 6 أرقام.",
+        "2fa_verify_title": "المصادقة الثنائية",
+        "2fa_verify_subtitle": "أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+        "2fa_enter_code_hint": "يرجى إدخال رمز.",
+        "2fa_use_backup_code": "استخدام رمز نسخ احتياطي",
+        "2fa_use_totp_code": "استخدام رمز التطبيق",
+        "2fa_enter_backup_code": "أدخل أحد رموز النسخ الاحتياطي.",
+        "2fa_section_title": "الأمان",
+        "2fa_enabled_status": "المصادقة الثنائية مفعّلة",
+        "2fa_disabled_status": "المصادقة الثنائية معطّلة",
+        "2fa_enable_btn": "تفعيل 2FA",
+        "2fa_disable_btn": "تعطيل 2FA",
+        "2fa_disable_title": "تعطيل 2FA",
+        "2fa_disable_confirm": "هل أنت متأكد؟ سيصبح حسابك أقل أمانًا.",
+        "2fa_disabled_success": "تم تعطيل المصادقة الثنائية",
+        "2fa_enabled_success": "تم تفعيل المصادقة الثنائية",
+        "2fa_hint_title": "كيفية استخدام رمز QR هذا",
+        "2fa_hint_step1": "قم بتثبيت تطبيق مصادقة: Google Authenticator أو Microsoft Authenticator أو Authy.",
+        "2fa_hint_step2": "افتح التطبيق واضغط على زر \"+\" ثم اختر \"مسح رمز QR\".",
+        "2fa_hint_step3": "وجّه كاميرا هاتفك نحو رمز QR أعلاه (استخدم كاميرا التطبيق، وليس كاميرا هاتفك).",
+        "2fa_hint_step4": "سيعرض التطبيق رمزًا مكوّنًا من 6 أرقام. أدخله في المربع أدناه.",
+        "2fa_manual_secret_hint": "لا يمكنك المسح؟ انسخ المفتاح أدناه وأضفه يدويًا في تطبيقك (\"إدخال مفتاح الإعداد\").",
+        "auto_lock_section_title": "القفل التلقائي",
+        "auto_lock_enable": "القفل بعد عدم النشاط",
+        "auto_lock_timeout_label": "القفل بعد:",
+        "auto_lock_warning_title": "تحذير القفل التلقائي",
+        "auto_lock_warning_body": "سيتم قفل جلستك خلال {seconds} ثانية بسبب عدم النشاط.",
+        "lock_now": "قفل الآن",
+        "font_section_title": "الخط",
+        "font_family_label": "عائلة الخط",
+        "font_size_label": "الحجم الأساسي",
+        "font_scale_label": "مقياس العرض",
+        "font_scale_small": "صغير",
+        "font_scale_normal": "عادي",
+        "font_scale_large": "كبير",
+        "font_scale_xlarge": "كبير جدًا",
+        "font_scale_xxlarge": "ضخم",
+        "font_preview_text": "نص تجريبي لمعاينة الخط — 1234567890",
+        "font_reset": "إعادة إلى الافتراضي",
+        "font_applied": "تم تحديث الخط",
+        "motion_section_title": "الحركة والرسوم المتحركة",
+        "reduce_motion_label": "تقليل الحركة",
+        "reduce_motion_hint": "عطّل الرسوم المتحركة إذا كانت تسبب لك الانزعاج.",
+        "empty_history_empty_title": "لا يوجد سجل بعد",
+        "empty_history_empty_subtitle": "قم بمعالجة صورتك الأولى لتظهر هنا",
+        "empty_history_empty_hint": "يتم حفظ كل نتيجة تلقائيًا",
+        "empty_history_no_user_title": "سجّل الدخول لعرض السجل",
+        "empty_history_no_user_subtitle": "ستظهر نتائجك المحفوظة هنا",
+        "empty_history_no_user_hint": "السجل خاص بكل حساب",
+        "empty_dash_no_results_title": "لا توجد نتائج بعد",
+        "empty_dash_no_results_subtitle": "ستظهر تحليلاتك الأخيرة هنا",
+        "empty_dash_no_results_hint": "قم بمعالجة صورة للبدء",
+        "empty_dash_no_dist_title": "لا توجد بيانات توزيع",
+        "empty_dash_no_dist_subtitle": "ستمتلئ الإحصائيات أثناء معالجة الصور",
+        "empty_dash_no_dist_hint": "كل تحليل مهم",
+        "empty_image_empty_title": "لم يتم إدراج صورة",
+        "empty_image_empty_subtitle": "اسحب وأفلت صورة هنا، أو انقر على إدراج",
+        "empty_image_empty_hint": "يدعم PNG، JPG، JPEG، BMP، DCM",
+        "empty_image_drop_hint_title": "أفلت للتحليل",
+        "empty_image_drop_hint_subtitle": "أفلت الصورة لتحميلها",
+        "empty_image_drop_hint_hint": "سيتم اكتشاف التنسيق تلقائيًا",
+        "empty_processing_wait_title": "جارٍ المعالجة...",
+        "empty_processing_wait_subtitle": "الذكاء الاصطناعي يحلل صورتك",
+        "empty_processing_wait_hint": "يستغرق هذا عادةً بضع ثوانٍ",
+        "tour_show_again": "إظهار الجولة مرة أخرى",
+        "tour_completed_msg": "اكتملت الجولة! أنت جاهز.",
+        "tour_skipped_msg": "تم تخطي الجولة. يمكنك إعادتها من قائمة الحساب.",
+        "tour_btn_next": "التالي",
+        "tour_btn_prev": "السابق",
+        "tour_btn_skip": "تخطي",
+        "tour_btn_finish": "إنهاء ✓",
+        "tour_guest_login_title": "تسجيل الدخول",
+        "tour_guest_login_subtitle": "انقر هنا لتسجيل الدخول وفتح جميع الميزات.",
+        "tour_guest_signup_title": "إنشاء حساب",
+        "tour_guest_signup_subtitle": "جديد هنا؟ انقر هنا لإنشاء حساب في ثوانٍ.",
+        "tour_insert_title": "إدراج صورة",
+        "tour_insert_subtitle": "حمّل صورة سونو من القرص، أو اسحبها وأفلتها في أي مكان في النافذة.",
+        "tour_process_title": "معالجة الصورة",
+        "tour_process_subtitle": "شغّل تحليل الذكاء الاصطناعي على الصورة المحملة. تظهر النتائج في بضع ثوانٍ.",
+        "tour_export_title": "تصدير PDF",
+        "tour_export_subtitle": "احفظ النتيجة الحالية كتقرير طبي احترافي بصيغة PDF.",
+        "tour_gradcam_title": "خريطة الانتباه الحرارية",
+        "tour_gradcam_subtitle": "تصوّر أين ينظر الذكاء الاصطناعي — خريطة حرارية فوق الصورة المحللة.",
+        "tour_dashboard_title": "لوحة التحكم",
+        "tour_dashboard_subtitle": "إظهار/إخفاء لوحة الإحصائيات: إجمالي الصور، متوسط الثقة، توزيع الدرجات.",
+        "tour_history_title": "السجل",
+        "tour_history_subtitle": "تصفّح آخر 20 صورة محللة. انقر على أي صورة مصغرة لإعادة تحميل نتيجتها.",
+        "tour_visit_title": "زيارة الموقع",
+        "tour_visit_subtitle": "افتح صفحة GitHub للمشروع في متصفحك للوثائق والتحديثات.",
+        "tour_mute_title": "كتم الموسيقى",
+        "tour_mute_subtitle": "أوقف أو استأنف موسيقى الخلفية في أي وقت.",
+        "tour_zoom_title": "عناصر التحكم في التكبير",
+        "tour_zoom_subtitle": "استخدم عجلة الماوس للتكبير، اسحب للتحريك، وانقر نقرًا مزدوجًا لإعادة الضبط.",
+        "tour_account_title": "قائمة الحساب",
+        "tour_account_subtitle": "انقر هنا للوصول إلى الإعدادات، معلومات الحساب، سجل التدقيق، والمزيد.",
+        "suggestion_image_ready":      "تم تحميل الصورة — جاهزة للمعالجة",
+        "suggestion_image_ready_sub":  "انقر على «معالجة» لتشغيل تحليل الذكاء الاصطناعي.",
+        "suggestion_pdf_ready":        "النتيجة جاهزة — تصدير كـ PDF؟",
+        "suggestion_pdf_ready_sub":    "احفظ تقريرًا طبيًا احترافيًا بنقرة واحدة.",
+        "suggestion_gradcam_hint":     "هل أنت فضولي لمعرفة ما نظر إليه الذكاء الاصطناعي؟",
+        "suggestion_gradcam_hint_sub": "شاهد خريطة الانتباه الحرارية فوق الصورة.",
+        "suggestion_repeated_grid":    "أنت تحصل دائمًا على {grid}",
+        "suggestion_repeated_grid_sub":"افتح لوحة التحكم لرؤية التوزيع.",
+        "suggestion_history_hint":     "سجلك يتراكم",
+        "suggestion_history_hint_sub": "تصفّح آخر 20 صورة تم تحليلها.",
+        "suggestion_dashboard_hint":   "لوحة التحكم الخاصة بك لديها إحصائيات مثيرة",
+        "suggestion_dashboard_hint_sub":"الإجماليات والمتوسطات والتوزيع بنظرة واحدة.",
+        "suggestion_settings_hint":    "خصّص التطبيق",
+        "suggestion_settings_hint_sub":"غيّر اللغة والمظهر والخط وفعّل المصادقة الثنائية.",
+        "suggestion_idle_help":        "تحتاج إلى دليل سريع؟",
+        "suggestion_idle_help_sub":    "أعد تشغيل الجولة التعريفية في أي وقت.",
+        "image_not_liver_warning": "هذه الصورة لا تبدو كصورة موجات فوق صوتية للكبد.\n\nيرجى إدراج صورة موجات فوق صوتية صحيحة للكبد.",
+        "result_not_confident": "لم يتمكن الذكاء الاصطناعي من تحديد هذه الصورة بثقة كصورة موجات فوق صوتية للكبد.\n\nيرجى إدراج صورة موجات فوق صوتية صحيحة للكبد والمحاولة مرة أخرى.",
+        "not_liver_title": "ليست صورة موجات فوق صوتية للكبد",
+        "not_liver_hint": "يرجى استخدام صورة موجات فوق صوتية (سونار) صحيحة للكبد",
+        "voice_inference_result": "{grid_name}، الثقة {conf} بالمائة",
+        "voice_pdf_saved": "تم حفظ تقرير PDF بنجاح",
+        "voice_error": "حدث خطأ",
+        "voice_settings_applied": "تم تطبيق الإعدادات",
+        "voice_language_changed": "تم تغيير اللغة إلى {lang}",
+        "voice_theme_changed": "تم تغيير المظهر",
+        "voice_2fa_enabled": "تم تفعيل المصادقة الثنائية",
+        "voice_2fa_disabled": "تم تعطيل المصادقة الثنائية",
+        "voice_locked": "تم قفل الجلسة",
+        "voice_unlocked": "تم إلغاء قفل الجلسة",
+        "voice_processing": "جارٍ معالجة الصورة",
+        "voice_processing_done": "اكتملت المعالجة",
+        "voice_voice_enabled": "تم تفعيل التغذية الصوتية",
+        "voice_voice_disabled": "تم تعطيل التغذية الصوتية",
     },
     "Ukranian": {
         "app_title": "Конвеєр ШІ печінки",
@@ -2004,6 +3583,186 @@ TRANSLATIONS = {
         "install_failed": "Встановлення не вдалося. Ваша стара версія в безпеці.",
         "download_failed": "Завантаження не вдалося.",
         "source_update_requires_zip": "Оновлення вихідного коду потребує файлу .zip.",
+        "session_locked": "Сесія заблокована",
+        "locked_for_user": "Заблоковано для {user}",
+        "unlock": "Розблокувати",
+        "session_unlocked": "Сесію розблоковано",
+        "auto_lock_notice": "Сесія заблокується через 2 хвилини бездіяльності.",
+        "audit_log_title": "Журнал аудиту",
+        "audit_export": "Експорт",
+        "audit_exported": "Успішно експортовано",
+        "audit_export_failed": "Помилка експорту",
+        "audit_search_placeholder": "Пошук дій або деталей...",
+        "audit_col_time": "Час",
+        "audit_col_level": "Рівень",
+        "audit_col_category": "Категорія",
+        "audit_col_action": "Дія",
+        "audit_col_user": "Користувач",
+        "audit_details_title": "Деталі події",
+        "audit_status": "Показано {count} з {total} подій",
+        "strength_very_weak": "Дуже слабкий",
+        "strength_weak": "Слабкий",
+        "strength_medium": "Середній",
+        "strength_strong": "Сильний",
+        "strength_very_strong": "Дуже сильний",
+        "strength_rule_length": "8-16 символів",
+        "strength_rule_lowercase": "Мала літера",
+        "strength_rule_uppercase": "Велика літера",
+        "strength_rule_digits": "Цифри",
+        "strength_rule_special": "Спеціальні символи",
+        "strength_add_chars": "Додайте ще {n} символ(ів)",
+        "strength_remove_chars": "Приберіть {n} символ(ів)",
+        "strength_need_digits": "Додайте ще {n} цифр(и)",
+        "strength_need_special": "Додайте ще {n} спеціальних символ(ів)",
+        "strength_common_pattern": "Уникайте поширених слів",
+        "strength_common_year": "Уникайте поширених років",
+        "strength_has_sequence": "Уникайте послідовностей (1234, abcd)",
+        "strength_has_repeats": "Уникайте повторів (aaaa, 1111)",
+        "passwords_match": "Паролі збігаються",
+        "2fa_setup_title": "Увімкнути двофакторну автентифікацію",
+        "2fa_setup_subtitle": "Відскануйте QR-код за допомогою Google Authenticator, Authy або Microsoft Authenticator.",
+        "2fa_manual_secret": "Або введіть цей код вручну:",
+        "2fa_enter_code": "Введіть 6-значний код із застосунку:",
+        "2fa_verify_btn": "Підтвердити",
+        "2fa_backup_codes_title": "Збережіть ці резервні коди!",
+        "2fa_backup_codes_hint": "Кожен код можна використати лише один раз. Зберігайте їх у безпечному місці.",
+        "2fa_done_btn": "Готово",
+        "2fa_secret_copied": "Секретний код скопійовано до буфера обміну",
+        "2fa_invalid_code": "Невірний код. Спробуйте ще раз.",
+        "2fa_invalid_code_format": "Код має складатися з 6 цифр.",
+        "2fa_verify_title": "Двофакторна автентифікація",
+        "2fa_verify_subtitle": "Введіть 6-значний код із застосунку-автентифікатора.",
+        "2fa_enter_code_hint": "Будь ласка, введіть код.",
+        "2fa_use_backup_code": "Використати резервний код",
+        "2fa_use_totp_code": "Використати код застосунку",
+        "2fa_enter_backup_code": "Введіть один із ваших резервних кодів.",
+        "2fa_section_title": "Безпека",
+        "2fa_enabled_status": "Двофакторну автентифікацію увімкнено",
+        "2fa_disabled_status": "Двофакторну автентифікацію вимкнено",
+        "2fa_enable_btn": "Увімкнути 2FA",
+        "2fa_disable_btn": "Вимкнути 2FA",
+        "2fa_disable_title": "Вимкнути 2FA",
+        "2fa_disable_confirm": "Ви впевнені? Ваш обліковий запис стане менш захищеним.",
+        "2fa_disabled_success": "Двофакторну автентифікацію вимкнено",
+        "2fa_enabled_success": "Двофакторну автентифікацію увімкнено",
+        "2fa_hint_title": "Як використовувати цей QR-код",
+        "2fa_hint_step1": "Встановіть застосунок-автентифікатор: Google Authenticator, Microsoft Authenticator або Authy.",
+        "2fa_hint_step2": "Відкрийте застосунок, натисніть кнопку «+» і виберіть «Сканувати QR-код».",
+        "2fa_hint_step3": "Наведіть камеру телефону на QR-код вище (використовуйте камеру застосунку, а не камеру телефону).",
+        "2fa_hint_step4": "Застосунок покаже 6-значний код. Введіть його в полі нижче.",
+        "2fa_manual_secret_hint": "Не можете відсканувати? Скопіюйте ключ нижче та додайте його вручну у застосунку («Ввести ключ налаштування»).",
+        "auto_lock_section_title": "Автоблокування",
+        "auto_lock_enable": "Блокувати після бездіяльності",
+        "auto_lock_timeout_label": "Блокувати через:",
+        "auto_lock_warning_title": "Попередження про автоблокування",
+        "auto_lock_warning_body": "Вашу сесію буде заблоковано через {seconds} секунд через бездіяльність.",
+        "lock_now": "Заблокувати зараз",
+        "font_section_title": "Шрифт",
+        "font_family_label": "Сімейство шрифтів",
+        "font_size_label": "Базовий розмір",
+        "font_scale_label": "Масштаб відображення",
+        "font_scale_small": "Малий",
+        "font_scale_normal": "Звичайний",
+        "font_scale_large": "Великий",
+        "font_scale_xlarge": "Дуже великий",
+        "font_scale_xxlarge": "Величезний",
+        "font_preview_text": "Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів! — 1234567890",
+        "font_reset": "Скинути до стандартного",
+        "font_applied": "Шрифт оновлено",
+        "motion_section_title": "Рух і анімації",
+        "reduce_motion_label": "Зменшити рух",
+        "reduce_motion_hint": "Вимкніть анімації, якщо вони викликають у вас дискомфорт.",
+        "empty_history_empty_title": "Поки немає історії",
+        "empty_history_empty_subtitle": "Обробіть перше зображення, щоб побачити його тут",
+        "empty_history_empty_hint": "Кожен результат зберігається автоматично",
+        "empty_history_no_user_title": "Увійдіть, щоб переглянути історію",
+        "empty_history_no_user_subtitle": "Ваші збережені результати з'являться тут",
+        "empty_history_no_user_hint": "Історія приватна для кожного акаунта",
+        "empty_dash_no_results_title": "Поки немає результатів",
+        "empty_dash_no_results_subtitle": "Ваші останні аналізи з'являться тут",
+        "empty_dash_no_results_hint": "Обробіть зображення, щоб почати",
+        "empty_dash_no_dist_title": "Немає даних розподілу",
+        "empty_dash_no_dist_subtitle": "Статистика заповнюватиметься в міру обробки",
+        "empty_dash_no_dist_hint": "Кожен аналіз важливий",
+        "empty_image_empty_title": "Зображення не вставлено",
+        "empty_image_empty_subtitle": "Перетягніть зображення сюди або натисніть «Вставити»",
+        "empty_image_empty_hint": "Підтримуються PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Відпустіть для аналізу",
+        "empty_image_drop_hint_subtitle": "Відпустіть зображення, щоб завантажити",
+        "empty_image_drop_hint_hint": "Формат визначиться автоматично",
+        "empty_processing_wait_title": "Обробка...",
+        "empty_processing_wait_subtitle": "ШІ аналізує ваше зображення",
+        "empty_processing_wait_hint": "Зазвичай це займає кілька секунд",
+        "tour_show_again": "Показати тур знову",
+        "tour_completed_msg": "Тур завершено! Ви готові.",
+        "tour_skipped_msg": "Тур пропущено. Ви можете повторити його з меню акаунта.",
+        "tour_btn_next": "Далі",
+        "tour_btn_prev": "Назад",
+        "tour_btn_skip": "Пропустити",
+        "tour_btn_finish": "Готово ✓",
+        "tour_guest_login_title": "Вхід",
+        "tour_guest_login_subtitle": "Натисніть тут, щоб увійти в акаунт і відкрити всі можливості.",
+        "tour_guest_signup_title": "Створити акаунт",
+        "tour_guest_signup_subtitle": "Вперше тут? Натисніть тут, щоб створити акаунт за секунди.",
+        "tour_insert_title": "Вставити зображення",
+        "tour_insert_subtitle": "Завантажте сонограму з диска або перетягніть її будь-де у вікні.",
+        "tour_process_title": "Обробити зображення",
+        "tour_process_subtitle": "Запустіть ШІ-аналіз завантаженого зображення. Результати з'являться за кілька секунд.",
+        "tour_export_title": "Експорт PDF",
+        "tour_export_subtitle": "Збережіть поточний результат як професійний медичний PDF-звіт.",
+        "tour_gradcam_title": "Теплова карта уваги",
+        "tour_gradcam_subtitle": "Подивіться, куди дивиться ШІ — теплова карта поверх аналізованого зображення.",
+        "tour_dashboard_title": "Панель керування",
+        "tour_dashboard_subtitle": "Показати/приховати панель статистики: всього зображень, середня впевненість, розподіл за ступенями.",
+        "tour_history_title": "Історія",
+        "tour_history_subtitle": "Перегляньте останні 20 проаналізованих зображень. Натисніть на мініатюру, щоб завантажити результат знову.",
+        "tour_visit_title": "Відвідати сайт",
+        "tour_visit_subtitle": "Відкрийте сторінку GitHub проєкту в браузері для документації та оновлень.",
+        "tour_mute_title": "Вимкнути музику",
+        "tour_mute_subtitle": "Призупиніть або відновіть фонову музику будь-коли.",
+        "tour_zoom_title": "Керування масштабом",
+        "tour_zoom_subtitle": "Колесо миші — масштаб, перетягування — панорама, подвійний клік — скидання.",
+        "tour_account_title": "Меню акаунта",
+        "tour_account_subtitle": "Натисніть тут, щоб відкрити Налаштування, Інформацію про акаунт, Журнал аудиту та інше.",
+        "suggestion_image_ready": "Зображення завантажено — готове до обробки",
+        "suggestion_image_ready_sub": "Натисніть «Обробити», щоб запустити аналіз ШІ.",
+        "suggestion_pdf_ready": "Результат готовий — експортувати в PDF?",
+        "suggestion_pdf_ready_sub": "Збережіть професійний медичний звіт одним кліком.",
+        "suggestion_gradcam_hint": "Цікаво, куди дивився ШІ?",
+        "suggestion_gradcam_hint_sub": "Подивіться теплову карту уваги поверх зображення.",
+        "suggestion_repeated_grid": "Ви постійно отримуєте {grid}",
+        "suggestion_repeated_grid_sub": "Відкрийте панель, щоб побачити розподіл.",
+        "suggestion_history_hint": "Ваша історія наповнюється",
+        "suggestion_history_hint_sub": "Перегляньте останні 20 проаналізованих зображень.",
+        "suggestion_dashboard_hint": "На вашій панелі є цікава статистика",
+        "suggestion_dashboard_hint_sub": "Підсумки, середні значення та розподіл одним поглядом.",
+        "suggestion_settings_hint": "Налаштуйте застосунок під себе",
+        "suggestion_settings_hint_sub": "Змініть мову, тему, шрифт і увімкніть 2FA.",
+        "suggestion_idle_help": "Потрібна швидка підказка?",
+        "suggestion_idle_help_sub": "Повторіть навчальний тур у будь-який час.",
+        "image_not_liver_warning": "Це зображення не схоже на УЗД печінки.\n\nБудь ласка, вставте відповідне зображення УЗД печінки.",
+        "result_not_confident": "ШІ не зміг упевнено ідентифікувати це зображення як УЗД печінки.\n\nБудь ласка, вставте відповідне зображення УЗД печінки та спробуйте ще раз.",
+        "not_liver_title": "Не УЗД печінки",
+        "not_liver_hint": "Будь ласка, використовуйте відповідне зображення УЗД (сонограму) печінки",
+        "voice_welcome": "Ласкаво просимо, {user}",
+        "voice_goodbye": "До побачення",
+        "voice_logged_out": "Вихід виконано успішно",
+        "voice_image_loaded": "Зображення успішно завантажено",
+        "voice_image_rejected": "Це не УЗД печінки",
+        "voice_inference_result": "{grid_name}, впевненість {conf} відсотків",
+        "voice_pdf_saved": "PDF-звіт успішно збережено",
+        "voice_error": "Сталася помилка",
+        "voice_settings_applied": "Налаштування застосовано",
+        "voice_language_changed": "Мову змінено на {lang}",
+        "voice_theme_changed": "Тему змінено",
+        "voice_2fa_enabled": "Двофакторну автентифікацію увімкнено",
+        "voice_2fa_disabled": "Двофакторну автентифікацію вимкнено",
+        "voice_locked": "Сесію заблоковано",
+        "voice_unlocked": "Сесію розблоковано",
+        "voice_processing": "Обробка зображення",
+        "voice_processing_done": "Обробку завершено",
+        "voice_voice_enabled": "Голосовий зворотний зв'язок увімкнено",
+        "voice_voice_disabled": "Голосовий зворотний зв'язок вимкнено",
     },
     "Italy": {
         "app_title": "Pipeline IA del Fegato",
@@ -2203,6 +3962,186 @@ TRANSLATIONS = {
         "install_failed": "Installazione non riuscita. La tua vecchia versione è al sicuro.",
         "download_failed": "Download non riuscito.",
         "source_update_requires_zip": "L'aggiornamento sorgente richiede un file .zip.",
+        "session_locked": "Sessione Bloccata",
+        "locked_for_user": "Bloccata per {user}",
+        "unlock": "Sblocca",
+        "session_unlocked": "Sessione sbloccata",
+        "auto_lock_notice": "La sessione si bloccherà dopo 2 minuti di inattività.",
+        "audit_log_title": "Registro di Audit",
+        "audit_export": "Esporta",
+        "audit_exported": "Esportato con successo",
+        "audit_export_failed": "Esportazione non riuscita",
+        "audit_search_placeholder": "Cerca azioni o dettagli...",
+        "audit_col_time": "Ora",
+        "audit_col_level": "Livello",
+        "audit_col_category": "Categoria",
+        "audit_col_action": "Azione",
+        "audit_col_user": "Utente",
+        "audit_details_title": "Dettagli Evento",
+        "audit_status": "Visualizzazione {count} di {total} eventi",
+        "strength_very_weak": "Molto debole",
+        "strength_weak": "Debole",
+        "strength_medium": "Media",
+        "strength_strong": "Forte",
+        "strength_very_strong": "Molto forte",
+        "strength_rule_length": "8-16 caratteri",
+        "strength_rule_lowercase": "Lettera minuscola",
+        "strength_rule_uppercase": "Lettera maiuscola",
+        "strength_rule_digits": "Cifre",
+        "strength_rule_special": "Caratteri speciali",
+        "strength_add_chars": "Aggiungi {n} carattere/i in più",
+        "strength_remove_chars": "Rimuovi {n} carattere/i",
+        "strength_need_digits": "Aggiungi {n} cifra/e in più",
+        "strength_need_special": "Aggiungi {n} carattere/i speciale/i in più",
+        "strength_common_pattern": "Evita parole comuni",
+        "strength_common_year": "Evita anni comuni",
+        "strength_has_sequence": "Evita sequenze (1234, abcd)",
+        "strength_has_repeats": "Evita ripetizioni (aaaa, 1111)",
+        "passwords_match": "Le password corrispondono",
+        "2fa_setup_title": "Abilita l'autenticazione a due fattori",
+        "2fa_setup_subtitle": "Scansiona il codice QR con Google Authenticator, Authy o Microsoft Authenticator.",
+        "2fa_manual_secret": "Oppure inserisci questo codice manualmente:",
+        "2fa_enter_code": "Inserisci il codice a 6 cifre dalla tua app:",
+        "2fa_verify_btn": "Verifica",
+        "2fa_backup_codes_title": "Salva questi codici di backup!",
+        "2fa_backup_codes_hint": "Ogni codice può essere usato una sola volta. Conservali in un luogo sicuro.",
+        "2fa_done_btn": "Fatto",
+        "2fa_secret_copied": "Codice segreto copiato negli appunti",
+        "2fa_invalid_code": "Codice non valido. Riprova.",
+        "2fa_invalid_code_format": "Il codice deve contenere 6 cifre.",
+        "2fa_verify_title": "Autenticazione a due fattori",
+        "2fa_verify_subtitle": "Inserisci il codice a 6 cifre dalla tua app di autenticazione.",
+        "2fa_enter_code_hint": "Inserisci un codice.",
+        "2fa_use_backup_code": "Usa un codice di backup",
+        "2fa_use_totp_code": "Usa il codice dell'app",
+        "2fa_enter_backup_code": "Inserisci uno dei tuoi codici di backup.",
+        "2fa_section_title": "Sicurezza",
+        "2fa_enabled_status": "L'autenticazione a due fattori è abilitata",
+        "2fa_disabled_status": "L'autenticazione a due fattori è disabilitata",
+        "2fa_enable_btn": "Abilita 2FA",
+        "2fa_disable_btn": "Disabilita 2FA",
+        "2fa_disable_title": "Disabilita 2FA",
+        "2fa_disable_confirm": "Sei sicuro? Il tuo account sarà meno sicuro.",
+        "2fa_disabled_success": "Autenticazione a due fattori disabilitata",
+        "2fa_enabled_success": "Autenticazione a due fattori abilitata",
+        "2fa_hint_title": "Come utilizzare questo codice QR",
+        "2fa_hint_step1": "Installa un'app di autenticazione: Google Authenticator, Microsoft Authenticator o Authy.",
+        "2fa_hint_step2": "Apri l'app, tocca il pulsante «+» e scegli «Scansiona codice QR».",
+        "2fa_hint_step3": "Punta la fotocamera del telefono verso il codice QR sopra (usa la fotocamera dell'app, non quella del telefono).",
+        "2fa_hint_step4": "L'app mostrerà un codice a 6 cifre. Inseriscilo nel campo sottostante.",
+        "2fa_manual_secret_hint": "Non riesci a scansionare? Copia la chiave qui sotto e aggiungila manualmente nell'app («Inserisci chiave di configurazione»).",
+        "auto_lock_section_title": "Blocco automatico",
+        "auto_lock_enable": "Blocca dopo inattività",
+        "auto_lock_timeout_label": "Blocca dopo:",
+        "auto_lock_warning_title": "Avviso di blocco automatico",
+        "auto_lock_warning_body": "La tua sessione verrà bloccata tra {seconds} secondi per inattività.",
+        "lock_now": "Blocca ora",
+        "font_section_title": "Carattere",
+        "font_family_label": "Famiglia di caratteri",
+        "font_size_label": "Dimensione base",
+        "font_scale_label": "Scala di visualizzazione",
+        "font_scale_small": "Piccolo",
+        "font_scale_normal": "Normale",
+        "font_scale_large": "Grande",
+        "font_scale_xlarge": "Molto grande",
+        "font_scale_xxlarge": "Enorme",
+        "font_preview_text": "Ma la volpe, col suo balzo, raggiunse il piccolo cane — 1234567890",
+        "font_reset": "Ripristina predefinito",
+        "font_applied": "Carattere aggiornato",
+        "motion_section_title": "Movimento e animazioni",
+        "reduce_motion_label": "Riduci movimento",
+        "reduce_motion_hint": "Disattiva le animazioni se ti mettono a disagio.",
+        "empty_history_empty_title": "Nessuna cronologia ancora",
+        "empty_history_empty_subtitle": "Elabora la tua prima immagine per vederla qui",
+        "empty_history_empty_hint": "Ogni risultato viene salvato automaticamente",
+        "empty_history_no_user_title": "Accedi per vedere la cronologia",
+        "empty_history_no_user_subtitle": "I tuoi risultati salvati appariranno qui",
+        "empty_history_no_user_hint": "La cronologia è privata per ogni account",
+        "empty_dash_no_results_title": "Nessun risultato ancora",
+        "empty_dash_no_results_subtitle": "Le tue analisi recenti appariranno qui",
+        "empty_dash_no_results_hint": "Elabora un'immagine per iniziare",
+        "empty_dash_no_dist_title": "Nessun dato di distribuzione",
+        "empty_dash_no_dist_subtitle": "Le statistiche si riempiranno man mano",
+        "empty_dash_no_dist_hint": "Ogni analisi conta",
+        "empty_image_empty_title": "Nessuna immagine inserita",
+        "empty_image_empty_subtitle": "Trascina un'immagine qui o clicca Inserisci",
+        "empty_image_empty_hint": "Supporta PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Rilascia per analizzare",
+        "empty_image_drop_hint_subtitle": "Rilascia l'immagine per caricarla",
+        "empty_image_drop_hint_hint": "Il formato verrà rilevato automaticamente",
+        "empty_processing_wait_title": "Elaborazione...",
+        "empty_processing_wait_subtitle": "L'IA sta analizzando la tua immagine",
+        "empty_processing_wait_hint": "Di solito richiede pochi secondi",
+        "tour_show_again": "Mostra di nuovo il tour",
+        "tour_completed_msg": "Tour completato! Sei pronto.",
+        "tour_skipped_msg": "Tour saltato. Puoi ripeterlo dal menu Account.",
+        "tour_btn_next": "Avanti",
+        "tour_btn_prev": "Indietro",
+        "tour_btn_skip": "Salta",
+        "tour_btn_finish": "Fine ✓",
+        "tour_guest_login_title": "Accedi",
+        "tour_guest_login_subtitle": "Clicca qui per accedere e sbloccare tutte le funzionalità.",
+        "tour_guest_signup_title": "Crea un account",
+        "tour_guest_signup_subtitle": "Nuovo qui? Clicca qui per creare un account in pochi secondi.",
+        "tour_insert_title": "Inserisci immagine",
+        "tour_insert_subtitle": "Carica un'immagine ecografica dal disco, o trascinala in qualsiasi punto della finestra.",
+        "tour_process_title": "Elabora immagine",
+        "tour_process_subtitle": "Avvia l'analisi AI sull'immagine caricata. I risultati appaiono in pochi secondi.",
+        "tour_export_title": "Esporta PDF",
+        "tour_export_subtitle": "Salva il risultato corrente come report medico PDF professionale.",
+        "tour_gradcam_title": "Mappa di calore dell'attenzione",
+        "tour_gradcam_subtitle": "Visualizza dove guarda l'IA — una mappa di calore sopra l'immagine analizzata.",
+        "tour_dashboard_title": "Pannello",
+        "tour_dashboard_subtitle": "Mostra/nascondi il pannello statistiche: totale immagini, confidenza media, distribuzione dei gradi.",
+        "tour_history_title": "Cronologia",
+        "tour_history_subtitle": "Sfoglia le ultime 20 immagini analizzate. Clicca su una miniatura per ricaricare il risultato.",
+        "tour_visit_title": "Visita il sito",
+        "tour_visit_subtitle": "Apri la pagina GitHub del progetto nel browser per documentazione e aggiornamenti.",
+        "tour_mute_title": "Muto",
+        "tour_mute_subtitle": "Metti in pausa o riprendi la musica di sottofondo in qualsiasi momento.",
+        "tour_zoom_title": "Controlli zoom",
+        "tour_zoom_subtitle": "Usa la rotella per lo zoom, trascina per spostare, doppio clic per reimpostare.",
+        "tour_account_title": "Menu account",
+        "tour_account_subtitle": "Clicca qui per accedere a Impostazioni, Info account, Registro di audit e altro.",
+        "suggestion_image_ready": "Immagine caricata — pronta per l'elaborazione",
+        "suggestion_image_ready_sub": "Clicca su Elabora per avviare l'analisi IA.",
+        "suggestion_pdf_ready": "Risultato pronto — esportare in PDF?",
+        "suggestion_pdf_ready_sub": "Salva un rapporto medico professionale con un clic.",
+        "suggestion_gradcam_hint": "Curioso di cosa ha visto l'IA?",
+        "suggestion_gradcam_hint_sub": "Guarda la mappa di calore dell'attenzione sull'immagine.",
+        "suggestion_repeated_grid": "Ottieni sempre {grid}",
+        "suggestion_repeated_grid_sub": "Apri il pannello per vedere la distribuzione.",
+        "suggestion_history_hint": "La tua cronologia si sta accumulando",
+        "suggestion_history_hint_sub": "Sfoglia le tue ultime 20 immagini analizzate.",
+        "suggestion_dashboard_hint": "Il tuo pannello ha statistiche interessanti",
+        "suggestion_dashboard_hint_sub": "Totali, medie e distribuzione a colpo d'occhio.",
+        "suggestion_settings_hint": "Personalizza l'app",
+        "suggestion_settings_hint_sub": "Cambia lingua, tema, carattere e abilita la 2FA.",
+        "suggestion_idle_help": "Ti serve una guida rapida?",
+        "suggestion_idle_help_sub": "Ripeti il tour di benvenuto in qualsiasi momento.",
+        "image_not_liver_warning": "Questa immagine non sembra un'ecografia del fegato.\n\nInserisci un'immagine ecografica del fegato appropriata.",
+        "result_not_confident": "L'IA non è riuscita a identificare con certezza questa immagine come un'ecografia del fegato.\n\nInserisci un'immagine ecografica del fegato appropriata e riprova.",
+        "not_liver_title": "Non è un'ecografia del fegato",
+        "not_liver_hint": "Utilizza un'immagine ecografica (sonogramma) del fegato appropriata",
+        "voice_welcome": "Benvenuto, {user}",
+        "voice_goodbye": "Arrivederci",
+        "voice_logged_out": "Disconnessione riuscita",
+        "voice_image_loaded": "Immagine caricata con successo",
+        "voice_image_rejected": "Questa non è un'ecografia del fegato",
+        "voice_inference_result": "{grid_name}, confidenza {conf} per cento",
+        "voice_pdf_saved": "Report PDF salvato con successo",
+        "voice_error": "Si è verificato un errore",
+        "voice_settings_applied": "Impostazioni applicate",
+        "voice_language_changed": "Lingua cambiata in {lang}",
+        "voice_theme_changed": "Tema cambiato",
+        "voice_2fa_enabled": "Autenticazione a due fattori abilitata",
+        "voice_2fa_disabled": "Autenticazione a due fattori disabilitata",
+        "voice_locked": "Sessione bloccata",
+        "voice_unlocked": "Sessione sbloccata",
+        "voice_processing": "Elaborazione immagine",
+        "voice_processing_done": "Elaborazione completata",
+        "voice_voice_enabled": "Feedback vocale abilitato",
+        "voice_voice_disabled": "Feedback vocale disabilitato",
     },
     "China": {
         "app_title": "肝脏AI-babak",
@@ -2402,6 +4341,186 @@ TRANSLATIONS = {
         "install_failed": "安装失败。您的旧版本是安全的。",
         "download_failed": "下载失败。",
         "source_update_requires_zip": "源码更新需要 .zip 文件。",
+        "session_locked": "会话已锁定",
+        "locked_for_user": "已为 {user} 锁定",
+        "unlock": "解锁",
+        "session_unlocked": "会话已解锁",
+        "auto_lock_notice": "会话将在 2 分钟无操作后锁定。",
+        "audit_log_title": "审计日志",
+        "audit_export": "导出",
+        "audit_exported": "导出成功",
+        "audit_export_failed": "导出失败",
+        "audit_search_placeholder": "搜索操作或详情...",
+        "audit_col_time": "时间",
+        "audit_col_level": "级别",
+        "audit_col_category": "类别",
+        "audit_col_action": "操作",
+        "audit_col_user": "用户",
+        "audit_details_title": "事件详情",
+        "audit_status": "显示 {count} / {total} 个事件",
+        "strength_very_weak": "非常弱",
+        "strength_weak": "弱",
+        "strength_medium": "中等",
+        "strength_strong": "强",
+        "strength_very_strong": "非常强",
+        "strength_rule_length": "8-16 个字符",
+        "strength_rule_lowercase": "小写字母",
+        "strength_rule_uppercase": "大写字母",
+        "strength_rule_digits": "数字",
+        "strength_rule_special": "特殊字符",
+        "strength_add_chars": "再添加 {n} 个字符",
+        "strength_remove_chars": "删除 {n} 个字符",
+        "strength_need_digits": "再添加 {n} 个数字",
+        "strength_need_special": "再添加 {n} 个特殊字符",
+        "strength_common_pattern": "避免常见词汇",
+        "strength_common_year": "避免常见年份",
+        "strength_has_sequence": "避免序列（1234、abcd）",
+        "strength_has_repeats": "避免重复（aaaa、1111）",
+        "passwords_match": "密码匹配",
+        "2fa_setup_title": "启用双因素认证",
+        "2fa_setup_subtitle": "使用 Google Authenticator、Authy 或 Microsoft Authenticator 扫描二维码。",
+        "2fa_manual_secret": "或手动输入此代码：",
+        "2fa_enter_code": "输入您应用中的 6 位代码：",
+        "2fa_verify_btn": "验证",
+        "2fa_backup_codes_title": "请保存这些备用代码！",
+        "2fa_backup_codes_hint": "每个代码仅可使用一次。请将它们存放在安全的地方。",
+        "2fa_done_btn": "完成",
+        "2fa_secret_copied": "密钥已复制到剪贴板",
+        "2fa_invalid_code": "代码无效。请重试。",
+        "2fa_invalid_code_format": "代码必须为 6 位数字。",
+        "2fa_verify_title": "双因素认证",
+        "2fa_verify_subtitle": "输入您验证器应用中的 6 位代码。",
+        "2fa_enter_code_hint": "请输入代码。",
+        "2fa_use_backup_code": "改用备用代码",
+        "2fa_use_totp_code": "改用验证器代码",
+        "2fa_enter_backup_code": "输入您的其中一个备用代码。",
+        "2fa_section_title": "安全",
+        "2fa_enabled_status": "双因素认证已启用",
+        "2fa_disabled_status": "双因素认证已禁用",
+        "2fa_enable_btn": "启用 2FA",
+        "2fa_disable_btn": "禁用 2FA",
+        "2fa_disable_title": "禁用 2FA",
+        "2fa_disable_confirm": "您确定吗？您的账户将变得不那么安全。",
+        "2fa_disabled_success": "双因素认证已禁用",
+        "2fa_enabled_success": "双因素认证已启用",
+        "2fa_hint_title": "如何使用此二维码",
+        "2fa_hint_step1": "安装身份验证器应用：Google Authenticator、Microsoft Authenticator 或 Authy。",
+        "2fa_hint_step2": "打开应用，点击「+」按钮，然后选择「扫描二维码」。",
+        "2fa_hint_step3": "将手机摄像头对准上方的二维码（请使用应用内的摄像头，而不是手机自带的相机应用）。",
+        "2fa_hint_step4": "应用会显示 6 位代码。在下方输入框中输入该代码。",
+        "2fa_manual_secret_hint": "无法扫描？请复制下方密钥，并在应用中手动添加（「输入设置密钥」）。",
+        "auto_lock_section_title": "自动锁定",
+        "auto_lock_enable": "无操作后锁定",
+        "auto_lock_timeout_label": "锁定时间:",
+        "auto_lock_warning_title": "自动锁定警告",
+        "auto_lock_warning_body": "由于无操作，您的会话将在 {seconds} 秒后锁定。",
+        "lock_now": "立即锁定",
+        "font_section_title": "字体",
+        "font_family_label": "字体族",
+        "font_size_label": "基础大小",
+        "font_scale_label": "显示缩放",
+        "font_scale_small": "小",
+        "font_scale_normal": "正常",
+        "font_scale_large": "大",
+        "font_scale_xlarge": "特大",
+        "font_scale_xxlarge": "巨大",
+        "font_preview_text": "敏捷的棕色狐狸跳过懒狗 — 1234567890",
+        "font_reset": "恢复默认",
+        "font_applied": "字体已更新",
+        "motion_section_title": "动作和动画",
+        "reduce_motion_label": "减少动态效果",
+        "reduce_motion_hint": "如果动画让您感到不适，请禁用它们。",
+        "empty_history_empty_title": "暂无历史记录",
+        "empty_history_empty_subtitle": "处理您的第一张图像即可在此查看",
+        "empty_history_empty_hint": "每个结果都会自动保存",
+        "empty_history_no_user_title": "登录以查看历史记录",
+        "empty_history_no_user_subtitle": "您保存的结果将显示在此处",
+        "empty_history_no_user_hint": "历史记录对每个账户私密",
+        "empty_dash_no_results_title": "暂无结果",
+        "empty_dash_no_results_subtitle": "您最近的分析将显示在此处",
+        "empty_dash_no_results_hint": "处理图像即可开始",
+        "empty_dash_no_dist_title": "暂无分布数据",
+        "empty_dash_no_dist_subtitle": "处理图像后统计信息将逐渐填充",
+        "empty_dash_no_dist_hint": "每次分析都很重要",
+        "empty_image_empty_title": "未插入图像",
+        "empty_image_empty_subtitle": "将图像拖放到此处，或点击「插入」",
+        "empty_image_empty_hint": "支持 PNG、JPG、JPEG、BMP、DCM",
+        "empty_image_drop_hint_title": "松开以分析",
+        "empty_image_drop_hint_subtitle": "松开图像以加载",
+        "empty_image_drop_hint_hint": "将自动识别格式",
+        "empty_processing_wait_title": "正在处理...",
+        "empty_processing_wait_subtitle": "AI 正在分析您的图像",
+        "empty_processing_wait_hint": "通常需要几秒钟",
+        "tour_show_again": "再次显示导览",
+        "tour_completed_msg": "导览已完成！您可以开始了。",
+        "tour_skipped_msg": "导览已跳过。您可以从账户菜单再次查看。",
+        "tour_btn_next": "下一步",
+        "tour_btn_prev": "上一步",
+        "tour_btn_skip": "跳过",
+        "tour_btn_finish": "完成 ✓",
+        "tour_guest_login_title": "登录",
+        "tour_guest_login_subtitle": "点击此处登录并解锁全部功能。",
+        "tour_guest_signup_title": "创建账户",
+        "tour_guest_signup_subtitle": "第一次来？点击此处几秒钟内创建账户。",
+        "tour_insert_title": "插入图像",
+        "tour_insert_subtitle": "从磁盘加载超声图像，或将图像拖放到窗口任意位置。",
+        "tour_process_title": "处理图像",
+        "tour_process_subtitle": "对已加载的图像运行 AI 分析。结果将在几秒内显示。",
+        "tour_export_title": "导出 PDF",
+        "tour_export_subtitle": "将当前结果保存为专业的 PDF 医疗报告。",
+        "tour_gradcam_title": "注意力热力图",
+        "tour_gradcam_subtitle": "可视化 AI 关注的位置 — 在分析图像上叠加的热力图。",
+        "tour_dashboard_title": "仪表板",
+        "tour_dashboard_subtitle": "显示/隐藏统计面板：图像总数、平均置信度、等级分布。",
+        "tour_history_title": "历史记录",
+        "tour_history_subtitle": "浏览最近 20 张已分析的图像。点击任意缩略图重新加载其结果。",
+        "tour_visit_title": "访问网页",
+        "tour_visit_subtitle": "在浏览器中打开项目的 GitHub 页面以查看文档和更新。",
+        "tour_mute_title": "静音音乐",
+        "tour_mute_subtitle": "随时暂停或恢复背景音乐。",
+        "tour_zoom_title": "缩放控制",
+        "tour_zoom_subtitle": "使用鼠标滚轮缩放，拖动平移，双击重置。",
+        "tour_account_title": "账户菜单",
+        "tour_account_subtitle": "点击此处访问设置、账户信息、审计日志等。",
+        "suggestion_image_ready": "图像已加载 — 可以处理了",
+        "suggestion_image_ready_sub": "点击「处理」以运行 AI 分析。",
+        "suggestion_pdf_ready": "结果已就绪 — 导出为 PDF？",
+        "suggestion_pdf_ready_sub": "一键保存专业医疗报告。",
+        "suggestion_gradcam_hint": "想知道 AI 看到了什么吗？",
+        "suggestion_gradcam_hint_sub": "查看图像上的注意力热力图。",
+        "suggestion_repeated_grid": "你总是得到 {grid}",
+        "suggestion_repeated_grid_sub": "打开仪表板查看分布。",
+        "suggestion_history_hint": "你的历史记录正在累积",
+        "suggestion_history_hint_sub": "浏览你最近分析的 20 张图像。",
+        "suggestion_dashboard_hint": "你的仪表板有有趣的统计",
+        "suggestion_dashboard_hint_sub": "一目了然地查看总数、平均值和分布。",
+        "suggestion_settings_hint": "个性化应用",
+        "suggestion_settings_hint_sub": "更改语言、主题、字体并启用 2FA。",
+        "suggestion_idle_help": "需要快速指南吗？",
+        "suggestion_idle_help_sub": "随时重新播放引导之旅。",
+        "image_not_liver_warning": "此图像看起来不像肝脏超声图像。\n\n请插入正确的肝脏超声图像。",
+        "result_not_confident": "AI 无法确信地将此图像识别为肝脏超声图像。\n\n请插入正确的肝脏超声图像并重试。",
+        "not_liver_title": "不是肝脏超声图像",
+        "not_liver_hint": "请使用正确的肝脏超声（声像图）图像",
+        "voice_welcome": "欢迎，{user}",
+        "voice_goodbye": "再见",
+        "voice_logged_out": "已成功退出登录",
+        "voice_image_loaded": "图像加载成功",
+        "voice_image_rejected": "这不是肝脏超声图像",
+        "voice_inference_result": "{grid_name}，置信度 {conf} 百分比",
+        "voice_pdf_saved": "PDF 报告已成功保存",
+        "voice_error": "发生错误",
+        "voice_settings_applied": "设置已应用",
+        "voice_language_changed": "语言已更改为 {lang}",
+        "voice_theme_changed": "主题已更改",
+        "voice_2fa_enabled": "双因素认证已启用",
+        "voice_2fa_disabled": "双因素认证已禁用",
+        "voice_locked": "会话已锁定",
+        "voice_unlocked": "会话已解锁",
+        "voice_processing": "正在处理图像",
+        "voice_processing_done": "处理完成",
+        "voice_voice_enabled": "语音反馈已启用",
+        "voice_voice_disabled": "语音反馈已禁用",
     },
     "Japan": {
         "app_title": "肝臓AI-babak",
@@ -2601,6 +4720,186 @@ TRANSLATIONS = {
         "install_failed": "インストールに失敗しました。古いバージョンは安全です。",
         "download_failed": "ダウンロードに失敗しました。",
         "source_update_requires_zip": "ソースアップデートには .zip ファイルが必要です。",
+        "session_locked": "セッションロック",
+        "locked_for_user": "{user} のためにロック中",
+        "unlock": "ロック解除",
+        "session_unlocked": "セッションのロックを解除しました",
+        "auto_lock_notice": "2分間操作がないとセッションがロックされます。",
+        "audit_log_title": "監査ログ",
+        "audit_export": "エクスポート",
+        "audit_exported": "正常にエクスポートされました",
+        "audit_export_failed": "エクスポートに失敗しました",
+        "audit_search_placeholder": "アクションまたは詳細を検索...",
+        "audit_col_time": "時刻",
+        "audit_col_level": "レベル",
+        "audit_col_category": "カテゴリ",
+        "audit_col_action": "アクション",
+        "audit_col_user": "ユーザー",
+        "audit_details_title": "イベントの詳細",
+        "audit_status": "{total} 件中 {count} 件を表示中",
+        "strength_very_weak": "非常弱",
+        "strength_weak": "弱",
+        "strength_medium": "中等",
+        "strength_strong": "强",
+        "strength_very_strong": "非常强",
+        "strength_rule_length": "8-16 个字符",
+        "strength_rule_lowercase": "小写字母",
+        "strength_rule_uppercase": "大写字母",
+        "strength_rule_digits": "数字",
+        "strength_rule_special": "特殊字符",
+        "strength_add_chars": "再添加 {n} 个字符",
+        "strength_remove_chars": "删除 {n} 个字符",
+        "strength_need_digits": "再添加 {n} 个数字",
+        "strength_need_special": "再添加 {n} 个特殊字符",
+        "strength_common_pattern": "避免常见词汇",
+        "strength_common_year": "避免常见年份",
+        "strength_has_sequence": "避免序列（1234、abcd）",
+        "strength_has_repeats": "避免重复（aaaa、1111）",
+        "passwords_match": "密码匹配",
+        "2fa_setup_title": "二要素認証を有効にする",
+        "2fa_setup_subtitle": "Google Authenticator、Authy、または Microsoft Authenticator で QR コードをスキャンしてください。",
+        "2fa_manual_secret": "または、このコードを手動で入力してください：",
+        "2fa_enter_code": "アプリの 6 桁のコードを入力してください：",
+        "2fa_verify_btn": "確認",
+        "2fa_backup_codes_title": "これらのバックアップコードを保存してください！",
+        "2fa_backup_codes_hint": "各コードは 1 回のみ使用できます。安全な場所に保管してください。",
+        "2fa_done_btn": "完了",
+        "2fa_secret_copied": "シークレットコードをクリップボードにコピーしました",
+        "2fa_invalid_code": "無効なコードです。もう一度お試しください。",
+        "2fa_invalid_code_format": "コードは 6 桁の数字である必要があります。",
+        "2fa_verify_title": "二要素認証",
+        "2fa_verify_subtitle": "認証アプリの 6 桁のコードを入力してください。",
+        "2fa_enter_code_hint": "コードを入力してください。",
+        "2fa_use_backup_code": "バックアップコードを使用",
+        "2fa_use_totp_code": "認証アプリのコードを使用",
+        "2fa_enter_backup_code": "バックアップコードの 1 つを入力してください。",
+        "2fa_section_title": "セキュリティ",
+        "2fa_enabled_status": "二要素認証が有効です",
+        "2fa_disabled_status": "二要素認証が無効です",
+        "2fa_enable_btn": "2FA を有効にする",
+        "2fa_disable_btn": "2FA を無効にする",
+        "2fa_disable_title": "2FA を無効にする",
+        "2fa_disable_confirm": "よろしいですか？アカウントの安全性が低下します。",
+        "2fa_disabled_success": "二要素認証を無効にしました",
+        "2fa_enabled_success": "二要素認証を有効にしました",
+        "2fa_hint_title": "この QR コードの使い方",
+        "2fa_hint_step1": "認証アプリをインストールしてください：Google Authenticator、Microsoft Authenticator、または Authy。",
+        "2fa_hint_step2": "アプリを開き、「+」ボタンをタップして「QR コードをスキャン」を選択します。",
+        "2fa_hint_step3": "スマートフォンのカメラを上の QR コードに向けてください（アプリのカメラを使用し、スマートフォンのカメラアプリは使わないでください）。",
+        "2fa_hint_step4": "アプリに 6 桁のコードが表示されます。下の入力欄に入力してください。",
+        "2fa_manual_secret_hint": "スキャンできない場合は、下のキーをコピーしてアプリに手動で追加してください（「設定キーを入力」）。",
+        "auto_lock_section_title": "自動ロック",
+        "auto_lock_enable": "無操作後にロック",
+        "auto_lock_timeout_label": "ロック時間:",
+        "auto_lock_warning_title": "自動ロックの警告",
+        "auto_lock_warning_body": "無操作のため、{seconds} 秒後にセッションがロックされます。",
+        "lock_now": "今すぐロック",
+        "font_section_title": "フォント",
+        "font_family_label": "フォントファミリー",
+        "font_size_label": "基本サイズ",
+        "font_scale_label": "表示スケール",
+        "font_scale_small": "小",
+        "font_scale_normal": "標準",
+        "font_scale_large": "大",
+        "font_scale_xlarge": "特大",
+        "font_scale_xxlarge": "巨大",
+        "font_preview_text": "いろはにほへと ちりぬるを — 1234567890",
+        "font_reset": "デフォルトに戻す",
+        "font_applied": "フォントを更新しました",
+        "motion_section_title": "モーションとアニメーション",
+        "reduce_motion_label": "モーションを減らす",
+        "reduce_motion_hint": "アニメーションが気になる場合は無効にしてください。",
+        "empty_history_empty_title": "履歴はまだありません",
+        "empty_history_empty_subtitle": "最初の画像を処理するとここに表示されます",
+        "empty_history_empty_hint": "各結果は自動的に保存されます",
+        "empty_history_no_user_title": "サインインして履歴を表示",
+        "empty_history_no_user_subtitle": "保存された結果がここに表示されます",
+        "empty_history_no_user_hint": "履歴はアカウントごとにプライベートです",
+        "empty_dash_no_results_title": "結果はまだありません",
+        "empty_dash_no_results_subtitle": "最近の分析がここに表示されます",
+        "empty_dash_no_results_hint": "画像を処理して開始してください",
+        "empty_dash_no_dist_title": "分布データがありません",
+        "empty_dash_no_dist_subtitle": "画像を処理すると統計が表示されます",
+        "empty_dash_no_dist_hint": "すべての分析が重要です",
+        "empty_image_empty_title": "画像が挿入されていません",
+        "empty_image_empty_subtitle": "ここに画像をドラッグ＆ドロップするか、挿入をクリック",
+        "empty_image_empty_hint": "PNG、JPG、JPEG、BMP、DCM に対応",
+        "empty_image_drop_hint_title": "ドロップして分析",
+        "empty_image_drop_hint_subtitle": "画像を離して読み込み",
+        "empty_image_drop_hint_hint": "形式は自動的に検出されます",
+        "empty_processing_wait_title": "処理中...",
+        "empty_processing_wait_subtitle": "AI が画像を分析しています",
+        "empty_processing_wait_hint": "通常数秒かかります",
+        "tour_show_again": "ツアーを再表示",
+        "tour_completed_msg": "ツアーが完了しました！準備完了です。",
+        "tour_skipped_msg": "ツアーをスキップしました。アカウントメニューから再表示できます。",
+        "tour_btn_next": "次へ",
+        "tour_btn_prev": "戻る",
+        "tour_btn_skip": "スキップ",
+        "tour_btn_finish": "完了 ✓",
+        "tour_guest_login_title": "サインイン",
+        "tour_guest_login_subtitle": "ここをクリックしてサインインし、すべての機能を利用できます。",
+        "tour_guest_signup_title": "アカウント作成",
+        "tour_guest_signup_subtitle": "初めてですか？ここをクリックして数秒でアカウントを作成できます。",
+        "tour_insert_title": "画像を挿入",
+        "tour_insert_subtitle": "ディスクから超音波画像を読み込むか、ウィンドウの任意の場所にドラッグ＆ドロップします。",
+        "tour_process_title": "画像を処理",
+        "tour_process_subtitle": "読み込んだ画像に対して AI 分析を実行します。結果は数秒で表示されます。",
+        "tour_export_title": "PDF をエクスポート",
+        "tour_export_subtitle": "現在の結果をプロフェッショナルな PDF 医療レポートとして保存します。",
+        "tour_gradcam_title": "アテンションヒートマップ",
+        "tour_gradcam_subtitle": "AI がどこを見ているかを可視化 — 分析画像に重ねたヒートマップ。",
+        "tour_dashboard_title": "ダッシュボード",
+        "tour_dashboard_subtitle": "統計パネルの表示/非表示：合計画像数、平均信頼度、グレード分布。",
+        "tour_history_title": "履歴",
+        "tour_history_subtitle": "最近分析した 20 枚の画像を閲覧できます。サムネイルをクリックして結果を再読み込みします。",
+        "tour_visit_title": "ウェブページを開く",
+        "tour_visit_subtitle": "ブラウザでプロジェクトの GitHub ページを開き、ドキュメントと更新を確認します。",
+        "tour_mute_title": "ミュート",
+        "tour_mute_subtitle": "バックグラウンドミュージックをいつでも一時停止・再開できます。",
+        "tour_zoom_title": "ズームコントロール",
+        "tour_zoom_subtitle": "マウスホイールでズーム、ドラッグでパン、ダブルクリックでリセット。",
+        "tour_account_title": "アカウントメニュー",
+        "tour_account_subtitle": "ここをクリックして設定、アカウント情報、監査ログなどにアクセスします。",
+        "suggestion_image_ready": "画像を読み込みました — 処理できます",
+        "suggestion_image_ready_sub":  "「処理」をクリックして AI 分析を実行してください。",
+        "suggestion_pdf_ready":        "結果の準備ができました — PDF にエクスポートしますか？",
+        "suggestion_pdf_ready_sub":    "プロフェッショナルな医療レポートをワンクリックで保存。",
+        "suggestion_gradcam_hint":     "AI がどこを見たか気になりますか？",
+        "suggestion_gradcam_hint_sub": "画像上のアテンションヒートマップをご覧ください。",
+        "suggestion_repeated_grid":    "いつも {grid} になりますね",
+        "suggestion_repeated_grid_sub":"ダッシュボードを開いて分布を確認してください。",
+        "suggestion_history_hint":     "履歴がたまっています",
+        "suggestion_history_hint_sub": "最近分析した 20 枚の画像を閲覧できます。",
+        "suggestion_dashboard_hint":   "ダッシュボードに興味深い統計があります",
+        "suggestion_dashboard_hint_sub":"合計、平均、分布をひと目で確認できます。",
+        "suggestion_settings_hint":    "アプリをパーソナライズ",
+        "suggestion_settings_hint_sub":"言語、テーマ、フォントを変更し、2FA を有効にできます。",
+        "suggestion_idle_help":        "クイックガイドが必要ですか？",
+        "suggestion_idle_help_sub":    "いつでもオンボーディングツアーを再再生できます。",
+        "image_not_liver_warning": "この画像は肝臓の超音波画像ではないようです。\n\n適切な肝臓の超音波画像を挿入してください。",
+        "result_not_confident": "AI はこの画像を肝臓の超音波画像として確信を持って識別できませんでした。\n\n適切な肝臓の超音波画像を挿入して、もう一度お試しください。",
+        "not_liver_title": "肝臓の超音波画像ではありません",
+        "not_liver_hint": "適切な肝臓の超音波（ソノグラム）画像を使用してください",
+        "voice_welcome": "ようこそ、{user}さん",
+        "voice_goodbye": "さようなら",
+        "voice_logged_out": "正常にログアウトしました",
+        "voice_image_loaded": "画像が正常に読み込まれました",
+        "voice_image_rejected": "これは肝臓の超音波画像ではありません",
+        "voice_inference_result": "{grid_name}、信頼度 {conf} パーセント",
+        "voice_pdf_saved": "PDFレポートが正常に保存されました",
+        "voice_error": "エラーが発生しました",
+        "voice_settings_applied": "設定が適用されました",
+        "voice_language_changed": "言語が{lang}に変更されました",
+        "voice_theme_changed": "テーマが変更されました",
+        "voice_2fa_enabled": "二要素認証が有効になりました",
+        "voice_2fa_disabled": "二要素認証が無効になりました",
+        "voice_locked": "セッションがロックされました",
+        "voice_unlocked": "セッションのロックが解除されました",
+        "voice_processing": "画像を処理中",
+        "voice_processing_done": "処理が完了しました",
+        "voice_voice_enabled": "音声フィードバックが有効になりました",
+        "voice_voice_disabled": "音声フィードバックが無効になりました",
     },
     "SouthKorea": {
         "app_title": "간 AI-babak",
@@ -2800,6 +5099,186 @@ TRANSLATIONS = {
         "install_failed": "설치 실패. 기존 판본은 안전합니다.",
         "download_failed": "내리적재 실패.",
         "source_update_requires_zip": "원천 갱신에는 .zip 파일이 필요합니다.",
+        "session_locked": "세션 잠김",
+        "locked_for_user": "{user}님을 위해 잠김",
+        "unlock": "잠금 해제",
+        "session_unlocked": "세션 잠금 해제됨",
+        "auto_lock_notice": "2분 동안 활동이 없으면 세션이 잠깁니다.",
+        "audit_log_title": "감사 로그",
+        "audit_export": "내보내기",
+        "audit_exported": "내보내기 성공",
+        "audit_export_failed": "내보내기 실패",
+        "audit_search_placeholder": "작업 또는 세부 정보 검색...",
+        "audit_col_time": "시간",
+        "audit_col_level": "수준",
+        "audit_col_category": "카테고리",
+        "audit_col_action": "작업",
+        "audit_col_user": "사용자",
+        "audit_details_title": "이벤트 세부 정보",
+        "audit_status": "{total}개 중 {count}개 이벤트 표시 중",
+        "strength_very_weak": "매우 약함",
+        "strength_weak": "약함",
+        "strength_medium": "보통",
+        "strength_strong": "강함",
+        "strength_very_strong": "매우 강함",
+        "strength_rule_length": "8-16자",
+        "strength_rule_lowercase": "소문자",
+        "strength_rule_uppercase": "대문자",
+        "strength_rule_digits": "숫자",
+        "strength_rule_special": "특수 문자",
+        "strength_add_chars": "{n}자 더 추가하세요",
+        "strength_remove_chars": "{n}자 제거하세요",
+        "strength_need_digits": "숫자 {n}개 더 추가하세요",
+        "strength_need_special": "특수 문자 {n}개 더 추가하세요",
+        "strength_common_pattern": "일반적인 단어를 피하세요",
+        "strength_common_year": "일반적인 연도를 피하세요",
+        "strength_has_sequence": "연속된 문자열(1234, abcd)을 피하세요",
+        "strength_has_repeats": "반복(aaaa, 1111)을 피하세요",
+        "passwords_match": "비밀번호가 일치합니다",
+        "2fa_setup_title": "2단계 인증 활성화",
+        "2fa_setup_subtitle": "Google Authenticator, Authy 또는 Microsoft Authenticator로 QR 코드를 스캔하세요.",
+        "2fa_manual_secret": "또는 이 코드를 수동으로 입력하세요:",
+        "2fa_enter_code": "앱에서 6자리 코드를 입력하세요:",
+        "2fa_verify_btn": "확인",
+        "2fa_backup_codes_title": "이 백업 코드를 저장하세요!",
+        "2fa_backup_codes_hint": "각 코드는 한 번만 사용할 수 있습니다. 안전한 곳에 보관하세요.",
+        "2fa_done_btn": "완료",
+        "2fa_secret_copied": "비밀 코드가 클립보드에 복사되었습니다",
+        "2fa_invalid_code": "잘못된 코드입니다. 다시 시도하세요.",
+        "2fa_invalid_code_format": "코드는 6자리 숫자여야 합니다.",
+        "2fa_verify_title": "2단계 인증",
+        "2fa_verify_subtitle": "인증 앱에서 6자리 코드를 입력하세요.",
+        "2fa_enter_code_hint": "코드를 입력하세요.",
+        "2fa_use_backup_code": "백업 코드 사용",
+        "2fa_use_totp_code": "인증 앱 코드 사용",
+        "2fa_enter_backup_code": "백업 코드 중 하나를 입력하세요.",
+        "2fa_section_title": "보안",
+        "2fa_enabled_status": "2단계 인증이 활성화되어 있습니다",
+        "2fa_disabled_status": "2단계 인증이 비활성화되어 있습니다",
+        "2fa_enable_btn": "2FA 활성화",
+        "2fa_disable_btn": "2FA 비활성화",
+        "2fa_disable_title": "2FA 비활성화",
+        "2fa_disable_confirm": "확실합니까? 계정 보안이 약해집니다.",
+        "2fa_disabled_success": "2단계 인증이 비활성화되었습니다",
+        "2fa_enabled_success": "2단계 인증이 활성화되었습니다",
+        "2fa_hint_title": "이 QR 코드 사용 방법",
+        "2fa_hint_step1": "인증 앱을 설치하세요: Google Authenticator, Microsoft Authenticator 또는 Authy.",
+        "2fa_hint_step2": "앱을 열고 \"+\" 버튼을 탭한 다음 \"QR 코드 스캔\"을 선택하세요.",
+        "2fa_hint_step3": "휴대폰 카메라를 위의 QR 코드로 향하세요 (휴대폰 카메라 앱이 아닌 앱 내 카메라를 사용하세요).",
+        "2fa_hint_step4": "앱에 6자리 코드가 표시됩니다. 아래 입력란에 입력하세요.",
+        "2fa_manual_secret_hint": "스캔할 수 없나요? 아래 키를 복사하여 앱에 수동으로 추가하세요 (\"설정 키 입력\").",
+        "auto_lock_section_title": "자동 잠금",
+        "auto_lock_enable": "비활성 후 잠금",
+        "auto_lock_timeout_label": "잠금 시간:",
+        "auto_lock_warning_title": "자동 잠금 경고",
+        "auto_lock_warning_body": "비활성으로 인해 {seconds}초 후 세션이 잠깁니다.",
+        "lock_now": "지금 잠금",
+        "font_section_title": "글꼴",
+        "font_family_label": "글꼴 패밀리",
+        "font_size_label": "기본 크기",
+        "font_scale_label": "표시 비율",
+        "font_scale_small": "작게",
+        "font_scale_normal": "보통",
+        "font_scale_large": "크게",
+        "font_scale_xlarge": "매우 크게",
+        "font_scale_xxlarge": "거대하게",
+        "font_preview_text": "다람쥐 헌 쳇바퀴에 타고파 — 1234567890",
+        "font_reset": "기본값으로 재설정",
+        "font_applied": "글꼴이 업데이트되었습니다",
+        "motion_section_title": "모션 및 애니메이션",
+        "reduce_motion_label": "모션 줄이기",
+        "reduce_motion_hint": "애니메이션이 불편하시면 비활성화하세요.",
+        "empty_history_empty_title": "아직 기록이 없습니다",
+        "empty_history_empty_subtitle": "첫 이미지를 처리하면 여기에 표시됩니다",
+        "empty_history_empty_hint": "각 결과는 자동으로 저장됩니다",
+        "empty_history_no_user_title": "기록을 보려면 로그인하세요",
+        "empty_history_no_user_subtitle": "저장된 결과가 여기에 표시됩니다",
+        "empty_history_no_user_hint": "기록은 계정마다 비공개입니다",
+        "empty_dash_no_results_title": "아직 결과가 없습니다",
+        "empty_dash_no_results_subtitle": "최근 분석이 여기에 표시됩니다",
+        "empty_dash_no_results_hint": "이미지를 처리하여 시작하세요",
+        "empty_dash_no_dist_title": "분포 데이터 없음",
+        "empty_dash_no_dist_subtitle": "이미지를 처리하면 통계가 채워집니다",
+        "empty_dash_no_dist_hint": "모든 분석이 중요합니다",
+        "empty_image_empty_title": "이미지가 삽입되지 않았습니다",
+        "empty_image_empty_subtitle": "여기에 이미지를 드래그 앤 드롭하거나 삽입을 클릭하세요",
+        "empty_image_empty_hint": "PNG, JPG, JPEG, BMP, DCM 지원",
+        "empty_image_drop_hint_title": "분석하려면 놓으세요",
+        "empty_image_drop_hint_subtitle": "이미지를 놓아 로드",
+        "empty_image_drop_hint_hint": "형식이 자동으로 감지됩니다",
+        "empty_processing_wait_title": "처리 중...",
+        "empty_processing_wait_subtitle": "AI가 이미지를 분석하고 있습니다",
+        "empty_processing_wait_hint": "보통 몇 초 걸립니다",
+        "tour_show_again": "투어 다시 보기",
+        "tour_completed_msg": "투어 완료! 준비되었습니다.",
+        "tour_skipped_msg": "투어를 건너뛰었습니다. 계정 메뉴에서 다시 볼 수 있습니다.",
+        "tour_btn_next": "다음",
+        "tour_btn_prev": "이전",
+        "tour_btn_skip": "건너뛰기",
+        "tour_btn_finish": "완료 ✓",
+        "tour_guest_login_title": "로그인",
+        "tour_guest_login_subtitle": "여기를 클릭하여 로그인하고 모든 기능을 사용하세요.",
+        "tour_guest_signup_title": "계정 만들기",
+        "tour_guest_signup_subtitle": "처음이신가요? 여기를 클릭하여 몇 초 만에 계정을 만드세요.",
+        "tour_insert_title": "이미지 삽입",
+        "tour_insert_subtitle": "디스크에서 초음파 이미지를 불러오거나 창의 아무 곳에나 드래그 앤 드롭하세요.",
+        "tour_process_title": "이미지 처리",
+        "tour_process_subtitle": "불러온 이미지에 AI 분석을 실행합니다. 몇 초 안에 결과가 나타납니다.",
+        "tour_export_title": "PDF 내보내기",
+        "tour_export_subtitle": "현재 결과를 전문적인 PDF 의료 보고서로 저장합니다.",
+        "tour_gradcam_title": "어텐션 히트맵",
+        "tour_gradcam_subtitle": "AI가 어디를 보는지 시각화 — 분석 이미지 위에 히트맵을 표시합니다.",
+        "tour_dashboard_title": "대시보드",
+        "tour_dashboard_subtitle": "통계 패널 표시/숨기기: 총 이미지, 평균 신뢰도, 등급 분포.",
+        "tour_history_title": "기록",
+        "tour_history_subtitle": "최근 분석한 20개 이미지를 찾아보세요. 썸네일을 클릭하여 결과를 다시 불러옵니다.",
+        "tour_visit_title": "웹페이지 방문",
+        "tour_visit_subtitle": "브라우저에서 프로젝트의 GitHub 페이지를 열어 문서와 업데이트를 확인하세요.",
+        "tour_mute_title": "음소거",
+        "tour_mute_subtitle": "배경 음악을 언제든지 일시정지하거나 다시 시작할 수 있습니다.",
+        "tour_zoom_title": "줌 컨트롤",
+        "tour_zoom_subtitle": "마우스 휠로 확대/축소, 드래그로 이동, 더블클릭으로 재설정합니다.",
+        "tour_account_title": "계정 메뉴",
+        "tour_account_subtitle": "여기를 클릭하여 설정, 계정 정보, 감사 로그 등에 액세스하세요.",
+        "suggestion_image_ready":      "이미지가 로드되었습니다 — 처리할 준비 완료",
+        "suggestion_image_ready_sub":  "「처리」를 클릭하여 AI 분석을 실행하세요.",
+        "suggestion_pdf_ready":        "결과가 준비되었습니다 — PDF로 내보낼까요?",
+        "suggestion_pdf_ready_sub":    "전문적인 의료 보고서를 한 번의 클릭으로 저장하세요.",
+        "suggestion_gradcam_hint":     "AI가 어디를 보았는지 궁금하신가요?",
+        "suggestion_gradcam_hint_sub": "이미지 위의 어텐션 히트맵을 확인하세요.",
+        "suggestion_repeated_grid":    "항상 {grid}이 나옵니다",
+        "suggestion_repeated_grid_sub":"대시보드를 열어 분포를 확인하세요.",
+        "suggestion_history_hint":     "기록이 쌓이고 있습니다",
+        "suggestion_history_hint_sub": "최근 분석한 20개 이미지를 둘러보세요.",
+        "suggestion_dashboard_hint":   "대시보드에 흥미로운 통계가 있습니다",
+        "suggestion_dashboard_hint_sub":"총계, 평균, 분포를 한눈에 확인하세요.",
+        "suggestion_settings_hint":    "앱을 개인화하세요",
+        "suggestion_settings_hint_sub":"언어, 테마, 글꼴을 변경하고 2FA를 활성화하세요.",
+        "suggestion_idle_help":        "빠른 안내가 필요하신가요?",
+        "suggestion_idle_help_sub":    "언제든지 온보딩 투어를 다시 재생하세요.",
+        "image_not_liver_warning": "이 이미지는 간 초음파 이미지가 아닌 것 같습니다.\n\n올바른 간 초음파 이미지를 삽입하세요.",
+        "result_not_confident": "AI가 이 이미지를 간 초음파 이미지로 확신 있게 식별하지 못했습니다.\n\n올바른 간 초음파 이미지를 삽입하고 다시 시도하세요.",
+        "not_liver_title": "간 초음파 이미지가 아닙니다",
+        "not_liver_hint": "올바른 간 초음파(소노그램) 이미지를 사용하세요",
+        "voice_welcome": "환영합니다, {user}님",
+        "voice_goodbye": "안녕히 가세요",
+        "voice_logged_out": "성공적으로 로그아웃되었습니다",
+        "voice_image_loaded": "이미지가 성공적으로 로드되었습니다",
+        "voice_image_rejected": "이것은 간 초음파 이미지가 아닙니다",
+        "voice_inference_result": "{grid_name}, 신뢰도 {conf} 퍼센트",
+        "voice_pdf_saved": "PDF 보고서가 성공적으로 저장되었습니다",
+        "voice_error": "오류가 발생했습니다",
+        "voice_settings_applied": "설정이 적용되었습니다",
+        "voice_language_changed": "언어가 {lang}(으)로 변경되었습니다",
+        "voice_theme_changed": "테마가 변경되었습니다",
+        "voice_2fa_enabled": "2단계 인증이 활성화되었습니다",
+        "voice_2fa_disabled": "2단계 인증이 비활성화되었습니다",
+        "voice_locked": "세션이 잠겼습니다",
+        "voice_unlocked": "세션 잠금이 해제되었습니다",
+        "voice_processing": "이미지 처리 중",
+        "voice_processing_done": "처리가 완료되었습니다",
+        "voice_voice_enabled": "음성 피드백이 활성화되었습니다",
+        "voice_voice_disabled": "음성 피드백이 비활성화되었습니다",
     },
     "NorthKorea": {
         "app_title": "간 AI-babak",
@@ -2999,6 +5478,186 @@ TRANSLATIONS = {
         "install_failed": "설치 실패. 기존 판본은 안전합니다.",
         "download_failed": "내리적재 실패.",
         "source_update_requires_zip": "원천 갱신에는 .zip 파일이 필요합니다.",
+        "session_locked": "련결마감",
+        "locked_for_user": "{user}를 위해 마감됨",
+        "unlock": "마감 풀기",
+        "session_unlocked": "련결마감이 풀렸습니다",
+        "auto_lock_notice": "2분간 움직임이 없으면 련결이 마감됩니다.",
+        "audit_log_title": "검열기록",
+        "audit_export": "내보내기",
+        "audit_exported": "내보내기 성공",
+        "audit_export_failed": "내보내기 실패",
+        "audit_search_placeholder": "행동 또는 세부사항 검색...",
+        "audit_col_time": "시간",
+        "audit_col_level": "수준",
+        "audit_col_category": "분류",
+        "audit_col_action": "행동",
+        "audit_col_user": "사용자",
+        "audit_details_title": "사건 세부사항",
+        "audit_status": "{total}개 중 {count}개 사건 표시 중",
+        "strength_very_weak": "아주 약함",
+        "strength_weak": "약함",
+        "strength_medium": "보통",
+        "strength_strong": "강함",
+        "strength_very_strong": "아주 강함",
+        "strength_rule_length": "8-16자",
+        "strength_rule_lowercase": "소문자",
+        "strength_rule_uppercase": "대문자",
+        "strength_rule_digits": "숫자",
+        "strength_rule_special": "특수 문자",
+        "strength_add_chars": "{n}자를 더 넣으십시오",
+        "strength_remove_chars": "{n}자를 빼십시오",
+        "strength_need_digits": "숫자 {n}개를 더 넣으십시오",
+        "strength_need_special": "특수 문자 {n}개를 더 넣으십시오",
+        "strength_common_pattern": "흔한 단어를 피하십시오",
+        "strength_common_year": "흔한 년도를 피하십시오",
+        "strength_has_sequence": "련속된 문자렬(1234, abcd)을 피하십시오",
+        "strength_has_repeats": "반복(aaaa, 1111)을 피하십시오",
+        "passwords_match": "암호가 일치합니다",
+        "2fa_setup_title": "두단계 인증 활성화",
+        "2fa_setup_subtitle": "Google Authenticator, Authy 또는 Microsoft Authenticator로 QR 코드를 스캔하십시오.",
+        "2fa_manual_secret": "또는 이 코드를 수동으로 입력하십시오:",
+        "2fa_enter_code": "응용프로그람에서 6자리 코드를 입력하십시오:",
+        "2fa_verify_btn": "확인",
+        "2fa_backup_codes_title": "이 예비 코드들을 저장하십시오!",
+        "2fa_backup_codes_hint": "각 코드는 한번만 사용할수 있습니다. 안전한 곳에 보관하십시오.",
+        "2fa_done_btn": "완료",
+        "2fa_secret_copied": "비밀 코드가 클립보드에 복사되였습니다",
+        "2fa_invalid_code": "잘못된 코드입니다. 다시 시도하십시오.",
+        "2fa_invalid_code_format": "코드는 6자리수자여야 합니다.",
+        "2fa_verify_title": "두단계 인증",
+        "2fa_verify_subtitle": "인증 응용프로그람에서 6자리 코드를 입력하십시오.",
+        "2fa_enter_code_hint": "코드를 입력하십시오.",
+        "2fa_use_backup_code": "예비 코드 사용",
+        "2fa_use_totp_code": "인증 응용프로그람 코드 사용",
+        "2fa_enter_backup_code": "예비 코드중 하나를 입력하십시오.",
+        "2fa_section_title": "보안",
+        "2fa_enabled_status": "두단계 인증이 활성화되여 있습니다",
+        "2fa_disabled_status": "두단계 인증이 비활성화되여 있습니다",
+        "2fa_enable_btn": "2FA 활성화",
+        "2fa_disable_btn": "2FA 비활성화",
+        "2fa_disable_title": "2FA 비활성화",
+        "2fa_disable_confirm": "확실합니까? 계정 보안이 약해집니다.",
+        "2fa_disabled_success": "두단계 인증이 비활성화되였습니다",
+        "2fa_enabled_success": "두단계 인증이 활성화되였습니다",
+        "2fa_hint_title": "이 QR 코드 사용 방법",
+        "2fa_hint_step1": "인증 앱을 설치하십시오: Google Authenticator, Microsoft Authenticator 또는 Authy.",
+        "2fa_hint_step2": "앱을 열고 \"+\" 단추를 누른 다음 \"QR 코드 스캔\"을 선택하십시오.",
+        "2fa_hint_step3": "손전화 카메라를 우의 QR 코드에 향하십시오 (손전화 카메라 앱이 아닌 앱안 카메라를 사용하십시오).",
+        "2fa_hint_step4": "앱에 6자리 코드가 표시됩니다. 아래 입력란에 입력하십시오.",
+        "2fa_manual_secret_hint": "스캔할수 없습니까? 아래 키를 복사하여 앱에 수동으로 추가하십시오 (\"설정 키 입력\").",
+        "auto_lock_section_title": "자동 잠금",
+        "auto_lock_enable": "비활성 후 잠금",
+        "auto_lock_timeout_label": "잠금 시간:",
+        "auto_lock_warning_title": "자동 잠금 경고",
+        "auto_lock_warning_body": "비활성으로 인해 {seconds}초 후 세션이 잠깁니다.",
+        "lock_now": "지금 잠금",
+        "font_section_title": "글자체",
+        "font_family_label": "글자체 계렬",
+        "font_size_label": "기본 크기",
+        "font_scale_label": "표시 비률",
+        "font_scale_small": "작게",
+        "font_scale_normal": "보통",
+        "font_scale_large": "크게",
+        "font_scale_xlarge": "아주 크게",
+        "font_scale_xxlarge": "거대하게",
+        "font_preview_text": "조선글자체를 미리보기하는 본문 — 1234567890",
+        "font_reset": "기본값으로 되돌리기",
+        "font_applied": "글자체가 갱신되였습니다",
+        "motion_section_title": "움직임 및 동화상",
+        "reduce_motion_label": "움직임 줄이기",
+        "reduce_motion_hint": "동화상이 불편하시면 비활성화하십시오.",
+        "empty_history_empty_title": "아직 력사기록이 없습니다",
+        "empty_history_empty_subtitle": "첫 사진을 처리하면 여기에 표시됩니다",
+        "empty_history_empty_hint": "각 결과는 자동으로 저장됩니다",
+        "empty_history_no_user_title": "력사기록을 보려면 련결하십시오",
+        "empty_history_no_user_subtitle": "저장된 결과가 여기에 표시됩니다",
+        "empty_history_no_user_hint": "력사기록은 계정마다 비공개입니다",
+        "empty_dash_no_results_title": "아직 결과가 없습니다",
+        "empty_dash_no_results_subtitle": "최근 분석이 여기에 표시됩니다",
+        "empty_dash_no_results_hint": "사진을 처리하여 시작하십시오",
+        "empty_dash_no_dist_title": "분포 데이터 없음",
+        "empty_dash_no_dist_subtitle": "사진을 처리하면 통계가 채워집니다",
+        "empty_dash_no_dist_hint": "모든 분석이 중요합니다",
+        "empty_image_empty_title": "사진이 들어가지 않았습니다",
+        "empty_image_empty_subtitle": "여기에 사진을 끌어놓거나 넣기를 누르십시오",
+        "empty_image_empty_hint": "PNG, JPG, JPEG, BMP, DCM 지원",
+        "empty_image_drop_hint_title": "분석하려면 놓으십시오",
+        "empty_image_drop_hint_subtitle": "사진을 놓아 로드",
+        "empty_image_drop_hint_hint": "형식이 자동으로 감지됩니다",
+        "empty_processing_wait_title": "처리 중...",
+        "empty_processing_wait_subtitle": "AI가 사진을 분석하고 있습니다",
+        "empty_processing_wait_hint": "보통 몇초 걸립니다",
+        "tour_show_again": "탐방 다시 보기",
+        "tour_completed_msg": "탐방 완료! 준비되였습니다.",
+        "tour_skipped_msg": "탐방을 건너뛰였습니다. 계정메뉴에서 다시 볼수 있습니다.",
+        "tour_btn_next": "다음",
+        "tour_btn_prev": "이전",
+        "tour_btn_skip": "건너뛰기",
+        "tour_btn_finish": "완료 ✓",
+        "tour_guest_login_title": "련결",
+        "tour_guest_login_subtitle": "여기를 눌러 련결하고 모든 기능을 사용하십시오.",
+        "tour_guest_signup_title": "계정 만들기",
+        "tour_guest_signup_subtitle": "처음입니까? 여기를 눌러 몇초안에 계정을 만드십시오.",
+        "tour_insert_title": "사진 넣기",
+        "tour_insert_subtitle": "디스크에서 초음파 사진을 불러오거나 창의 어느 곳에나 끌어놓으십시오.",
+        "tour_process_title": "사진 처리",
+        "tour_process_subtitle": "불러온 사진에 AI 분석을 실행합니다. 몇초안에 결과가 나타납니다.",
+        "tour_export_title": "PDF 내보내기",
+        "tour_export_subtitle": "현재 결과를 전문적인 PDF 의료보고서로 저장합니다.",
+        "tour_gradcam_title": "주의 렬지도",
+        "tour_gradcam_subtitle": "AI가 어디를 보는지 시각화 — 분석 사진우에 렬지도를 표시합니다.",
+        "tour_dashboard_title": "지시판",
+        "tour_dashboard_subtitle": "통계판넬 보이기/숨기기: 총 사진수, 평균 확신도, 등급분포.",
+        "tour_history_title": "력사기록",
+        "tour_history_subtitle": "최근 분석한 20개 사진을 찾아보십시오. 작은사진을 눌러 결과를 다시 불러옵니다.",
+        "tour_visit_title": "웹페지 방문",
+        "tour_visit_subtitle": "브라우저에서 프로젝트의 GitHub 페지를 열어 문서와 갱신을 확인하십시오.",
+        "tour_mute_title": "소리 끄기",
+        "tour_mute_subtitle": "배경음악을 언제든지 일시정지하거나 다시 시작할수 있습니다.",
+        "tour_zoom_title": "줌 제어",
+        "tour_zoom_subtitle": "마우스굴림으로 확대/축소, 끌기로 이동, 두번클릭으로 재설정합니다.",
+        "tour_account_title": "계정메뉴",
+        "tour_account_subtitle": "여기를 눌러 설정, 계정정보, 검열기록 등에 접근하십시오.",
+        "suggestion_image_ready": "사진을 불러왔습니다 — 처리할준비가 되였습니다",
+        "suggestion_image_ready_sub": "《처리》를 눌러 AI 분석을 실행하십시오.",
+        "suggestion_pdf_ready": "결과가 준비되였습니다 — PDF로 내보내시겠습니까?",
+        "suggestion_pdf_ready_sub": "전문적인 의료보고서를 한번의 클릭으로 저장하십시오.",
+        "suggestion_gradcam_hint": "AI가 어디를 보았는지 궁금하십니까?",
+        "suggestion_gradcam_hint_sub": "사진우의 주의 렬지도를 보십시오.",
+        "suggestion_repeated_grid": "항상 {grid}이 나옵니다",
+        "suggestion_repeated_grid_sub": "지시판을 열어 분포를 보십시오.",
+        "suggestion_history_hint": "력사기록이 쌓이고 있습니다",
+        "suggestion_history_hint_sub": "최근 분석한 20개 사진을 찾아보십시오.",
+        "suggestion_dashboard_hint": "지시판에 흥미로운 통계가 있습니다",
+        "suggestion_dashboard_hint_sub": "총계, 평균, 분포를 한눈에 보십시오.",
+        "suggestion_settings_hint": "프로그람을 개성화하십시오",
+        "suggestion_settings_hint_sub": "언어, 테마, 글자체를 변경하고 2FA를 활성화하십시오.",
+        "suggestion_idle_help": "빠른 안내가 필요하십니까?",
+        "suggestion_idle_help_sub": "언제든지 안내tour를 다시 재생하십시오.",
+        "image_not_liver_warning": "이 사진은 간 초음파 사진이 아닌것 같습니다.\n\n올바른 간 초음파 사진을 넣으십시오.",
+        "result_not_confident": "AI가 이 사진을 간 초음파 사진으로 확신있게 식별하지 못했습니다.\n\n올바른 간 초음파 사진을 넣고 다시 시도하십시오.",
+        "not_liver_title": "간 초음파 사진이 아닙니다",
+        "not_liver_hint": "올바른 간 초음파(소노그람) 사진을 사용하십시오",
+        "voice_welcome": "환영합니다, {user}동무",
+        "voice_goodbye": "안녕히 계십시오",
+        "voice_logged_out": "련결이 성공적으로 해제되였습니다",
+        "voice_image_loaded": "사진이 성공적으로 로드되였습니다",
+        "voice_image_rejected": "이것은 간 초음파 사진이 아닙니다",
+        "voice_inference_result": "{grid_name}, 확신도 {conf} 프로",
+        "voice_pdf_saved": "PDF 보고서가 성공적으로 저장되였습니다",
+        "voice_error": "오유가 발생하였습니다",
+        "voice_settings_applied": "설정이 적용되였습니다",
+        "voice_language_changed": "언어가 {lang}(으)로 변경되였습니다",
+        "voice_theme_changed": "테마가 변경되였습니다",
+        "voice_2fa_enabled": "두단계 인증이 활성화되였습니다",
+        "voice_2fa_disabled": "두단계 인증이 비활성화되였습니다",
+        "voice_locked": "련결이 마감되였습니다",
+        "voice_unlocked": "련결마감이 풀렸습니다",
+        "voice_processing": "사진을 처리중입니다",
+        "voice_processing_done": "처리가 완료되였습니다",
+        "voice_voice_enabled": "음성안내가 활성화되였습니다",
+        "voice_voice_disabled": "음성안내가 비활성화되였습니다",
     },
     "India": {
         "app_title": "लिवर AI-babak",
@@ -3198,6 +5857,186 @@ TRANSLATIONS = {
         "install_failed": "इंस्टॉलेशन विफल। आपका पुराना संस्करण सुरक्षित है।",
         "download_failed": "डाउनलोड विफल।",
         "source_update_requires_zip": "स्रोत अद्यतन के लिए .zip फ़ाइल आवश्यक है।",
+        "session_locked": "सत्र लॉक",
+        "locked_for_user": "{user} के लिए लॉक",
+        "unlock": "अनलॉक करें",
+        "session_unlocked": "सत्र अनलॉक हो गया",
+        "auto_lock_notice": "2 मिनट निष्क्रियता के बाद सत्र लॉक हो जाएगा।",
+        "audit_log_title": "ऑडिट लॉग",
+        "audit_export": "निर्यात करें",
+        "audit_exported": "सफलतापूर्वक निर्यात किया गया",
+        "audit_export_failed": "निर्यात विफल",
+        "audit_search_placeholder": "क्रियाएँ या विवरण खोजें...",
+        "audit_col_time": "समय",
+        "audit_col_level": "स्तर",
+        "audit_col_category": "श्रेणी",
+        "audit_col_action": "क्रिया",
+        "audit_col_user": "उपयोगकर्ता",
+        "audit_details_title": "इवेंट विवरण",
+        "audit_status": "{total} में से {count} इवेंट दिखाए जा रहे हैं",
+        "strength_very_weak": "बहुत कमज़ोर",
+        "strength_weak": "कमज़ोर",
+        "strength_medium": "मध्यम",
+        "strength_strong": "मज़बूत",
+        "strength_very_strong": "बहुत मज़बूत",
+        "strength_rule_length": "8-16 वर्ण",
+        "strength_rule_lowercase": "छोटा अक्षर",
+        "strength_rule_uppercase": "बड़ा अक्षर",
+        "strength_rule_digits": "अंक",
+        "strength_rule_special": "विशेष वर्ण",
+        "strength_add_chars": "{n} और वर्ण जोड़ें",
+        "strength_remove_chars": "{n} वर्ण हटाएं",
+        "strength_need_digits": "{n} और अंक जोड़ें",
+        "strength_need_special": "{n} और विशेष वर्ण जोड़ें",
+        "strength_common_pattern": "सामान्य शब्दों से बचें",
+        "strength_common_year": "सामान्य वर्षों से बचें",
+        "strength_has_sequence": "क्रम (1234, abcd) से बचें",
+        "strength_has_repeats": "दोहराव (aaaa, 1111) से बचें",
+        "passwords_match": "पासवर्ड मेल खाते हैं",
+        "2fa_setup_title": "दो-कारक प्रमाणीकरण सक्षम करें",
+        "2fa_setup_subtitle": "Google Authenticator, Authy या Microsoft Authenticator से QR कोड स्कैन करें।",
+        "2fa_manual_secret": "या इस कोड को मैन्युअल रूप से दर्ज करें:",
+        "2fa_enter_code": "अपने ऐप से 6 अंकों का कोड दर्ज करें:",
+        "2fa_verify_btn": "सत्यापित करें",
+        "2fa_backup_codes_title": "इन बैकअप कोड को सहेजें!",
+        "2fa_backup_codes_hint": "प्रत्येक कोड केवल एक बार उपयोग किया जा सकता है। उन्हें सुरक्षित स्थान पर रखें।",
+        "2fa_done_btn": "पूर्ण",
+        "2fa_secret_copied": "गुप्त कोड क्लिपबोर्ड पर कॉपी किया गया",
+        "2fa_invalid_code": "अमान्य कोड। कृपया पुनः प्रयास करें।",
+        "2fa_invalid_code_format": "कोड 6 अंकों का होना चाहिए।",
+        "2fa_verify_title": "दो-कारक प्रमाणीकरण",
+        "2fa_verify_subtitle": "अपने प्रमाणक ऐप से 6 अंकों का कोड दर्ज करें।",
+        "2fa_enter_code_hint": "कृपया एक कोड दर्ज करें।",
+        "2fa_use_backup_code": "बैकअप कोड का उपयोग करें",
+        "2fa_use_totp_code": "प्रमाणक कोड का उपयोग करें",
+        "2fa_enter_backup_code": "अपने बैकअप कोड में से एक दर्ज करें।",
+        "2fa_section_title": "सुरक्षा",
+        "2fa_enabled_status": "दो-कारक प्रमाणीकरण सक्षम है",
+        "2fa_disabled_status": "दो-कारक प्रमाणीकरण अक्षम है",
+        "2fa_enable_btn": "2FA सक्षम करें",
+        "2fa_disable_btn": "2FA अक्षम करें",
+        "2fa_disable_title": "2FA अक्षम करें",
+        "2fa_disable_confirm": "क्या आप सुनिश्चित हैं? आपका खाता कम सुरक्षित हो जाएगा।",
+        "2fa_disabled_success": "दो-कारक प्रमाणीकरण अक्षम किया गया",
+        "2fa_enabled_success": "दो-कारक प्रमाणीकरण सक्षम किया गया",
+        "2fa_hint_title": "इस QR कोड का उपयोग कैसे करें",
+        "2fa_hint_step1": "एक प्रमाणक ऐप इंस्टॉल करें: Google Authenticator, Microsoft Authenticator या Authy।",
+        "2fa_hint_step2": "ऐप खोलें, \"+\" बटन पर टैप करें, फिर \"QR कोड स्कैन करें\" चुनें।",
+        "2fa_hint_step3": "अपने फ़ोन का कैमरा ऊपर दिए गए QR कोड की ओर करें (ऐप के कैमरा का उपयोग करें, अपने फ़ोन के कैमरा ऐप का नहीं)।",
+        "2fa_hint_step4": "ऐप 6 अंकों का कोड दिखाएगा। इसे नीचे दिए गए बॉक्स में दर्ज करें।",
+        "2fa_manual_secret_hint": "स्कैन नहीं कर सकते? नीचे दी गई कुंजी को कॉपी करें और अपने ऐप में मैन्युअल रूप से जोड़ें (\"सेटअप कुंजी दर्ज करें\")।",
+        "auto_lock_section_title": "स्वतः लॉक",
+        "auto_lock_enable": "निष्क्रियता के बाद लॉक करें",
+        "auto_lock_timeout_label": "लॉक समय:",
+        "auto_lock_warning_title": "स्वतः लॉक चेतावनी",
+        "auto_lock_warning_body": "निष्क्रियता के कारण आपका सत्र {seconds} सेकंड में लॉक हो जाएगा।",
+        "lock_now": "अभी लॉक करें",
+        "font_section_title": "फ़ॉन्ट",
+        "font_family_label": "फ़ॉन्ट परिवार",
+        "font_size_label": "आधार आकार",
+        "font_scale_label": "प्रदर्शन स्केल",
+        "font_scale_small": "छोटा",
+        "font_scale_normal": "सामान्य",
+        "font_scale_large": "बड़ा",
+        "font_scale_xlarge": "बहुत बड़ा",
+        "font_scale_xxlarge": "विशाल",
+        "font_preview_text": "यह फ़ॉन्ट पूर्वावलोकन के लिए एक नमूना पाठ है — 1234567890",
+        "font_reset": "डिफ़ॉल्ट पर रीसेट करें",
+        "font_applied": "फ़ॉन्ट अपडेट किया गया",
+        "motion_section_title": "मोशन और एनिमेशन",
+        "reduce_motion_label": "मोशन कम करें",
+        "reduce_motion_hint": "यदि एनिमेशन आपको असहज करते हैं तो उन्हें अक्षम करें।",
+        "empty_history_empty_title": "अभी तक कोई इतिहास नहीं",
+        "empty_history_empty_subtitle": "अपनी पहली छवि संसाधित करें और यहाँ देखें",
+        "empty_history_empty_hint": "प्रत्येक परिणाम स्वतः सहेजा जाता है",
+        "empty_history_no_user_title": "इतिहास देखने के लिए साइन इन करें",
+        "empty_history_no_user_subtitle": "आपके सहेजे गए परिणाम यहाँ दिखाई देंगे",
+        "empty_history_no_user_hint": "इतिहास प्रत्येक खाते के लिए निजी है",
+        "empty_dash_no_results_title": "अभी तक कोई परिणाम नहीं",
+        "empty_dash_no_results_subtitle": "आपके हाल के विश्लेषण यहाँ दिखाई देंगे",
+        "empty_dash_no_results_hint": "शुरू करने के लिए एक छवि संसाधित करें",
+        "empty_dash_no_dist_title": "कोई वितरण डेटा नहीं",
+        "empty_dash_no_dist_subtitle": "छवियाँ संसाधित करते ही आँकड़े भरेंगे",
+        "empty_dash_no_dist_hint": "हर विश्लेषण मायने रखता है",
+        "empty_image_empty_title": "कोई छवि नहीं डाली गई",
+        "empty_image_empty_subtitle": "छवि यहाँ खींचकर छोड़ें, या डालें पर क्लिक करें",
+        "empty_image_empty_hint": "PNG, JPG, JPEG, BMP, DCM समर्थित",
+        "empty_image_drop_hint_title": "विश्लेषण के लिए छोड़ें",
+        "empty_image_drop_hint_subtitle": "लोड करने के लिए छवि छोड़ें",
+        "empty_image_drop_hint_hint": "प्रारूप स्वतः पहचाना जाएगा",
+        "empty_processing_wait_title": "प्रक्रिया हो रही है...",
+        "empty_processing_wait_subtitle": "AI आपकी छवि का विश्लेषण कर रहा है",
+        "empty_processing_wait_hint": "आमतौर पर कुछ सेकंड लगते हैं",
+        "tour_show_again": "टूर फिर से दिखाएं",
+        "tour_completed_msg": "टूर पूर्ण! आप तैयार हैं।",
+        "tour_skipped_msg": "टूर छोड़ दिया गया। आप इसे खाता मेनू से फिर से देख सकते हैं।",
+        "tour_btn_next": "अगला",
+        "tour_btn_prev": "पिछला",
+        "tour_btn_skip": "छोड़ें",
+        "tour_btn_finish": "समाप्त ✓",
+        "tour_guest_login_title": "साइन इन",
+        "tour_guest_login_subtitle": "साइन इन करने और सभी सुविधाओं को अनलॉक करने के लिए यहाँ क्लिक करें।",
+        "tour_guest_signup_title": "खाता बनाएँ",
+        "tour_guest_signup_subtitle": "यहाँ नए हैं? कुछ सेकंड में खाता बनाने के लिए यहाँ क्लिक करें।",
+        "tour_insert_title": "छवि डालें",
+        "tour_insert_subtitle": "डिस्क से सोनो छवि लोड करें, या इसे विंडो में कहीं भी खींचकर छोड़ें।",
+        "tour_process_title": "छवि संसाधित करें",
+        "tour_process_subtitle": "लोड की गई छवि पर AI विश्लेषण चलाएं। परिणाम कुछ सेकंड में दिखाई देंगे।",
+        "tour_export_title": "PDF निर्यात करें",
+        "tour_export_subtitle": "वर्तमान परिणाम को पेशेवर PDF चिकित्सा रिपोर्ट के रूप में सहेजें।",
+        "tour_gradcam_title": "अटेंशन हीटमैप",
+        "tour_gradcam_subtitle": "देखें AI कहाँ देख रहा है — विश्लेषण की गई छवि पर हीटमैप।",
+        "tour_dashboard_title": "डैशबोर्ड",
+        "tour_dashboard_subtitle": "आँकड़े पैनल दिखाएं/छिपाएं: कुल छवियाँ, औसत विश्वास, ग्रेड वितरण।",
+        "tour_history_title": "इतिहास",
+        "tour_history_subtitle": "अपनी अंतिम 20 विश्लेषित छवियाँ ब्राउज़ करें। परिणाम फिर से लोड करने के लिए किसी थंबनेल पर क्लिक करें।",
+        "tour_visit_title": "वेबपेज देखें",
+        "tour_visit_subtitle": "दस्तावेज़ और अपडेट के लिए ब्राउज़र में प्रोजेक्ट का GitHub पेज खोलें।",
+        "tour_mute_title": "संगीत म्यूट करें",
+        "tour_mute_subtitle": "किसी भी समय पृष्ठभूमि संगीत रोकें या फिर से शुरू करें।",
+        "tour_zoom_title": "ज़ूम नियंत्रण",
+        "tour_zoom_subtitle": "ज़ूम के लिए माउस व्हील, पैन के लिए ड्रैग, रीसेट के लिए डबल-क्लिक करें।",
+        "tour_account_title": "खाता मेनू",
+        "tour_account_subtitle": "सेटिंग्स, खाता जानकारी, ऑडिट लॉग और अधिक तक पहुँचने के लिए यहाँ क्लिक करें।",
+        "suggestion_image_ready": "छवि लोड हो गई — प्रक्रिया के लिए तैयार",
+        "suggestion_image_ready_sub": "AI विश्लेषण चलाने के लिए प्रक्रिया पर क्लिक करें।",
+        "suggestion_pdf_ready": "परिणाम तैयार है — PDF में निर्यात करें?",
+        "suggestion_pdf_ready_sub": "एक क्लिक में पेशेवर चिकित्सा रिपोर्ट सहेजें।",
+        "suggestion_gradcam_hint": "जानना चाहते हैं कि AI ने क्या देखा?",
+        "suggestion_gradcam_hint_sub": "छवि पर अटेंशन हीटमैप देखें।",
+        "suggestion_repeated_grid": "आपको हमेशा {grid} मिलता है",
+        "suggestion_repeated_grid_sub": "वितरण देखने के लिए डैशबोर्ड खोलें।",
+        "suggestion_history_hint": "आपका इतिहास बढ़ रहा है",
+        "suggestion_history_hint_sub": "अपनी अंतिम 20 विश्लेषित छवियाँ ब्राउज़ करें।",
+        "suggestion_dashboard_hint": "आपके डैशबोर्ड में रोचक आँकड़े हैं",
+        "suggestion_dashboard_hint_sub": "कुल, औसत और वितरण एक नज़र में देखें।",
+        "suggestion_settings_hint": "ऐप को व्यक्तिगत बनाएं",
+        "suggestion_settings_hint_sub": "भाषा, थीम, फ़ॉन्ट बदलें और 2FA सक्षम करें।",
+        "suggestion_idle_help": "त्वरित मार्गदर्शिका चाहिए?",
+        "suggestion_idle_help_sub": "किसी भी समय ऑनबोर्डिंग टूर फिर से चलाएँ।",
+        "image_not_liver_warning": "यह छवि लिवर अल्ट्रासाउंड जैसी नहीं दिखती।\n\nकृपया उचित लिवर अल्ट्रासाउंड छवि डालें।",
+        "result_not_confident": "AI इस छवि को लिवर अल्ट्रासाउंड के रूप में आत्मविश्वास से पहचान नहीं सका।\n\nकृपया उचित लिवर अल्ट्रासाउंड छवि डालें और पुनः प्रयास करें।",
+        "not_liver_title": "लिवर अल्ट्रासाउंड नहीं है",
+        "not_liver_hint": "कृपया उचित लिवर अल्ट्रासाउंड (सोनोग्राम) छवि का उपयोग करें",
+        "voice_welcome": "स्वागत है, {user}",
+        "voice_goodbye": "अलविदा",
+        "voice_logged_out": "सफलतापूर्वक लॉगआउट हो गया",
+        "voice_image_loaded": "छवि सफलतापूर्वक लोड हो गई",
+        "voice_image_rejected": "यह लिवर अल्ट्रासाउंड छवि नहीं है",
+        "voice_inference_result": "{grid_name}, विश्वास {conf} प्रतिशत",
+        "voice_pdf_saved": "PDF रिपोर्ट सफलतापूर्वक सहेजी गई",
+        "voice_error": "एक त्रुटि हुई",
+        "voice_settings_applied": "सेटिंग्स लागू हो गईं",
+        "voice_language_changed": "भाषा {lang} में बदल गई",
+        "voice_theme_changed": "थीम बदल गई",
+        "voice_2fa_enabled": "दो-कारक प्रमाणीकरण सक्षम हो गया",
+        "voice_2fa_disabled": "दो-कारक प्रमाणीकरण अक्षम हो गया",
+        "voice_locked": "सत्र लॉक हो गया",
+        "voice_unlocked": "सत्र अनलॉक हो गया",
+        "voice_processing": "छवि संसाधित हो रही है",
+        "voice_processing_done": "प्रसंस्करण पूरा हुआ",
+        "voice_voice_enabled": "ध्वनि फ़ीडबैक सक्षम हो गया",
+        "voice_voice_disabled": "ध्वनि फ़ीडबैक अक्षम हो गया",
     },
     "Portugal": {
         "app_title": "Fígado AI-babak",
@@ -3397,6 +6236,186 @@ TRANSLATIONS = {
         "install_failed": "Instalação falhou. A sua versão antiga está segura.",
         "download_failed": "Transferência falhou.",
         "source_update_requires_zip": "A atualização de código-fonte requer um ficheiro .zip.",
+        "session_locked": "Sessão Bloqueada",
+        "locked_for_user": "Bloqueada para {user}",
+        "unlock": "Desbloquear",
+        "session_unlocked": "Sessão desbloqueada",
+        "auto_lock_notice": "A sessão será bloqueada após 2 minutos de inatividade.",
+        "audit_log_title": "Registo de Auditoria",
+        "audit_export": "Exportar",
+        "audit_exported": "Exportado com sucesso",
+        "audit_export_failed": "Falha na exportação",
+        "audit_search_placeholder": "Pesquisar ações ou detalhes...",
+        "audit_col_time": "Hora",
+        "audit_col_level": "Nível",
+        "audit_col_category": "Categoria",
+        "audit_col_action": "Ação",
+        "audit_col_user": "Utilizador",
+        "audit_details_title": "Detalhes do Evento",
+        "audit_status": "A mostrar {count} de {total} eventos",
+        "strength_very_weak": "Muito fraca",
+        "strength_weak": "Fraca",
+        "strength_medium": "Média",
+        "strength_strong": "Forte",
+        "strength_very_strong": "Muito forte",
+        "strength_rule_length": "8-16 caracteres",
+        "strength_rule_lowercase": "Letra minúscula",
+        "strength_rule_uppercase": "Letra maiúscula",
+        "strength_rule_digits": "Dígitos",
+        "strength_rule_special": "Caracteres especiais",
+        "strength_add_chars": "Adicione mais {n} caractere(s)",
+        "strength_remove_chars": "Remova {n} caractere(s)",
+        "strength_need_digits": "Adicione mais {n} dígito(s)",
+        "strength_need_special": "Adicione mais {n} caractere(s) especial(ais)",
+        "strength_common_pattern": "Evite palavras comuns",
+        "strength_common_year": "Evite anos comuns",
+        "strength_has_sequence": "Evite sequências (1234, abcd)",
+        "strength_has_repeats": "Evite repetições (aaaa, 1111)",
+        "passwords_match": "As palavras-passe coincidem",
+        "2fa_setup_title": "Ativar autenticação de dois fatores",
+        "2fa_setup_subtitle": "Digitalize o código QR com Google Authenticator, Authy ou Microsoft Authenticator.",
+        "2fa_manual_secret": "Ou introduza este código manualmente:",
+        "2fa_enter_code": "Introduza o código de 6 dígitos da sua aplicação:",
+        "2fa_verify_btn": "Verificar",
+        "2fa_backup_codes_title": "Guarde estes códigos de recuperação!",
+        "2fa_backup_codes_hint": "Cada código só pode ser usado uma vez. Guarde-os num local seguro.",
+        "2fa_done_btn": "Concluído",
+        "2fa_secret_copied": "Código secreto copiado para a área de transferência",
+        "2fa_invalid_code": "Código inválido. Tente novamente.",
+        "2fa_invalid_code_format": "O código deve ter 6 dígitos.",
+        "2fa_verify_title": "Autenticação de dois fatores",
+        "2fa_verify_subtitle": "Introduza o código de 6 dígitos da sua aplicação de autenticação.",
+        "2fa_enter_code_hint": "Por favor, introduza um código.",
+        "2fa_use_backup_code": "Usar um código de recuperação",
+        "2fa_use_totp_code": "Usar código da aplicação",
+        "2fa_enter_backup_code": "Introduza um dos seus códigos de recuperação.",
+        "2fa_section_title": "Segurança",
+        "2fa_enabled_status": "A autenticação de dois fatores está ativada",
+        "2fa_disabled_status": "A autenticação de dois fatores está desativada",
+        "2fa_enable_btn": "Ativar 2FA",
+        "2fa_disable_btn": "Desativar 2FA",
+        "2fa_disable_title": "Desativar 2FA",
+        "2fa_disable_confirm": "Tem a certeza? A sua conta ficará menos segura.",
+        "2fa_disabled_success": "Autenticação de dois fatores desativada",
+        "2fa_enabled_success": "Autenticação de dois fatores ativada",
+        "2fa_hint_title": "Como usar este código QR",
+        "2fa_hint_step1": "Instale uma aplicação de autenticação: Google Authenticator, Microsoft Authenticator ou Authy.",
+        "2fa_hint_step2": "Abra a aplicação, toque no botão «+» e escolha «Digitalizar código QR».",
+        "2fa_hint_step3": "Aponte a câmara do seu telemóvel para o código QR acima (use a câmara da aplicação, não a aplicação de câmara do telemóvel).",
+        "2fa_hint_step4": "A aplicação mostrará um código de 6 dígitos. Introduza-o na caixa abaixo.",
+        "2fa_manual_secret_hint": "Não consegue digitalizar? Copie a chave abaixo e adicione-a manualmente na aplicação («Introduzir chave de configuração»).",
+        "auto_lock_section_title": "Bloqueio automático",
+        "auto_lock_enable": "Bloquear após inatividade",
+        "auto_lock_timeout_label": "Bloquear após:",
+        "auto_lock_warning_title": "Aviso de bloqueio automático",
+        "auto_lock_warning_body": "A sua sessão será bloqueada em {seconds} segundos por inatividade.",
+        "lock_now": "Bloquear agora",
+        "font_section_title": "Tipo de letra",
+        "font_family_label": "Família de letras",
+        "font_size_label": "Tamanho base",
+        "font_scale_label": "Escala de visualização",
+        "font_scale_small": "Pequeno",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Grande",
+        "font_scale_xlarge": "Muito grande",
+        "font_scale_xxlarge": "Enorme",
+        "font_preview_text": "Luís argüia à Júlia que «brações, fé, chá, óxido, pôr, zângão» eram palavras do português — 1234567890",
+        "font_reset": "Repor predefinição",
+        "font_applied": "Tipo de letra atualizado",
+        "motion_section_title": "Movimento e animações",
+        "reduce_motion_label": "Reduzir movimento",
+        "reduce_motion_hint": "Desative as animações se o deixarem desconfortável.",
+        "empty_history_empty_title": "Ainda sem histórico",
+        "empty_history_empty_subtitle": "Processe a sua primeira imagem para a ver aqui",
+        "empty_history_empty_hint": "Cada resultado é guardado automaticamente",
+        "empty_history_no_user_title": "Inicie sessão para ver o histórico",
+        "empty_history_no_user_subtitle": "Os seus resultados guardados aparecerão aqui",
+        "empty_history_no_user_hint": "O histórico é privado para cada conta",
+        "empty_dash_no_results_title": "Ainda sem resultados",
+        "empty_dash_no_results_subtitle": "As suas análises recentes aparecerão aqui",
+        "empty_dash_no_results_hint": "Processe uma imagem para começar",
+        "empty_dash_no_dist_title": "Sem dados de distribuição",
+        "empty_dash_no_dist_subtitle": "As estatísticas preencher-se-ão à medida",
+        "empty_dash_no_dist_hint": "Cada análise conta",
+        "empty_image_empty_title": "Nenhuma imagem inserida",
+        "empty_image_empty_subtitle": "Arraste e solte uma imagem aqui, ou clique Inserir",
+        "empty_image_empty_hint": "Suporta PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Solte para analisar",
+        "empty_image_drop_hint_subtitle": "Liberte a imagem para a carregar",
+        "empty_image_drop_hint_hint": "O formato será detetado automaticamente",
+        "empty_processing_wait_title": "A processar...",
+        "empty_processing_wait_subtitle": "A IA está a analisar a sua imagem",
+        "empty_processing_wait_hint": "Normalmente demora alguns segundos",
+        "tour_show_again": "Mostrar tour novamente",
+        "tour_completed_msg": "Tour concluído! Está pronto.",
+        "tour_skipped_msg": "Tour ignorado. Pode repeti-lo no menu Conta.",
+        "tour_btn_next": "Seguinte",
+        "tour_btn_prev": "Anterior",
+        "tour_btn_skip": "Ignorar",
+        "tour_btn_finish": "Concluir ✓",
+        "tour_guest_login_title": "Entrar",
+        "tour_guest_login_subtitle": "Clique aqui para entrar na sua conta e desbloquear todas as funcionalidades.",
+        "tour_guest_signup_title": "Criar uma conta",
+        "tour_guest_signup_subtitle": "Novo por aqui? Clique aqui para criar uma conta em segundos.",
+        "tour_insert_title": "Inserir imagem",
+        "tour_insert_subtitle": "Carregue uma imagem de eco do disco, ou arraste e solte-a em qualquer lugar da janela.",
+        "tour_process_title": "Processar imagem",
+        "tour_process_subtitle": "Execute a análise de IA na imagem carregada. Os resultados aparecem em poucos segundos.",
+        "tour_export_title": "Exportar PDF",
+        "tour_export_subtitle": "Guarde o resultado atual como um relatório médico PDF profissional.",
+        "tour_gradcam_title": "Mapa de calor de atenção",
+        "tour_gradcam_subtitle": "Veja onde a IA está a olhar — um mapa de calor sobre a imagem analisada.",
+        "tour_dashboard_title": "Painel",
+        "tour_dashboard_subtitle": "Mostrar/ocultar painel de estatísticas: total de imagens, confiança média, distribuição por grau.",
+        "tour_history_title": "Histórico",
+        "tour_history_subtitle": "Navegue pelas últimas 20 imagens analisadas. Clique numa miniatura para recarregar o resultado.",
+        "tour_visit_title": "Visitar página",
+        "tour_visit_subtitle": "Abra a página GitHub do projeto no navegador para documentação e atualizações.",
+        "tour_mute_title": "Silenciar música",
+        "tour_mute_subtitle": "Pause ou retome a música de fundo a qualquer momento.",
+        "tour_zoom_title": "Controlos de zoom",
+        "tour_zoom_subtitle": "Use a roda do rato para zoom, arraste para mover, e duplo-clique para reiniciar.",
+        "tour_account_title": "Menu da conta",
+        "tour_account_subtitle": "Clique aqui para aceder a Configurações, Informações da conta, Registo de auditoria e mais.",
+        "suggestion_image_ready":      "Imagem carregada — pronta para processar",
+        "suggestion_image_ready_sub":  "Clique em Processar para executar a análise de IA.",
+        "suggestion_pdf_ready":        "Resultado pronto — exportar como PDF?",
+        "suggestion_pdf_ready_sub":    "Guarde um relatório médico profissional com um clique.",
+        "suggestion_gradcam_hint":     "Curioso para saber o que a IA viu?",
+        "suggestion_gradcam_hint_sub": "Veja o mapa de calor de atenção sobre a imagem.",
+        "suggestion_repeated_grid":    "Está sempre a obter {grid}",
+        "suggestion_repeated_grid_sub":"Abra o painel para ver a distribuição.",
+        "suggestion_history_hint":     "O seu histórico está a crescer",
+        "suggestion_history_hint_sub": "Navegue pelas suas últimas 20 imagens analisadas.",
+        "suggestion_dashboard_hint":   "O seu painel tem estatísticas interessantes",
+        "suggestion_dashboard_hint_sub":"Totais, médias e distribuição num relance.",
+        "suggestion_settings_hint":    "Personalize a aplicação",
+        "suggestion_settings_hint_sub":"Altere idioma, tema, tipo de letra e ative 2FA.",
+        "suggestion_idle_help":        "Precisa de um guia rápido?",
+        "suggestion_idle_help_sub":    "Repita o tour de integração a qualquer momento.",
+        "image_not_liver_warning": "Esta imagem não parece uma ecografia do fígado.\n\nPor favor, insira uma imagem de ecografia do fígado adequada.",
+        "result_not_confident": "A IA não conseguiu identificar com confiança esta imagem como uma ecografia do fígado.\n\nPor favor, insira uma imagem de ecografia do fígado adequada e tente novamente.",
+        "not_liver_title": "Não é uma ecografia do fígado",
+        "not_liver_hint": "Por favor, use uma imagem de ecografia (sonograma) do fígado adequada",
+        "voice_welcome": "Bem-vindo, {user}",
+        "voice_goodbye": "Adeus",
+        "voice_logged_out": "Sessão terminada com sucesso",
+        "voice_image_loaded": "Imagem carregada com sucesso",
+        "voice_image_rejected": "Isto não é uma ecografia do fígado",
+        "voice_inference_result": "{grid_name}, confiança {conf} por cento",
+        "voice_pdf_saved": "Relatório PDF guardado com sucesso",
+        "voice_error": "Ocorreu um erro",
+        "voice_settings_applied": "Definições aplicadas",
+        "voice_language_changed": "Idioma alterado para {lang}",
+        "voice_theme_changed": "Tema alterado",
+        "voice_2fa_enabled": "Autenticação de dois fatores ativada",
+        "voice_2fa_disabled": "Autenticação de dois fatores desativada",
+        "voice_locked": "Sessão bloqueada",
+        "voice_unlocked": "Sessão desbloqueada",
+        "voice_processing": "A processar imagem",
+        "voice_processing_done": "Processamento concluído",
+        "voice_voice_enabled": "Feedback de voz ativado",
+        "voice_voice_disabled": "Feedback de voz desativado",
     },
     "Brazil": {
         "app_title": "Fígado AI-babak",
@@ -3596,6 +6615,186 @@ TRANSLATIONS = {
         "install_failed": "Falha na instalação. Sua versão antiga está segura.",
         "download_failed": "Falha no download.",
         "source_update_requires_zip": "A atualização de código-fonte requer um arquivo .zip.",
+        "session_locked": "Sessão Bloqueada",
+        "locked_for_user": "Bloqueada para {user}",
+        "unlock": "Desbloquear",
+        "session_unlocked": "Sessão desbloqueada",
+        "auto_lock_notice": "A sessão será bloqueada após 2 minutos de inatividade.",
+        "audit_log_title": "Registro de Auditoria",
+        "audit_export": "Exportar",
+        "audit_exported": "Exportado com sucesso",
+        "audit_export_failed": "Falha na exportação",
+        "audit_search_placeholder": "Pesquisar ações ou detalhes...",
+        "audit_col_time": "Hora",
+        "audit_col_level": "Nível",
+        "audit_col_category": "Categoria",
+        "audit_col_action": "Ação",
+        "audit_col_user": "Usuário",
+        "audit_details_title": "Detalhes do Evento",
+        "audit_status": "Mostrando {count} de {total} eventos",
+        "strength_very_weak": "Muito fraca",
+        "strength_weak": "Fraca",
+        "strength_medium": "Média",
+        "strength_strong": "Forte",
+        "strength_very_strong": "Muito forte",
+        "strength_rule_length": "8-16 caracteres",
+        "strength_rule_lowercase": "Letra minúscula",
+        "strength_rule_uppercase": "Letra maiúscula",
+        "strength_rule_digits": "Dígitos",
+        "strength_rule_special": "Caracteres especiais",
+        "strength_add_chars": "Adicione mais {n} caractere(s)",
+        "strength_remove_chars": "Remova {n} caractere(s)",
+        "strength_need_digits": "Adicione mais {n} dígito(s)",
+        "strength_need_special": "Adicione mais {n} caractere(s) especial(is)",
+        "strength_common_pattern": "Evite palavras comuns",
+        "strength_common_year": "Evite anos comuns",
+        "strength_has_sequence": "Evite sequências (1234, abcd)",
+        "strength_has_repeats": "Evite repetições (aaaa, 1111)",
+        "passwords_match": "As senhas coincidem",
+        "2fa_setup_title": "Ativar autenticação de dois fatores",
+        "2fa_setup_subtitle": "Escaneie o código QR com Google Authenticator, Authy ou Microsoft Authenticator.",
+        "2fa_manual_secret": "Ou insira este código manualmente:",
+        "2fa_enter_code": "Insira o código de 6 dígitos do seu aplicativo:",
+        "2fa_verify_btn": "Verificar",
+        "2fa_backup_codes_title": "Salve estes códigos de backup!",
+        "2fa_backup_codes_hint": "Cada código só pode ser usado uma vez. Guarde-os em um local seguro.",
+        "2fa_done_btn": "Concluído",
+        "2fa_secret_copied": "Código secreto copiado para a área de transferência",
+        "2fa_invalid_code": "Código inválido. Tente novamente.",
+        "2fa_invalid_code_format": "O código deve ter 6 dígitos.",
+        "2fa_verify_title": "Autenticação de dois fatores",
+        "2fa_verify_subtitle": "Insira o código de 6 dígitos do seu aplicativo autenticador.",
+        "2fa_enter_code_hint": "Por favor, insira um código.",
+        "2fa_use_backup_code": "Usar um código de backup",
+        "2fa_use_totp_code": "Usar código do aplicativo",
+        "2fa_enter_backup_code": "Insira um dos seus códigos de backup.",
+        "2fa_section_title": "Segurança",
+        "2fa_enabled_status": "A autenticação de dois fatores está ativada",
+        "2fa_disabled_status": "A autenticação de dois fatores está desativada",
+        "2fa_enable_btn": "Ativar 2FA",
+        "2fa_disable_btn": "Desativar 2FA",
+        "2fa_disable_title": "Desativar 2FA",
+        "2fa_disable_confirm": "Tem certeza? Sua conta ficará menos segura.",
+        "2fa_disabled_success": "Autenticação de dois fatores desativada",
+        "2fa_enabled_success": "Autenticação de dois fatores ativada",
+        "2fa_hint_title": "Como usar este código QR",
+        "2fa_hint_step1": "Instale um aplicativo autenticador: Google Authenticator, Microsoft Authenticator ou Authy.",
+        "2fa_hint_step2": "Abra o aplicativo, toque no botão \"+\" e escolha \"Escanear código QR\".",
+        "2fa_hint_step3": "Aponte a câmera do seu celular para o código QR acima (use a câmera do aplicativo, não o app de câmera do celular).",
+        "2fa_hint_step4": "O aplicativo mostrará um código de 6 dígitos. Insira-o na caixa abaixo.",
+        "2fa_manual_secret_hint": "Não consegue escanear? Copie a chave abaixo e adicione-a manualmente no aplicativo (\"Inserir chave de configuração\").",
+        "auto_lock_section_title": "Bloqueio automático",
+        "auto_lock_enable": "Bloquear após inatividade",
+        "auto_lock_timeout_label": "Bloquear após:",
+        "auto_lock_warning_title": "Aviso de bloqueio automático",
+        "auto_lock_warning_body": "Sua sessão será bloqueada em {seconds} segundos por inatividade.",
+        "lock_now": "Bloquear agora",
+        "font_section_title": "Fonte",
+        "font_family_label": "Família da fonte",
+        "font_size_label": "Tamanho base",
+        "font_scale_label": "Escala de exibição",
+        "font_scale_small": "Pequena",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Grande",
+        "font_scale_xlarge": "Muito grande",
+        "font_scale_xxlarge": "Enorme",
+        "font_preview_text": "Um pequeno jabuti xereta viu dez cegonhas felizes — 1234567890",
+        "font_reset": "Redefinir para o padrão",
+        "font_applied": "Fonte atualizada",
+        "motion_section_title": "Movimento e animações",
+        "reduce_motion_label": "Reduzir movimento",
+        "reduce_motion_hint": "Desative as animações se elas te deixarem desconfortável.",
+        "empty_history_empty_title": "Ainda sem histórico",
+        "empty_history_empty_subtitle": "Processe sua primeira imagem para vê-la aqui",
+        "empty_history_empty_hint": "Cada resultado é salvo automaticamente",
+        "empty_history_no_user_title": "Entre para ver o histórico",
+        "empty_history_no_user_subtitle": "Seus resultados salvos aparecerão aqui",
+        "empty_history_no_user_hint": "O histórico é privado para cada conta",
+        "empty_dash_no_results_title": "Ainda sem resultados",
+        "empty_dash_no_results_subtitle": "Suas análises recentes aparecerão aqui",
+        "empty_dash_no_results_hint": "Processe uma imagem para começar",
+        "empty_dash_no_dist_title": "Sem dados de distribuição",
+        "empty_dash_no_dist_subtitle": "As estatísticas serão preenchidas conforme você processa",
+        "empty_dash_no_dist_hint": "Cada análise conta",
+        "empty_image_empty_title": "Nenhuma imagem inserida",
+        "empty_image_empty_subtitle": "Arraste e solte uma imagem aqui, ou clique Inserir",
+        "empty_image_empty_hint": "Suporta PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Solte para analisar",
+        "empty_image_drop_hint_subtitle": "Solte a imagem para carregá-la",
+        "empty_image_drop_hint_hint": "O formato será detectado automaticamente",
+        "empty_processing_wait_title": "Processando...",
+        "empty_processing_wait_subtitle": "A IA está analisando sua imagem",
+        "empty_processing_wait_hint": "Geralmente leva alguns segundos",
+        "tour_show_again": "Mostrar tour novamente",
+        "tour_completed_msg": "Tour concluído! Você está pronto.",
+        "tour_skipped_msg": "Tour ignorado. Você pode repeti-lo no menu Conta.",
+        "tour_btn_next": "Próximo",
+        "tour_btn_prev": "Anterior",
+        "tour_btn_skip": "Pular",
+        "tour_btn_finish": "Concluir ✓",
+        "tour_guest_login_title": "Entrar",
+        "tour_guest_login_subtitle": "Clique aqui para entrar na sua conta e desbloquear todos os recursos.",
+        "tour_guest_signup_title": "Criar uma conta",
+        "tour_guest_signup_subtitle": "Novo por aqui? Clique aqui para criar uma conta em segundos.",
+        "tour_insert_title": "Inserir imagem",
+        "tour_insert_subtitle": "Carregue uma imagem de ultrassom do disco, ou arraste e solte-a em qualquer lugar da janela.",
+        "tour_process_title": "Processar imagem",
+        "tour_process_subtitle": "Execute a análise de IA na imagem carregada. Os resultados aparecem em poucos segundos.",
+        "tour_export_title": "Exportar PDF",
+        "tour_export_subtitle": "Salve o resultado atual como um relatório médico PDF profissional.",
+        "tour_gradcam_title": "Mapa de calor de atenção",
+        "tour_gradcam_subtitle": "Veja onde a IA está olhando — um mapa de calor sobre a imagem analisada.",
+        "tour_dashboard_title": "Painel",
+        "tour_dashboard_subtitle": "Mostrar/ocultar painel de estatísticas: total de imagens, confiança média, distribuição por grau.",
+        "tour_history_title": "Histórico",
+        "tour_history_subtitle": "Navegue pelas últimas 20 imagens analisadas. Clique em uma miniatura para recarregar o resultado.",
+        "tour_visit_title": "Visitar página",
+        "tour_visit_subtitle": "Abra a página GitHub do projeto no navegador para documentação e atualizações.",
+        "tour_mute_title": "Silenciar música",
+        "tour_mute_subtitle": "Pause ou retome a música de fundo a qualquer momento.",
+        "tour_zoom_title": "Controles de zoom",
+        "tour_zoom_subtitle": "Use a roda do mouse para zoom, arraste para mover, e clique duplo para redefinir.",
+        "tour_account_title": "Menu da conta",
+        "tour_account_subtitle": "Clique aqui para acessar Configurações, Informações da conta, Registro de auditoria e mais.",
+        "suggestion_image_ready": "Imagem carregada — pronta para processar",
+        "suggestion_image_ready_sub": "Clique em Processar para executar a análise de IA.",
+        "suggestion_pdf_ready": "Resultado pronto — exportar como PDF?",
+        "suggestion_pdf_ready_sub": "Salve um relatório médico profissional com um clique.",
+        "suggestion_gradcam_hint": "Curioso para saber o que a IA viu?",
+        "suggestion_gradcam_hint_sub": "Veja o mapa de calor de atenção sobre a imagem.",
+        "suggestion_repeated_grid": "Você sempre obtém {grid}",
+        "suggestion_repeated_grid_sub": "Abra o painel para ver a distribuição.",
+        "suggestion_history_hint": "Seu histórico está crescendo",
+        "suggestion_history_hint_sub": "Navegue pelas suas últimas 20 imagens analisadas.",
+        "suggestion_dashboard_hint": "Seu painel tem estatísticas interessantes",
+        "suggestion_dashboard_hint_sub": "Totais, médias e distribuição rapidamente.",
+        "suggestion_settings_hint": "Personalize o aplicativo",
+        "suggestion_settings_hint_sub": "Altere idioma, tema, fonte e ative 2FA.",
+        "suggestion_idle_help": "Precisa de um guia rápido?",
+        "suggestion_idle_help_sub": "Repita o tour de integração a qualquer momento.",
+        "image_not_liver_warning": "Esta imagem não parece uma ultrassonografia do fígado.\n\nPor favor, insira uma imagem de ultrassonografia do fígado adequada.",
+        "result_not_confident": "A IA não conseguiu identificar com confiança esta imagem como uma ultrassonografia do fígado.\n\nPor favor, insira uma imagem de ultrassonografia do fígado adequada e tente novamente.",
+        "not_liver_title": "Não é uma ultrassonografia do fígado",
+        "not_liver_hint": "Por favor, use uma imagem de ultrassonografia (sonograma) do fígado adequada",
+        "voice_welcome": "Bem-vindo, {user}",
+        "voice_goodbye": "Tchau",
+        "voice_logged_out": "Logout realizado com sucesso",
+        "voice_image_loaded": "Imagem carregada com sucesso",
+        "voice_image_rejected": "Esta não é uma ultrassonografia do fígado",
+        "voice_inference_result": "{grid_name}, confiança {conf} por cento",
+        "voice_pdf_saved": "Relatório PDF salvo com sucesso",
+        "voice_error": "Ocorreu um erro",
+        "voice_settings_applied": "Configurações aplicadas",
+        "voice_language_changed": "Idioma alterado para {lang}",
+        "voice_theme_changed": "Tema alterado",
+        "voice_2fa_enabled": "Autenticação de dois fatores ativada",
+        "voice_2fa_disabled": "Autenticação de dois fatores desativada",
+        "voice_locked": "Sessão bloqueada",
+        "voice_unlocked": "Sessão desbloqueada",
+        "voice_processing": "Processando imagem",
+        "voice_processing_done": "Processamento concluído",
+        "voice_voice_enabled": "Feedback de voz ativado",
+        "voice_voice_disabled": "Feedback de voz desativado",
     },
     "Argentina": {
         "app_title": "Hígado AI-babak",
@@ -3795,6 +6994,186 @@ TRANSLATIONS = {
         "install_failed": "Falló la instalación. Tu versión anterior está segura.",
         "download_failed": "Falló la descarga.",
         "source_update_requires_zip": "La actualización de código fuente requiere un archivo .zip.",
+        "session_locked": "Sesión Bloqueada",
+        "locked_for_user": "Bloqueada para {user}",
+        "unlock": "Desbloquear",
+        "session_unlocked": "Sesión desbloqueada",
+        "auto_lock_notice": "La sesión se bloqueará después de 2 minutos de inactividad.",
+        "audit_log_title": "Registro de Auditoría",
+        "audit_export": "Exportar",
+        "audit_exported": "Exportado con éxito",
+        "audit_export_failed": "Falló la exportación",
+        "audit_search_placeholder": "Buscar acciones o detalles...",
+        "audit_col_time": "Hora",
+        "audit_col_level": "Nivel",
+        "audit_col_category": "Categoría",
+        "audit_col_action": "Acción",
+        "audit_col_user": "Usuario",
+        "audit_details_title": "Detalles del Evento",
+        "audit_status": "Mostrando {count} de {total} eventos",
+        "strength_very_weak": "Muy débil",
+        "strength_weak": "Débil",
+        "strength_medium": "Media",
+        "strength_strong": "Fuerte",
+        "strength_very_strong": "Muy fuerte",
+        "strength_rule_length": "8-16 caracteres",
+        "strength_rule_lowercase": "Letra minúscula",
+        "strength_rule_uppercase": "Letra mayúscula",
+        "strength_rule_digits": "Dígitos",
+        "strength_rule_special": "Caracteres especiales",
+        "strength_add_chars": "Agregá {n} carácter(es) más",
+        "strength_remove_chars": "Quitá {n} carácter(es)",
+        "strength_need_digits": "Agregá {n} dígito(s) más",
+        "strength_need_special": "Agregá {n} carácter(es) especial(es) más",
+        "strength_common_pattern": "Evitá palabras comunes",
+        "strength_common_year": "Evitá años comunes",
+        "strength_has_sequence": "Evitá secuencias (1234, abcd)",
+        "strength_has_repeats": "Evitá repeticiones (aaaa, 1111)",
+        "passwords_match": "Las contraseñas coinciden",
+        "2fa_setup_title": "Habilitar autenticación de dos factores",
+        "2fa_setup_subtitle": "Escaneá el código QR con Google Authenticator, Authy o Microsoft Authenticator.",
+        "2fa_manual_secret": "O ingresá este código manualmente:",
+        "2fa_enter_code": "Ingresá el código de 6 dígitos de tu aplicación:",
+        "2fa_verify_btn": "Verificar",
+        "2fa_backup_codes_title": "¡Guardá estos códigos de respaldo!",
+        "2fa_backup_codes_hint": "Cada código se puede usar solo una vez. Guardalos en un lugar seguro.",
+        "2fa_done_btn": "Listo",
+        "2fa_secret_copied": "Código secreto copiado al portapapeles",
+        "2fa_invalid_code": "Código inválido. Intentá de nuevo.",
+        "2fa_invalid_code_format": "El código debe tener 6 dígitos.",
+        "2fa_verify_title": "Autenticación de dos factores",
+        "2fa_verify_subtitle": "Ingresá el código de 6 dígitos de tu aplicación autenticadora.",
+        "2fa_enter_code_hint": "Por favor, ingresá un código.",
+        "2fa_use_backup_code": "Usar un código de respaldo",
+        "2fa_use_totp_code": "Usar código de la aplicación",
+        "2fa_enter_backup_code": "Ingresá uno de tus códigos de respaldo.",
+        "2fa_section_title": "Seguridad",
+        "2fa_enabled_status": "La autenticación de dos factores está habilitada",
+        "2fa_disabled_status": "La autenticación de dos factores está deshabilitada",
+        "2fa_enable_btn": "Habilitar 2FA",
+        "2fa_disable_btn": "Deshabilitar 2FA",
+        "2fa_disable_title": "Deshabilitar 2FA",
+        "2fa_disable_confirm": "¿Estás seguro? Tu cuenta será menos segura.",
+        "2fa_disabled_success": "Autenticación de dos factores deshabilitada",
+        "2fa_enabled_success": "Autenticación de dos factores habilitada",
+        "2fa_hint_title": "Cómo usar este código QR",
+        "2fa_hint_step1": "Instalá una aplicación de autenticación: Google Authenticator, Microsoft Authenticator o Authy.",
+        "2fa_hint_step2": "Abrí la aplicación, tocá el botón «+» y elegí «Escanear código QR».",
+        "2fa_hint_step3": "Apuntá la cámara de tu celular al código QR de arriba (usá la cámara de la aplicación, no la app de cámara del celular).",
+        "2fa_hint_step4": "La aplicación va a mostrar un código de 6 dígitos. Ingresalo en el cuadro de abajo.",
+        "2fa_manual_secret_hint": "¿No podés escanear? Copiá la clave de abajo y agregala manualmente en tu aplicación («Ingresar clave de configuración»).",
+        "auto_lock_section_title": "Bloqueo automático",
+        "auto_lock_enable": "Bloquear después de inactividad",
+        "auto_lock_timeout_label": "Bloquear después de:",
+        "auto_lock_warning_title": "Aviso de bloqueo automático",
+        "auto_lock_warning_body": "Tu sesión se bloqueará en {seconds} segundos por inactividad.",
+        "lock_now": "Bloquear ahora",
+        "font_section_title": "Tipografía",
+        "font_family_label": "Familia tipográfica",
+        "font_size_label": "Tamaño base",
+        "font_scale_label": "Escala de visualización",
+        "font_scale_small": "Chico",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Grande",
+        "font_scale_xlarge": "Muy grande",
+        "font_scale_xxlarge": "Enorme",
+        "font_preview_text": "El veloz murciélago hindú comía feliz cardillo y kiwi — 1234567890",
+        "font_reset": "Restablecer predeterminado",
+        "font_applied": "Tipografía actualizada",
+        "motion_section_title": "Movimiento y animaciones",
+        "reduce_motion_label": "Reducir movimiento",
+        "reduce_motion_hint": "Desactivá las animaciones si te resultan incómodas.",
+        "empty_history_empty_title": "Aún sin historial",
+        "empty_history_empty_subtitle": "Procesá tu primera imagen para verla acá",
+        "empty_history_empty_hint": "Cada resultado se guarda automáticamente",
+        "empty_history_no_user_title": "Iniciá sesión para ver el historial",
+        "empty_history_no_user_subtitle": "Tus resultados guardados aparecerán acá",
+        "empty_history_no_user_hint": "El historial es privado para cada cuenta",
+        "empty_dash_no_results_title": "Aún sin resultados",
+        "empty_dash_no_results_subtitle": "Tus análisis recientes aparecerán acá",
+        "empty_dash_no_results_hint": "Procesá una imagen para empezar",
+        "empty_dash_no_dist_title": "Sin datos de distribución",
+        "empty_dash_no_dist_subtitle": "Las estadísticas se llenarán a medida",
+        "empty_dash_no_dist_hint": "Cada análisis cuenta",
+        "empty_image_empty_title": "Ninguna imagen insertada",
+        "empty_image_empty_subtitle": "Arrastrá y soltá una imagen acá, o hacé clic en Insertar",
+        "empty_image_empty_hint": "Soporta PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Soltá para analizar",
+        "empty_image_drop_hint_subtitle": "Soltá la imagen para cargarla",
+        "empty_image_drop_hint_hint": "El formato se detectará automáticamente",
+        "empty_processing_wait_title": "Procesando...",
+        "empty_processing_wait_subtitle": "La IA está analizando tu imagen",
+        "empty_processing_wait_hint": "Usualmente toma unos segundos",
+        "tour_show_again": "Mostrar tour de nuevo",
+        "tour_completed_msg": "¡Tour completado! Estás listo.",
+        "tour_skipped_msg": "Tour omitido. Podés repetirlo desde el menú Cuenta.",
+        "tour_btn_next": "Siguiente",
+        "tour_btn_prev": "Anterior",
+        "tour_btn_skip": "Omitir",
+        "tour_btn_finish": "Finalizar ✓",
+        "tour_guest_login_title": "Iniciar sesión",
+        "tour_guest_login_subtitle": "Hacé clic acá para iniciar sesión y desbloquear todas las funciones.",
+        "tour_guest_signup_title": "Crear una cuenta",
+        "tour_guest_signup_subtitle": "¿Nuevo por acá? Hacé clic acá para crear una cuenta en segundos.",
+        "tour_insert_title": "Insertar imagen",
+        "tour_insert_subtitle": "Cargá una imagen de ecografía desde el disco, o arrastrá y soltala en cualquier lugar de la ventana.",
+        "tour_process_title": "Procesar imagen",
+        "tour_process_subtitle": "Ejecutá el análisis de IA en la imagen cargada. Los resultados aparecen en pocos segundos.",
+        "tour_export_title": "Exportar PDF",
+        "tour_export_subtitle": "Guardá el resultado actual como un informe médico PDF profesional.",
+        "tour_gradcam_title": "Mapa de calor de atención",
+        "tour_gradcam_subtitle": "Visualizá dónde mira la IA — un mapa de calor sobre la imagen analizada.",
+        "tour_dashboard_title": "Panel",
+        "tour_dashboard_subtitle": "Mostrar/ocultar el panel de estadísticas: total de imágenes, confianza promedio, distribución por grado.",
+        "tour_history_title": "Historial",
+        "tour_history_subtitle": "Navegá por tus últimas 20 imágenes analizadas. Hacé clic en una miniatura para recargar el resultado.",
+        "tour_visit_title": "Visitar página web",
+        "tour_visit_subtitle": "Abrí la página GitHub del proyecto en tu navegador para documentación y actualizaciones.",
+        "tour_mute_title": "Silenciar música",
+        "tour_mute_subtitle": "Pausá o reanudá la música de fondo en cualquier momento.",
+        "tour_zoom_title": "Controles de zoom",
+        "tour_zoom_subtitle": "Usá la rueda del mouse para zoom, arrastrá para mover, y doble clic para reiniciar.",
+        "tour_account_title": "Menú de la cuenta",
+        "tour_account_subtitle": "Hacé clic acá para acceder a Configuración, Información de la cuenta, Registro de auditoría y más.",
+        "suggestion_image_ready": "Imagen cargada — lista para procesar",
+        "suggestion_image_ready_sub": "Hacé clic en Procesar para ejecutar el análisis de IA.",
+        "suggestion_pdf_ready": "Resultado listo — ¿exportar como PDF?",
+        "suggestion_pdf_ready_sub": "Guardá un informe médico profesional con un clic.",
+        "suggestion_gradcam_hint": "¿Curioso por saber qué vio la IA?",
+        "suggestion_gradcam_hint_sub": "Mirá el mapa de calor de atención sobre la imagen.",
+        "suggestion_repeated_grid": "Siempre obtenés {grid}",
+        "suggestion_repeated_grid_sub": "Abrí el panel para ver la distribución.",
+        "suggestion_history_hint": "Tu historial está creciendo",
+        "suggestion_history_hint_sub": "Navegá por tus últimas 20 imágenes analizadas.",
+        "suggestion_dashboard_hint": "Tu panel tiene estadísticas interesantes",
+        "suggestion_dashboard_hint_sub": "Totales, promedios y distribución de un vistazo.",
+        "suggestion_settings_hint": "Personalizá la aplicación",
+        "suggestion_settings_hint_sub": "Cambiá idioma, tema, tipografía y activá 2FA.",
+        "suggestion_idle_help": "¿Necesitás una guía rápida?",
+        "suggestion_idle_help_sub": "Repetí el tour de bienvenida cuando quieras.",
+        "image_not_liver_warning": "Esta imagen no parece una ecografía del hígado.\n\nPor favor, insertá una imagen de ecografía del hígado adecuada.",
+        "result_not_confident": "La IA no pudo identificar con confianza esta imagen como una ecografía del hígado.\n\nPor favor, insertá una imagen de ecografía del hígado adecuada e intentá de nuevo.",
+        "not_liver_title": "No es una ecografía del hígado",
+        "not_liver_hint": "Por favor, usá una imagen de ecografía (sonograma) del hígado adecuada",
+        "voice_welcome": "Bienvenido, {user}",
+        "voice_goodbye": "Chau",
+        "voice_logged_out": "Sesión cerrada con éxito",
+        "voice_image_loaded": "Imagen cargada con éxito",
+        "voice_image_rejected": "Esta no es una ecografía del hígado",
+        "voice_inference_result": "{grid_name}, confianza {conf} por ciento",
+        "voice_pdf_saved": "Informe PDF guardado con éxito",
+        "voice_error": "Ocurrió un error",
+        "voice_settings_applied": "Configuración aplicada",
+        "voice_language_changed": "Idioma cambiado a {lang}",
+        "voice_theme_changed": "Tema cambiado",
+        "voice_2fa_enabled": "Autenticación de dos factores habilitada",
+        "voice_2fa_disabled": "Autenticación de dos factores deshabilitada",
+        "voice_locked": "Sesión bloqueada",
+        "voice_unlocked": "Sesión desbloqueada",
+        "voice_processing": "Procesando imagen",
+        "voice_processing_done": "Procesamiento completado",
+        "voice_voice_enabled": "Respuesta de voz habilitada",
+        "voice_voice_disabled": "Respuesta de voz deshabilitada",
     },
     "Morocco": {
         "app_title": "خط أنابيب الذكاء الاصطناعي للكبد",
@@ -3994,6 +7373,186 @@ TRANSLATIONS = {
         "install_failed": "فشل التثبيت. إصدارك القديم آمن.",
         "download_failed": "فشل التحميل.",
         "source_update_requires_zip": "تحديث المصدر يتطلب ملف .zip.",
+        "session_locked": "الجلسة مقفلة",
+        "locked_for_user": "مقفلة لـ {user}",
+        "unlock": "إلغاء القفل",
+        "session_unlocked": "تم إلغاء قفل الجلسة",
+        "auto_lock_notice": "سيتم قفل الجلسة بعد دقيقتين من عدم النشاط.",
+        "audit_log_title": "سجل التدقيق",
+        "audit_export": "تصدير",
+        "audit_exported": "تم التصدير بنجاح",
+        "audit_export_failed": "فشل التصدير",
+        "audit_search_placeholder": "البحث في الإجراءات أو التفاصيل...",
+        "audit_col_time": "الوقت",
+        "audit_col_level": "المستوى",
+        "audit_col_category": "الفئة",
+        "audit_col_action": "الإجراء",
+        "audit_col_user": "المستخدم",
+        "audit_details_title": "تفاصيل الحدث",
+        "audit_status": "عرض {count} من {total} حدثاً",
+        "strength_very_weak": "ضعيف بزاف",
+        "strength_weak": "ضعيف",
+        "strength_medium": "متوسط",
+        "strength_strong": "قوي",
+        "strength_very_strong": "قوي بزاف",
+        "strength_rule_length": "8-16 حرف",
+        "strength_rule_lowercase": "حرف صغير",
+        "strength_rule_uppercase": "حرف كبير",
+        "strength_rule_digits": "أرقام",
+        "strength_rule_special": "رموز خاصة",
+        "strength_add_chars": "زيد {n} حرف آخر",
+        "strength_remove_chars": "نقص {n} حرف",
+        "strength_need_digits": "زيد {n} رقم آخر",
+        "strength_need_special": "زيد {n} رمز خاص آخر",
+        "strength_common_pattern": "تجنب الكلمات الشائعة",
+        "strength_common_year": "تجنب السنوات الشائعة",
+        "strength_has_sequence": "تجنب التسلسلات (1234، abcd)",
+        "strength_has_repeats": "تجنب التكرارات (aaaa، 1111)",
+        "passwords_match": "كلمتي السر متطابقتين",
+        "2fa_setup_title": "تفعيل المصادقة الثنائية",
+        "2fa_setup_subtitle": "امسح رمز QR باستخدام Google Authenticator أو Authy أو Microsoft Authenticator.",
+        "2fa_manual_secret": "أو أدخل هذا الرمز يدويًا:",
+        "2fa_enter_code": "دخّل الرمز المكوّن من 6 أرقام من التطبيق ديالك:",
+        "2fa_verify_btn": "تحقق",
+        "2fa_backup_codes_title": "حتافظ على رموز الاحتياط هادو!",
+        "2fa_backup_codes_hint": "كل رمز يمكن استعمالو غير مرة وحدة. حطهم فبلاصة آمنة.",
+        "2fa_done_btn": "تم",
+        "2fa_secret_copied": "الرمز السري تنسخ للحافظة",
+        "2fa_invalid_code": "رمز غير صالح. عاود المحاولة.",
+        "2fa_invalid_code_format": "الرمز خاصو يكون 6 أرقام.",
+        "2fa_verify_title": "المصادقة الثنائية",
+        "2fa_verify_subtitle": "دخّل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+        "2fa_enter_code_hint": "عافاك دخّل رمز.",
+        "2fa_use_backup_code": "استعمل رمز احتياطي",
+        "2fa_use_totp_code": "استعمل رمز التطبيق",
+        "2fa_enter_backup_code": "دخّل واحد من رموز الاحتياط ديالك.",
+        "2fa_section_title": "الأمان",
+        "2fa_enabled_status": "المصادقة الثنائية مفعّلة",
+        "2fa_disabled_status": "المصادقة الثنائية معطّلة",
+        "2fa_enable_btn": "فعّل 2FA",
+        "2fa_disable_btn": "عطّل 2FA",
+        "2fa_disable_title": "عطّل 2FA",
+        "2fa_disable_confirm": "واش متأكد؟ الحساب ديالك غادي يولي أقل أمان.",
+        "2fa_disabled_success": "المصادقة الثنائية تعطّلت",
+        "2fa_enabled_success": "المصادقة الثنائية تفعّلت",
+        "2fa_hint_title": "كيفاش تستعمل هاد رمز QR",
+        "2fa_hint_step1": "ركّب تطبيق مصادقة: Google Authenticator، Microsoft Authenticator، ولا Authy.",
+        "2fa_hint_step2": "حل التطبيق، ضغط على زر \"+\"، ومن بعد اختار \"مسح رمز QR\".",
+        "2fa_hint_step3": "وجّه كاميرا التيليفون ديالك لرمز QR اللي فوق (استعمل كاميرا التطبيق، ماشي كاميرا التيليفون).",
+        "2fa_hint_step4": "التطبيق غادي يوري ليك رمز فيه 6 أرقام. دخّلو فالمربع اللي تحت.",
+        "2fa_manual_secret_hint": "ماقدرتيش تسكاني؟ كوبي المفتاح اللي تحت وزيدو يدوياً فالتطبيق ديالك (\"إدخال مفتاح الإعداد\").",
+        "auto_lock_section_title": "القفل التلقائي",
+        "auto_lock_enable": "قفل من بعد عدم النشاط",
+        "auto_lock_timeout_label": "قفل من بعد:",
+        "auto_lock_warning_title": "تحذير القفل التلقائي",
+        "auto_lock_warning_body": "الجلسة ديالك غادي تتقفل فـ {seconds} ثانية حيت مامكاينش نشاط.",
+        "lock_now": "قفل دابا",
+        "font_section_title": "الخط",
+        "font_family_label": "نوع الخط",
+        "font_size_label": "الحجم الأساسي",
+        "font_scale_label": "مقياس العرض",
+        "font_scale_small": "صغير",
+        "font_scale_normal": "عادي",
+        "font_scale_large": "كبير",
+        "font_scale_xlarge": "كبير بزاف",
+        "font_scale_xxlarge": "ضخم",
+        "font_preview_text": "هاد النص نموذجي باش تشوف الخط — 1234567890",
+        "font_reset": "رجع للإعدادات الأصلية",
+        "font_applied": "الخط تبدل",
+        "motion_section_title": "الحركة والأنيماسيون",
+        "reduce_motion_label": "قلل الحركة",
+        "reduce_motion_hint": "طفي الأنيماسيون إلا كان كيضايقك.",
+        "empty_history_empty_title": "مازال ماكاينش سجل",
+        "empty_history_empty_subtitle": "عالج أول صورة باش تشوفها هنا",
+        "empty_history_empty_hint": "كل نتيجة كتسجل أوتوماتيكياً",
+        "empty_history_no_user_title": "دخل باش تشوف السجل",
+        "empty_history_no_user_subtitle": "النتايج المحفوظة ديالك غادي تبان هنا",
+        "empty_history_no_user_hint": "السجل خاص بكل حساب",
+        "empty_dash_no_results_title": "مازال ماكاينش نتايج",
+        "empty_dash_no_results_subtitle": "التحليلات الأخيرة ديالك غادي تبان هنا",
+        "empty_dash_no_results_hint": "عالج صورة باش تبدا",
+        "empty_dash_no_dist_title": "ماكاينش بيانات التوزيع",
+        "empty_dash_no_dist_subtitle": "الإحصائيات غادي تعمر معالجة الصور",
+        "empty_dash_no_dist_hint": "كل تحليل مهم",
+        "empty_image_empty_title": "ماكاينش صورة مدخلة",
+        "empty_image_empty_subtitle": "سحب وحط صورة هنا، ولا كليكي على إدراج",
+        "empty_image_empty_hint": "كيدعم PNG، JPG، JPEG، BMP، DCM",
+        "empty_image_drop_hint_title": "حط باش نحلل",
+        "empty_image_drop_hint_subtitle": "خلي الصورة باش تتحمل",
+        "empty_image_drop_hint_hint": "الصيغة غادي تتعرف أوتوماتيكياً",
+        "empty_processing_wait_title": "كيتم المعالجة...",
+        "empty_processing_wait_subtitle": "الذكاء الاصطناعي كيحلل الصورة ديالك",
+        "empty_processing_wait_hint": "عادة كياخد شي ثواني",
+        "tour_show_again": "بين الجولة مرة أخرى",
+        "tour_completed_msg": "الجولة كملات! راك واجد.",
+        "tour_skipped_msg": "الجولة تخطات. تقدر تعاودها من قائمة الحساب.",
+        "tour_btn_next": "التالي",
+        "tour_btn_prev": "السابق",
+        "tour_btn_skip": "تخطي",
+        "tour_btn_finish": "سالينا ✓",
+        "tour_guest_login_title": "دخول",
+        "tour_guest_login_subtitle": "كليكي هنا باش تدخل لحسابك وتفتح جميع الميزات.",
+        "tour_guest_signup_title": "دير حساب",
+        "tour_guest_signup_subtitle": "جديد هنا؟ كليكي هنا باش تدير حساب فشي ثواني.",
+        "tour_insert_title": "حط صورة",
+        "tour_insert_subtitle": "حمّل صورة سونو من الديسك، ولا سحبها وحطها فأي بلاصة فالنافذة.",
+        "tour_process_title": "عالج الصورة",
+        "tour_process_subtitle": "شغّل تحليل الذكاء الاصطناعي على الصورة المحملة. النتايج كتبان فشي ثواني.",
+        "tour_export_title": "صدّر PDF",
+        "tour_export_subtitle": "سجل النتيجة الحالية كتقرير طبي PDF احترافي.",
+        "tour_gradcam_title": "خريطة الانتباه الحرارية",
+        "tour_gradcam_subtitle": "شوف فين كيشوف الذكاء الاصطناعي — خريطة حرارية فوق الصورة المحللة.",
+        "tour_dashboard_title": "لوحة التحكم",
+        "tour_dashboard_subtitle": "بين/خبي لوحة الإحصائيات: مجموع الصور، متوسط الثقة، توزيع الدرجات.",
+        "tour_history_title": "السجل",
+        "tour_history_subtitle": "تصفح آخر 20 صورة محللة. كليكي على أي صورة مصغرة باش تعاود تحمل نتيجتها.",
+        "tour_visit_title": "زيارة الموقع",
+        "tour_visit_subtitle": "حل صفحة GitHub ديال المشروع فالمتصفح باش تشوف الوثائق والتحديثات.",
+        "tour_mute_title": "كتم الموسيقى",
+        "tour_mute_subtitle": "وقّف ولا كمّل موسيقى الخلفية فأي وقت.",
+        "tour_zoom_title": "التحكم فالتكبير",
+        "tour_zoom_subtitle": "استعمل عجلة الماوس للتكبير، سحب للتحريك، ونقرة مزدوجة لإعادة الضبط.",
+        "tour_account_title": "قائمة الحساب",
+        "tour_account_subtitle": "كليكي هنا باش توصل للإعدادات، معلومات الحساب، سجل التدقيق، والمزيد.",
+        "suggestion_image_ready": "الصورة تحمّلات — واجدة للمعالجة",
+        "suggestion_image_ready_sub": "كليكي على «معالجة» باش يبدا تحليل الذكاء الاصطناعي.",
+        "suggestion_pdf_ready": "النتيجة واجدة — تصدير ف PDF؟",
+        "suggestion_pdf_ready_sub": "سجل تقرير طبي احترافي بنقرة وحدة.",
+        "suggestion_gradcam_hint": "واش عندك الفضول تعرف فين شاف الذكاء الاصطناعي؟",
+        "suggestion_gradcam_hint_sub": "شوف خريطة الانتباه الحرارية فوق الصورة.",
+        "suggestion_repeated_grid": "دائماً كتاخد {grid}",
+        "suggestion_repeated_grid_sub": "حل لوحة التحكم باش تشوف التوزيع.",
+        "suggestion_history_hint": "السجل ديالك كيتعمر",
+        "suggestion_history_hint_sub": "تصفح آخر 20 صورة محللة.",
+        "suggestion_dashboard_hint": "لوحة التحكم ديالك فيها إحصائيات مثيرة",
+        "suggestion_dashboard_hint_sub": "المجموع والمتوسط والتوزيع بنظرة وحدة.",
+        "suggestion_settings_hint": "خصص التطبيق",
+        "suggestion_settings_hint_sub": "بدل اللغة، المظهر، الخط وفعّل 2FA.",
+        "suggestion_idle_help": "محتاج دليل سريع؟",
+        "suggestion_idle_help_sub": "عاود الجولة التعريفية فأي وقت.",
+        "image_not_liver_warning": "هاد الصورة ماكتبانش بحال صورة إيكوغرافي ديال الكبد.\n\nعافاك دخّل صورة إيكوغرافي ديال الكبد صحيحة.",
+        "result_not_confident": "الذكاء الاصطناعي ماقدرش يتعرف على هاد الصورة بثقة كصورة إيكوغرافي ديال الكبد.\n\nعافاك دخّل صورة إيكوغرافي ديال الكبد صحيحة وعاود المحاولة.",
+        "not_liver_title": "ماشي إيكوغرافي ديال الكبد",
+        "not_liver_hint": "عافاك استعمل صورة إيكوغرافي (سونوغرام) ديال الكبد صحيحة",
+        "voice_welcome": "مرحبا بيك، {user}",
+        "voice_goodbye": "بسلامة",
+        "voice_logged_out": "خرجتي بنجاح",
+        "voice_image_loaded": "الصورة تحمّلات بنجاح",
+        "voice_image_rejected": "هاد الصورة ماشي إيكوغرافي ديال الكبد",
+        "voice_inference_result": "{grid_name}، الثقة {conf} بالمئة",
+        "voice_pdf_saved": "تقرير PDF تسجل بنجاح",
+        "voice_error": "وقع شي خطأ",
+        "voice_settings_applied": "الإعدادات تطبقات",
+        "voice_language_changed": "اللغة تبدلات لـ {lang}",
+        "voice_theme_changed": "المظهر تبدل",
+        "voice_2fa_enabled": "المصادقة الثنائية تفعّلت",
+        "voice_2fa_disabled": "المصادقة الثنائية تعطّلت",
+        "voice_locked": "الجلسة تقفلت",
+        "voice_unlocked": "الجلسة تحلّت",
+        "voice_processing": "كنعالجو الصورة",
+        "voice_processing_done": "المعالجة كملات",
+        "voice_voice_enabled": "الصوت تفعّل",
+        "voice_voice_disabled": "الصوت تعطّل",
     },
     "Turkey": {
         "app_title": "Karaciğer AI-babak",
@@ -4193,6 +7752,186 @@ TRANSLATIONS = {
         "install_failed": "Yükleme başarısız. Eski sürümünüz güvende.",
         "download_failed": "İndirme başarısız.",
         "source_update_requires_zip": "Kaynak güncellemesi bir .zip dosyası gerektirir.",
+        "session_locked": "Oturum Kilitli",
+        "locked_for_user": "{user} için kilitli",
+        "unlock": "Kilidi Aç",
+        "session_unlocked": "Oturum kilidi açıldı",
+        "auto_lock_notice": "Oturum 2 dakika hareketsizlikten sonra kilitlenecek.",
+        "audit_log_title": "Denetim Günlüğü",
+        "audit_export": "Dışa Aktar",
+        "audit_exported": "Başarıyla dışa aktarıldı",
+        "audit_export_failed": "Dışa aktarma başarısız",
+        "audit_search_placeholder": "Eylemleri veya ayrıntıları ara...",
+        "audit_col_time": "Zaman",
+        "audit_col_level": "Seviye",
+        "audit_col_category": "Kategori",
+        "audit_col_action": "Eylem",
+        "audit_col_user": "Kullanıcı",
+        "audit_details_title": "Olay Ayrıntıları",
+        "audit_status": "{total} olaydan {count} tanesi gösteriliyor",
+        "strength_very_weak": "Çok zayıf",
+        "strength_weak": "Zayıf",
+        "strength_medium": "Orta",
+        "strength_strong": "Güçlü",
+        "strength_very_strong": "Çok güçlü",
+        "strength_rule_length": "8-16 karakter",
+        "strength_rule_lowercase": "Küçük harf",
+        "strength_rule_uppercase": "Büyük harf",
+        "strength_rule_digits": "Rakamlar",
+        "strength_rule_special": "Özel karakterler",
+        "strength_add_chars": "{n} karakter daha ekleyin",
+        "strength_remove_chars": "{n} karakter kaldırın",
+        "strength_need_digits": "{n} rakam daha ekleyin",
+        "strength_need_special": "{n} özel karakter daha ekleyin",
+        "strength_common_pattern": "Yaygın kelimelerden kaçının",
+        "strength_common_year": "Yaygın yıllardan kaçının",
+        "strength_has_sequence": "Dizilerden (1234, abcd) kaçının",
+        "strength_has_repeats": "Tekrarlardan (aaaa, 1111) kaçının",
+        "passwords_match": "Şifreler eşleşiyor",
+        "2fa_setup_title": "İki Faktörlü Kimlik Doğrulamayı Etkinleştir",
+        "2fa_setup_subtitle": "QR kodunu Google Authenticator, Authy veya Microsoft Authenticator ile tarayın.",
+        "2fa_manual_secret": "Veya bu kodu manuel olarak girin:",
+        "2fa_enter_code": "Uygulamanızdaki 6 haneli kodu girin:",
+        "2fa_verify_btn": "Doğrula",
+        "2fa_backup_codes_title": "Bu yedek kodları kaydedin!",
+        "2fa_backup_codes_hint": "Her kod yalnızca bir kez kullanılabilir. Güvenli bir yerde saklayın.",
+        "2fa_done_btn": "Tamam",
+        "2fa_secret_copied": "Gizli kod panoya kopyalandı",
+        "2fa_invalid_code": "Geçersiz kod. Lütfen tekrar deneyin.",
+        "2fa_invalid_code_format": "Kod 6 haneli olmalıdır.",
+        "2fa_verify_title": "İki Faktörlü Kimlik Doğrulama",
+        "2fa_verify_subtitle": "Kimlik doğrulayıcı uygulamanızdaki 6 haneli kodu girin.",
+        "2fa_enter_code_hint": "Lütfen bir kod girin.",
+        "2fa_use_backup_code": "Yedek kod kullan",
+        "2fa_use_totp_code": "Uygulama kodunu kullan",
+        "2fa_enter_backup_code": "Yedek kodlarınızdan birini girin.",
+        "2fa_section_title": "Güvenlik",
+        "2fa_enabled_status": "İki Faktörlü Kimlik Doğrulama etkin",
+        "2fa_disabled_status": "İki Faktörlü Kimlik Doğrulama devre dışı",
+        "2fa_enable_btn": "2FA'yı Etkinleştir",
+        "2fa_disable_btn": "2FA'yı Devre Dışı Bırak",
+        "2fa_disable_title": "2FA'yı Devre Dışı Bırak",
+        "2fa_disable_confirm": "Emin misiniz? Hesabınız daha az güvenli olacak.",
+        "2fa_disabled_success": "İki Faktörlü Kimlik Doğrulama devre dışı bırakıldı",
+        "2fa_enabled_success": "İki Faktörlü Kimlik Doğrulama etkinleştirildi",
+        "2fa_hint_title": "Bu QR kodunu nasıl kullanırım",
+        "2fa_hint_step1": "Bir kimlik doğrulama uygulaması yükleyin: Google Authenticator, Microsoft Authenticator veya Authy.",
+        "2fa_hint_step2": "Uygulamayı açın, \"+\" düğmesine dokunun ve \"QR kodunu tara\"yı seçin.",
+        "2fa_hint_step3": "Telefonunuzun kamerasını yukarıdaki QR koduna doğrultun (telefonunuzun kamera uygulamasını değil, uygulamanın kamerasını kullanın).",
+        "2fa_hint_step4": "Uygulama 6 haneli bir kod gösterecektir. Aşağıdaki kutuya girin.",
+        "2fa_manual_secret_hint": "Tarayamıyor musunuz? Aşağıdaki anahtarı kopyalayın ve uygulamanıza manuel olarak ekleyin (\"Kurulum anahtarını gir\").",
+        "auto_lock_section_title": "Otomatik Kilit",
+        "auto_lock_enable": "Hareketsizlik sonrası kilitle",
+        "auto_lock_timeout_label": "Kilitleme süresi:",
+        "auto_lock_warning_title": "Otomatik Kilit Uyarısı",
+        "auto_lock_warning_body": "Hareketsizlik nedeniyle oturumunuz {seconds} saniye içinde kilitlenecek.",
+        "lock_now": "Şimdi Kilitle",
+        "font_section_title": "Yazı Tipi",
+        "font_family_label": "Yazı tipi ailesi",
+        "font_size_label": "Temel boyut",
+        "font_scale_label": "Görüntüleme ölçeği",
+        "font_scale_small": "Küçük",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Büyük",
+        "font_scale_xlarge": "Çok büyük",
+        "font_scale_xxlarge": "Devasa",
+        "font_preview_text": "Pijamalı hasta yağız şoföre çabucak güvendi — 1234567890",
+        "font_reset": "Varsayılana sıfırla",
+        "font_applied": "Yazı tipi güncellendi",
+        "motion_section_title": "Hareket ve Animasyonlar",
+        "reduce_motion_label": "Hareketi azalt",
+        "reduce_motion_hint": "Animasyonlar sizi rahatsız ediyorsa devre dışı bırakın.",
+        "empty_history_empty_title": "Henüz geçmiş yok",
+        "empty_history_empty_subtitle": "Burada görmek için ilk görüntünüzü işleyin",
+        "empty_history_empty_hint": "Her sonuç otomatik olarak kaydedilir",
+        "empty_history_no_user_title": "Geçmişi görmek için giriş yapın",
+        "empty_history_no_user_subtitle": "Kaydedilen sonuçlarınız burada görünecek",
+        "empty_history_no_user_hint": "Geçmiş her hesap için özeldir",
+        "empty_dash_no_results_title": "Henüz sonuç yok",
+        "empty_dash_no_results_subtitle": "Son analizleriniz burada görünecek",
+        "empty_dash_no_results_hint": "Başlamak için bir görüntü işleyin",
+        "empty_dash_no_dist_title": "Dağılım verisi yok",
+        "empty_dash_no_dist_subtitle": "Görüntüleri işledikçe istatistikler dolacak",
+        "empty_dash_no_dist_hint": "Her analiz önemlidir",
+        "empty_image_empty_title": "Görüntü eklenmedi",
+        "empty_image_empty_subtitle": "Bir görüntüyü buraya sürükleyin veya Ekle'ye tıklayın",
+        "empty_image_empty_hint": "PNG, JPG, JPEG, BMP, DCM destekler",
+        "empty_image_drop_hint_title": "Analiz için bırakın",
+        "empty_image_drop_hint_subtitle": "Yüklemek için görüntüyü bırakın",
+        "empty_image_drop_hint_hint": "Format otomatik olarak algılanır",
+        "empty_processing_wait_title": "İşleniyor...",
+        "empty_processing_wait_subtitle": "AI görüntünüzü analiz ediyor",
+        "empty_processing_wait_hint": "Genellikle birkaç saniye sürer",
+        "tour_show_again": "Turu tekrar göster",
+        "tour_completed_msg": "Tur tamamlandı! Hazırsınız.",
+        "tour_skipped_msg": "Tur atlandı. Hesap menüsünden tekrar izleyebilirsiniz.",
+        "tour_btn_next": "İleri",
+        "tour_btn_prev": "Geri",
+        "tour_btn_skip": "Atla",
+        "tour_btn_finish": "Bitir ✓",
+        "tour_guest_login_title": "Giriş Yap",
+        "tour_guest_login_subtitle": "Hesabınıza giriş yapmak ve tüm özellikleri açmak için buraya tıklayın.",
+        "tour_guest_signup_title": "Hesap Oluştur",
+        "tour_guest_signup_subtitle": "Yeni misiniz? Saniyeler içinde hesap oluşturmak için buraya tıklayın.",
+        "tour_insert_title": "Görüntü Ekle",
+        "tour_insert_subtitle": "Diskten bir sono görüntüsü yükleyin veya pencereye herhangi bir yere sürükleyip bırakın.",
+        "tour_process_title": "Görüntüyü İşle",
+        "tour_process_subtitle": "Yüklenen görüntü üzerinde AI analizini çalıştırın. Sonuçlar birkaç saniye içinde görünür.",
+        "tour_export_title": "PDF Dışa Aktar",
+        "tour_export_subtitle": "Mevcut sonucu profesyonel bir PDF tıbbi raporu olarak kaydedin.",
+        "tour_gradcam_title": "Dikkat Isı Haritası",
+        "tour_gradcam_subtitle": "AI'nin nereye baktığını görün — analiz edilen görüntü üzerinde bir ısı haritası.",
+        "tour_dashboard_title": "Panel",
+        "tour_dashboard_subtitle": "İstatistik panelini aç/kapat: toplam görüntü, ortalama güven, derece dağılımı.",
+        "tour_history_title": "Geçmiş",
+        "tour_history_subtitle": "Son 20 analiz edilmiş görüntüye göz atın. Sonucu yeniden yüklemek için bir küçük resme tıklayın.",
+        "tour_visit_title": "Web Sayfasını Ziyaret Et",
+        "tour_visit_subtitle": "Belgeler ve güncellemeler için projenin GitHub sayfasını tarayıcınızda açın.",
+        "tour_mute_title": "Müziği Sessize Al",
+        "tour_mute_subtitle": "Arka plan müziğini istediğiniz zaman duraklatın veya devam ettirin.",
+        "tour_zoom_title": "Yakınlaştırma Kontrolleri",
+        "tour_zoom_subtitle": "Yakınlaştırmak için fare tekerleğini, kaydırmak için sürükleyin, sıfırlamak için çift tıklayın.",
+        "tour_account_title": "Hesap Menüsü",
+        "tour_account_subtitle": "Ayarlar, Hesap Bilgileri, Denetim Günlüğü ve daha fazlasına erişmek için buraya tıklayın.",
+        "suggestion_image_ready": "Görüntü yüklendi — işlemeye hazır",
+        "suggestion_image_ready_sub": "AI analizini başlatmak için İşle'ye tıklayın.",
+        "suggestion_pdf_ready": "Sonuç hazır — PDF olarak dışa aktarılsın mı?",
+        "suggestion_pdf_ready_sub": "Profesyonel bir tıbbi raporu tek tıkla kaydedin.",
+        "suggestion_gradcam_hint": "AI'nin ne gördüğünü merak ediyor musunuz?",
+        "suggestion_gradcam_hint_sub": "Görüntü üzerindeki dikkat ısı haritasına bakın.",
+        "suggestion_repeated_grid": "Her zaman {grid} alıyorsunuz",
+        "suggestion_repeated_grid_sub": "Dağılımı görmek için panoyu açın.",
+        "suggestion_history_hint": "Geçmişiniz büyüyor",
+        "suggestion_history_hint_sub": "Son 20 analiz edilmiş görüntünüze göz atın.",
+        "suggestion_dashboard_hint": "Panoınızda ilginç istatistikler var",
+        "suggestion_dashboard_hint_sub": "Toplamlar, ortalamalar ve dağılım bir bakışta.",
+        "suggestion_settings_hint": "Uygulamayı kişiselleştirin",
+        "suggestion_settings_hint_sub": "Dil, tema, yazı tipini değiştirin ve 2FA'yı etkinleştirin.",
+        "suggestion_idle_help": "Hızlı bir kılavuza mı ihtiyacınız var?",
+        "suggestion_idle_help_sub": "Tanıtım turunu istediğiniz zaman yeniden oynatın.",
+        "image_not_liver_warning": "Bu görüntü karaciğer ultrasonu gibi görünmüyor.\n\nLütfen uygun bir karaciğer ultrason görüntüsü ekleyin.",
+        "result_not_confident": "Yapay zeka bu görüntüyü karaciğer ultrasonu olarak güvenle tanımlayamadı.\n\nLütfen uygun bir karaciğer ultrason görüntüsü ekleyin ve tekrar deneyin.",
+        "not_liver_title": "Karaciğer ultrasonu değil",
+        "not_liver_hint": "Lütfen uygun bir karaciğer ultrason (sonogram) görüntüsü kullanın",
+        "voice_welcome": "Hoş geldiniz, {user}",
+        "voice_goodbye": "Hoşça kalın",
+        "voice_logged_out": "Başarıyla çıkış yapıldı",
+        "voice_image_loaded": "Görüntü başarıyla yüklendi",
+        "voice_image_rejected": "Bu bir karaciğer ultrasonu değil",
+        "voice_inference_result": "{grid_name}, güven yüzde {conf}",
+        "voice_pdf_saved": "PDF raporu başarıyla kaydedildi",
+        "voice_error": "Bir hata oluştu",
+        "voice_settings_applied": "Ayarlar uygulandı",
+        "voice_language_changed": "Dil {lang} olarak değiştirildi",
+        "voice_theme_changed": "Tema değiştirildi",
+        "voice_2fa_enabled": "İki faktörlü kimlik doğrulama etkinleştirildi",
+        "voice_2fa_disabled": "İki faktörlü kimlik doğrulama devre dışı bırakıldı",
+        "voice_locked": "Oturum kilitlendi",
+        "voice_unlocked": "Oturum kilidi açıldı",
+        "voice_processing": "Görüntü işleniyor",
+        "voice_processing_done": "İşleme tamamlandı",
+        "voice_voice_enabled": "Sesli geri bildirim etkinleştirildi",
+        "voice_voice_disabled": "Sesli geri bildirim devre dışı bırakıldı",
     },
     "Switzerland": {
         "app_title": "Leber KI-babak",
@@ -4392,6 +8131,186 @@ TRANSLATIONS = {
         "install_failed": "Installation fehlgeschlagen. Ihre alte Version ist sicher.",
         "download_failed": "Download fehlgeschlagen.",
         "source_update_requires_zip": "Quellcode-Update erfordert eine .zip-Datei.",
+        "session_locked": "Sitzung gesperrt",
+        "locked_for_user": "Gesperrt für {user}",
+        "unlock": "Entsperren",
+        "session_unlocked": "Sitzung entsperrt",
+        "auto_lock_notice": "Die Sitzung wird nach 2 Minuten Inaktivität gesperrt.",
+        "audit_log_title": "Audit-Protokoll",
+        "audit_export": "Exportieren",
+        "audit_exported": "Erfolgreich exportiert",
+        "audit_export_failed": "Export fehlgeschlagen",
+        "audit_search_placeholder": "Aktionen oder Details durchsuchen...",
+        "audit_col_time": "Zeit",
+        "audit_col_level": "Stufe",
+        "audit_col_category": "Kategorie",
+        "audit_col_action": "Aktion",
+        "audit_col_user": "Benutzer",
+        "audit_details_title": "Ereignisdetails",
+        "audit_status": "Zeige {count} von {total} Ereignissen",
+        "strength_very_weak": "Sehr schwach",
+        "strength_weak": "Schwach",
+        "strength_medium": "Mittel",
+        "strength_strong": "Stark",
+        "strength_very_strong": "Sehr stark",
+        "strength_rule_length": "8-16 Zeichen",
+        "strength_rule_lowercase": "Kleinbuchstabe",
+        "strength_rule_uppercase": "Grossbuchstabe",
+        "strength_rule_digits": "Ziffern",
+        "strength_rule_special": "Sonderzeichen",
+        "strength_add_chars": "Fügen Sie {n} weitere Zeichen hinzu",
+        "strength_remove_chars": "Entfernen Sie {n} Zeichen",
+        "strength_need_digits": "Fügen Sie {n} weitere Ziffer(n) hinzu",
+        "strength_need_special": "Fügen Sie {n} weitere Sonderzeichen hinzu",
+        "strength_common_pattern": "Vermeiden Sie häufige Wörter",
+        "strength_common_year": "Vermeiden Sie häufige Jahreszahlen",
+        "strength_has_sequence": "Vermeiden Sie Sequenzen (1234, abcd)",
+        "strength_has_repeats": "Vermeiden Sie Wiederholungen (aaaa, 1111)",
+        "passwords_match": "Passwörter stimmen überein",
+        "2fa_setup_title": "Zwei-Faktor-Authentifizierung aktivieren",
+        "2fa_setup_subtitle": "Scannen Sie den QR-Code mit Google Authenticator, Authy oder Microsoft Authenticator.",
+        "2fa_manual_secret": "Oder geben Sie diesen Code manuell ein:",
+        "2fa_enter_code": "Geben Sie den 6-stelligen Code aus Ihrer App ein:",
+        "2fa_verify_btn": "Bestätigen",
+        "2fa_backup_codes_title": "Speichern Sie diese Backup-Codes!",
+        "2fa_backup_codes_hint": "Jeder Code kann nur einmal verwendet werden. Bewahren Sie sie an einem sicheren Ort auf.",
+        "2fa_done_btn": "Fertig",
+        "2fa_secret_copied": "Geheimcode in die Zwischenablage kopiert",
+        "2fa_invalid_code": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+        "2fa_invalid_code_format": "Der Code muss 6 Ziffern haben.",
+        "2fa_verify_title": "Zwei-Faktor-Authentifizierung",
+        "2fa_verify_subtitle": "Geben Sie den 6-stelligen Code aus Ihrer Authentifizierungs-App ein.",
+        "2fa_enter_code_hint": "Bitte geben Sie einen Code ein.",
+        "2fa_use_backup_code": "Backup-Code verwenden",
+        "2fa_use_totp_code": "App-Code verwenden",
+        "2fa_enter_backup_code": "Geben Sie einen Ihrer Backup-Codes ein.",
+        "2fa_section_title": "Sicherheit",
+        "2fa_enabled_status": "Zwei-Faktor-Authentifizierung ist aktiviert",
+        "2fa_disabled_status": "Zwei-Faktor-Authentifizierung ist deaktiviert",
+        "2fa_enable_btn": "2FA aktivieren",
+        "2fa_disable_btn": "2FA deaktivieren",
+        "2fa_disable_title": "2FA deaktivieren",
+        "2fa_disable_confirm": "Sind Sie sicher? Ihr Konto wird weniger sicher sein.",
+        "2fa_disabled_success": "Zwei-Faktor-Authentifizierung deaktiviert",
+        "2fa_enabled_success": "Zwei-Faktor-Authentifizierung aktiviert",
+        "2fa_hint_title": "So verwenden Sie diesen QR-Code",
+        "2fa_hint_step1": "Installieren Sie eine Authentifizierungs-App: Google Authenticator, Microsoft Authenticator oder Authy.",
+        "2fa_hint_step2": "Öffnen Sie die App, tippen Sie auf die Schaltfläche „+“ und wählen Sie „QR-Code scannen“.",
+        "2fa_hint_step3": "Richten Sie die Kamera Ihres Telefons auf den QR-Code oben (verwenden Sie die Kamera der App, nicht die Kamera-App Ihres Telefons).",
+        "2fa_hint_step4": "Die App zeigt einen 6-stelligen Code an. Geben Sie ihn im Feld unten ein.",
+        "2fa_manual_secret_hint": "Können Sie nicht scannen? Kopieren Sie den Schlüssel unten und fügen Sie ihn manuell in Ihrer App hinzu („Einrichtungsschlüssel eingeben“).",
+        "auto_lock_section_title": "Automatische Sperre",
+        "auto_lock_enable": "Nach Inaktivität sperren",
+        "auto_lock_timeout_label": "Sperren nach:",
+        "auto_lock_warning_title": "Warnung: Automatische Sperre",
+        "auto_lock_warning_body": "Ihre Sitzung wird in {seconds} Sekunden aufgrund von Inaktivität gesperrt.",
+        "lock_now": "Jetzt sperren",
+        "font_section_title": "Yazı Tipi",
+        "font_family_label": "Yazı tipi ailesi",
+        "font_size_label": "Temel boyut",
+        "font_scale_label": "Görüntüleme ölçeği",
+        "font_scale_small": "Küçük",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Büyük",
+        "font_scale_xlarge": "Çok büyük",
+        "font_scale_xxlarge": "Devasa",
+        "font_preview_text": "Pijamalı hasta yağız şoföre çabucak güvendi — 1234567890",
+        "font_reset": "Varsayılana sıfırla",
+        "font_applied": "Yazı tipi güncellendi",
+        "motion_section_title": "Bewegung & Animationen",
+        "reduce_motion_label": "Bewegung reduzieren",
+        "reduce_motion_hint": "Deaktivieren Sie Animationen, wenn sie Ihnen unangenehm sind.",
+        "empty_history_empty_title": "Noch kein Verlauf",
+        "empty_history_empty_subtitle": "Verarbeiten Sie Ihr erstes Bild, um es hier zu sehen",
+        "empty_history_empty_hint": "Jedes Ergebnis wird automatisch gespeichert",
+        "empty_history_no_user_title": "Melden Sie sich an, um den Verlauf zu sehen",
+        "empty_history_no_user_subtitle": "Ihre gespeicherten Ergebnisse erscheinen hier",
+        "empty_history_no_user_hint": "Der Verlauf ist für jedes Konto privat",
+        "empty_dash_no_results_title": "Noch keine Ergebnisse",
+        "empty_dash_no_results_subtitle": "Ihre letzten Analysen erscheinen hier",
+        "empty_dash_no_results_hint": "Verarbeiten Sie ein Bild, um zu beginnen",
+        "empty_dash_no_dist_title": "Keine Verteilungsdaten",
+        "empty_dash_no_dist_subtitle": "Statistiken füllen sich beim Verarbeiten",
+        "empty_dash_no_dist_hint": "Jede Analyse zählt",
+        "empty_image_empty_title": "Kein Bild eingefügt",
+        "empty_image_empty_subtitle": "Ziehen Sie ein Bild hierher oder klicken Sie auf Einfügen",
+        "empty_image_empty_hint": "Unterstützt PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Zum Analysieren ablegen",
+        "empty_image_drop_hint_subtitle": "Lassen Sie das Bild los, um es zu laden",
+        "empty_image_drop_hint_hint": "Das Format wird automatisch erkannt",
+        "empty_processing_wait_title": "Verarbeitung...",
+        "empty_processing_wait_subtitle": "Die KI analysiert Ihr Bild",
+        "empty_processing_wait_hint": "Dies dauert normalerweise ein paar Sekunden",
+        "tour_show_again": "Tour erneut anzeigen",
+        "tour_completed_msg": "Tour abgeschlossen! Sie sind bereit.",
+        "tour_skipped_msg": "Tour übersprungen. Sie können sie im Kontomenü wiederholen.",
+        "tour_btn_next": "Weiter",
+        "tour_btn_prev": "Zurück",
+        "tour_btn_skip": "Überspringen",
+        "tour_btn_finish": "Fertig ✓",
+        "tour_guest_login_title": "Anmelden",
+        "tour_guest_login_subtitle": "Klicken Sie hier, um sich anzumelden und alle Funktionen freizuschalten.",
+        "tour_guest_signup_title": "Konto erstellen",
+        "tour_guest_signup_subtitle": "Neu hier? Klicken Sie hier, um in Sekunden ein Konto zu erstellen.",
+        "tour_insert_title": "Bild einfügen",
+        "tour_insert_subtitle": "Laden Sie ein Sono-Bild von der Festplatte oder ziehen Sie es an eine beliebige Stelle im Fenster.",
+        "tour_process_title": "Bild verarbeiten",
+        "tour_process_subtitle": "Starten Sie die KI-Analyse des geladenen Bildes. Ergebnisse erscheinen in wenigen Sekunden.",
+        "tour_export_title": "PDF exportieren",
+        "tour_export_subtitle": "Speichern Sie das aktuelle Ergebnis als professionellen medizinischen PDF-Bericht.",
+        "tour_gradcam_title": "Aufmerksamkeits-Heatmap",
+        "tour_gradcam_subtitle": "Sehen Sie, wohin die KI schaut — eine Heatmap über dem analysierten Bild.",
+        "tour_dashboard_title": "Übersicht",
+        "tour_dashboard_subtitle": "Statistik-Panel ein-/ausblenden: Gesamtbilder, Durchschnittskonfidenz, Gradeverteilung.",
+        "tour_history_title": "Verlauf",
+        "tour_history_subtitle": "Durchsuchen Sie Ihre letzten 20 analysierten Bilder. Klicken Sie auf eine Miniatur, um das Ergebnis neu zu laden.",
+        "tour_visit_title": "Webseite besuchen",
+        "tour_visit_subtitle": "Öffnen Sie die GitHub-Seite des Projekts im Browser für Dokumentation und Updates.",
+        "tour_mute_title": "Musik stumm",
+        "tour_mute_subtitle": "Pausieren oder setzen Sie die Hintergrundmusik jederzeit fort.",
+        "tour_zoom_title": "Zoom-Steuerung",
+        "tour_zoom_subtitle": "Mausrad zum Zoomen, Ziehen zum Verschieben, Doppelklick zum Zurücksetzen.",
+        "tour_account_title": "Kontomenü",
+        "tour_account_subtitle": "Klicken Sie hier für Einstellungen, Kontoinformationen, Audit-Protokoll und mehr.",
+        "suggestion_image_ready": "Bild geladen — bereit zur Verarbeitung",
+        "suggestion_image_ready_sub": "Klicken Sie auf Verarbeiten, um die KI-Analyse zu starten.",
+        "suggestion_pdf_ready": "Ergebnis bereit — als PDF exportieren?",
+        "suggestion_pdf_ready_sub": "Speichern Sie einen professionellen medizinischen Bericht mit einem Klick.",
+        "suggestion_gradcam_hint": "Neugierig, was die KI gesehen hat?",
+        "suggestion_gradcam_hint_sub": "Sehen Sie die Aufmerksamkeits-Heatmap über dem Bild.",
+        "suggestion_repeated_grid": "Sie erhalten immer {grid}",
+        "suggestion_repeated_grid_sub": "Öffnen Sie die Übersicht, um die Verteilung zu sehen.",
+        "suggestion_history_hint": "Ihr Verlauf wächst",
+        "suggestion_history_hint_sub": "Durchsuchen Sie Ihre letzten 20 analysierten Bilder.",
+        "suggestion_dashboard_hint": "Ihre Übersicht hat interessante Statistiken",
+        "suggestion_dashboard_hint_sub": "Gesamtwerte, Durchschnitte und Verteilung auf einen Blick.",
+        "suggestion_settings_hint": "Personalisieren Sie die App",
+        "suggestion_settings_hint_sub": "Ändern Sie Sprache, Thema, Schriftart und aktivieren Sie 2FA.",
+        "suggestion_idle_help": "Brauchen Sie eine kurze Anleitung?",
+        "suggestion_idle_help_sub": "Wiederholen Sie die Einführung jederzeit.",
+        "image_not_liver_warning": "Dieses Bild sieht nicht wie ein Leber-Ultraschall aus.\n\nBitte fügen Sie ein korrektes Leber-Ultraschallbild ein.",
+        "result_not_confident": "Die KI konnte dieses Bild nicht sicher als Leber-Ultraschall identifizieren.\n\nBitte fügen Sie ein korrektes Leber-Ultraschallbild ein und versuchen Sie es erneut.",
+        "not_liver_title": "Kein Leber-Ultraschall",
+        "not_liver_hint": "Bitte verwenden Sie ein korrektes Leber-Ultraschallbild (Sonogramm)",
+        "voice_welcome": "Willkomme, {user}",
+        "voice_goodbye": "Uf Wiederluege",
+        "voice_logged_out": "Erfolgriich abgmäldet",
+        "voice_image_loaded": "Bild erfolgriich glade",
+        "voice_image_rejected": "Das isch kes Leber-Ultraschallbild",
+        "voice_inference_result": "{grid_name}, Konfidenz {conf} Prozent",
+        "voice_pdf_saved": "PDF-Bericht erfolgriich gspeicheret",
+        "voice_error": "Es isch en Fehler ufträtte",
+        "voice_settings_applied": "Iistellige aagwändet",
+        "voice_language_changed": "Sprach gänderet uf {lang}",
+        "voice_theme_changed": "Thema gänderet",
+        "voice_2fa_enabled": "Zwei-Faktor-Authentifizierig aktiviert",
+        "voice_2fa_disabled": "Zwei-Faktor-Authentifizierig deaktiviert",
+        "voice_locked": "Sitzig gsperrt",
+        "voice_unlocked": "Sitzig entsperrt",
+        "voice_processing": "Bild wird verarbeitet",
+        "voice_processing_done": "Verarbeitig abgschlosse",
+        "voice_voice_enabled": "Sprachfeedback aktiviert",
+        "voice_voice_disabled": "Sprachfeedback deaktiviert",
     },
     "Sweden": {
         "app_title": "Lever AI-babak",
@@ -4591,6 +8510,186 @@ TRANSLATIONS = {
         "install_failed": "Installationen misslyckades. Din gamla version är säker.",
         "download_failed": "Nedladdningen misslyckades.",
         "source_update_requires_zip": "Källuppdatering kräver en .zip-fil.",
+        "session_locked": "Sessionen Låst",
+        "locked_for_user": "Låst för {user}",
+        "unlock": "Lås Upp",
+        "session_unlocked": "Sessionen upplåst",
+        "auto_lock_notice": "Sessionen låses efter 2 minuters inaktivitet.",
+        "audit_log_title": "Granskningslogg",
+        "audit_export": "Exportera",
+        "audit_exported": "Exporterades framgångsrikt",
+        "audit_export_failed": "Export misslyckades",
+        "audit_search_placeholder": "Sök åtgärder eller detaljer...",
+        "audit_col_time": "Tid",
+        "audit_col_level": "Nivå",
+        "audit_col_category": "Kategori",
+        "audit_col_action": "Åtgärd",
+        "audit_col_user": "Användare",
+        "audit_details_title": "Händelsedetaljer",
+        "audit_status": "Visar {count} av {total} händelser",
+        "strength_very_weak": "Mycket svagt",
+        "strength_weak": "Svagt",
+        "strength_medium": "Medel",
+        "strength_strong": "Starkt",
+        "strength_very_strong": "Mycket starkt",
+        "strength_rule_length": "8-16 tecken",
+        "strength_rule_lowercase": "Liten bokstav",
+        "strength_rule_uppercase": "Stor bokstav",
+        "strength_rule_digits": "Siffror",
+        "strength_rule_special": "Specialtecken",
+        "strength_add_chars": "Lägg till {n} tecken till",
+        "strength_remove_chars": "Ta bort {n} tecken",
+        "strength_need_digits": "Lägg till {n} siffra(-or) till",
+        "strength_need_special": "Lägg till {n} specialtecken till",
+        "strength_common_pattern": "Undvik vanliga ord",
+        "strength_common_year": "Undvik vanliga årtal",
+        "strength_has_sequence": "Undvik sekvenser (1234, abcd)",
+        "strength_has_repeats": "Undvik upprepningar (aaaa, 1111)",
+        "passwords_match": "Lösenorden matchar",
+        "2fa_setup_title": "Aktivera tvåfaktorsautentisering",
+        "2fa_setup_subtitle": "Skanna QR-koden med Google Authenticator, Authy eller Microsoft Authenticator.",
+        "2fa_manual_secret": "Eller ange den här koden manuellt:",
+        "2fa_enter_code": "Ange den 6-siffriga koden från din app:",
+        "2fa_verify_btn": "Verifiera",
+        "2fa_backup_codes_title": "Spara dessa reservkoder!",
+        "2fa_backup_codes_hint": "Varje kod kan endast användas en gång. Förvara dem på en säker plats.",
+        "2fa_done_btn": "Klar",
+        "2fa_secret_copied": "Hemlig kod kopierad till urklipp",
+        "2fa_invalid_code": "Ogiltig kod. Försök igen.",
+        "2fa_invalid_code_format": "Koden måste vara 6 siffror.",
+        "2fa_verify_title": "Tvåfaktorsautentisering",
+        "2fa_verify_subtitle": "Ange den 6-siffriga koden från din autentiseringsapp.",
+        "2fa_enter_code_hint": "Ange en kod.",
+        "2fa_use_backup_code": "Använd en reservkod",
+        "2fa_use_totp_code": "Använd app-kod",
+        "2fa_enter_backup_code": "Ange en av dina reservkoder.",
+        "2fa_section_title": "Säkerhet",
+        "2fa_enabled_status": "Tvåfaktorsautentisering är aktiverad",
+        "2fa_disabled_status": "Tvåfaktorsautentisering är inaktiverad",
+        "2fa_enable_btn": "Aktivera 2FA",
+        "2fa_disable_btn": "Inaktivera 2FA",
+        "2fa_disable_title": "Inaktivera 2FA",
+        "2fa_disable_confirm": "Är du säker? Ditt konto blir mindre säkert.",
+        "2fa_disabled_success": "Tvåfaktorsautentisering inaktiverad",
+        "2fa_enabled_success": "Tvåfaktorsautentisering aktiverad",
+        "2fa_hint_title": "Så här använder du den här QR-koden",
+        "2fa_hint_step1": "Installera en autentiseringsapp: Google Authenticator, Microsoft Authenticator eller Authy.",
+        "2fa_hint_step2": "Öppna appen, tryck på \"+\"-knappen och välj \"Skanna QR-kod\".",
+        "2fa_hint_step3": "Rikta telefonens kamera mot QR-koden ovan (använd appens kamera, inte telefonens kameraapp).",
+        "2fa_hint_step4": "Appen visar en 6-siffrig kod. Ange den i fältet nedan.",
+        "2fa_manual_secret_hint": "Kan du inte skanna? Kopiera nyckeln nedan och lägg till den manuellt i din app (\"Ange inställningsnyckel\").",
+        "auto_lock_section_title": "Automatisk låsning",
+        "auto_lock_enable": "Lås efter inaktivitet",
+        "auto_lock_timeout_label": "Lås efter:",
+        "auto_lock_warning_title": "Varning för automatisk låsning",
+        "auto_lock_warning_body": "Din session låses om {seconds} sekunder på grund av inaktivitet.",
+        "lock_now": "Lås nu",
+        "font_section_title": "Schriftart",
+        "font_family_label": "Schriftfamilie",
+        "font_size_label": "Basisgröße",
+        "font_scale_label": "Anzeigeskalierung",
+        "font_scale_small": "Klein",
+        "font_scale_normal": "Normal",
+        "font_scale_large": "Gross",
+        "font_scale_xlarge": "Sehr gross",
+        "font_scale_xxlarge": "Riesig",
+        "font_preview_text": "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern — 1234567890",
+        "font_reset": "Auf Standard zurücksetzen",
+        "font_applied": "Schriftart aktualisiert",
+        "motion_section_title": "Rörelse och animationer",
+        "reduce_motion_label": "Minska rörelse",
+        "reduce_motion_hint": "Inaktivera animationer om de gör dig obekväm.",
+        "empty_history_empty_title": "Ingen historik än",
+        "empty_history_empty_subtitle": "Bearbeta din första bild för att se den här",
+        "empty_history_empty_hint": "Varje resultat sparas automatiskt",
+        "empty_history_no_user_title": "Logga in för att se historiken",
+        "empty_history_no_user_subtitle": "Dina sparade resultat visas här",
+        "empty_history_no_user_hint": "Historiken är privat för varje konto",
+        "empty_dash_no_results_title": "Inga resultat än",
+        "empty_dash_no_results_subtitle": "Dina senaste analyser visas här",
+        "empty_dash_no_results_hint": "Bearbeta en bild för att börja",
+        "empty_dash_no_dist_title": "Ingen fördelningsdata",
+        "empty_dash_no_dist_subtitle": "Statistik fylls på när du bearbetar bilder",
+        "empty_dash_no_dist_hint": "Varje analys räknas",
+        "empty_image_empty_title": "Ingen bild infogad",
+        "empty_image_empty_subtitle": "Dra och släpp en bild här, eller klicka på Infoga",
+        "empty_image_empty_hint": "Stöder PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Släpp för att analysera",
+        "empty_image_drop_hint_subtitle": "Släpp bilden för att ladda den",
+        "empty_image_drop_hint_hint": "Formatet identifieras automatiskt",
+        "empty_processing_wait_title": "Bearbetar...",
+        "empty_processing_wait_subtitle": "AI analyserar din bild",
+        "empty_processing_wait_hint": "Det tar vanligtvis några sekunder",
+        "tour_show_again": "Visa rundturen igen",
+        "tour_completed_msg": "Rundturen klar! Du är redo.",
+        "tour_skipped_msg": "Rundturen hoppades över. Du kan spela upp den från Kontomenyn.",
+        "tour_btn_next": "Nästa",
+        "tour_btn_prev": "Tillbaka",
+        "tour_btn_skip": "Hoppa över",
+        "tour_btn_finish": "Klar ✓",
+        "tour_guest_login_title": "Logga in",
+        "tour_guest_login_subtitle": "Klicka här för att logga in och låsa upp alla funktioner.",
+        "tour_guest_signup_title": "Skapa ett konto",
+        "tour_guest_signup_subtitle": "Ny här? Klicka här för att skapa ett konto på några sekunder.",
+        "tour_insert_title": "Infoga bild",
+        "tour_insert_subtitle": "Ladda en sono-bild från disken eller dra och släpp den var som helst i fönstret.",
+        "tour_process_title": "Bearbeta bild",
+        "tour_process_subtitle": "Kör AI-analysen på den laddade bilden. Resultat visas inom några sekunder.",
+        "tour_export_title": "Exportera PDF",
+        "tour_export_subtitle": "Spara det aktuella resultatet som en professionell medicinsk PDF-rapport.",
+        "tour_gradcam_title": "Uppmärksamhetsvärmekarta",
+        "tour_gradcam_subtitle": "Se var AI tittar — en värmekarta över den analyserade bilden.",
+        "tour_dashboard_title": "Instrumentpanel",
+        "tour_dashboard_subtitle": "Visa/dölj statistikpanelen: totalt antal bilder, genomsnittlig konfidens, gradfördelning.",
+        "tour_history_title": "Historik",
+        "tour_history_subtitle": "Bläddra bland dina senaste 20 analyserade bilder. Klicka på en miniatyr för att ladda om resultatet.",
+        "tour_visit_title": "Besök webbplats",
+        "tour_visit_subtitle": "Öppna projektets GitHub-sida i webbläsaren för dokumentation och uppdateringar.",
+        "tour_mute_title": "Tysta musik",
+        "tour_mute_subtitle": "Pausa eller återuppta bakgrundsmusiken när som helst.",
+        "tour_zoom_title": "Zoomkontroller",
+        "tour_zoom_subtitle": "Använd mushjulet för att zooma, dra för att panorera, och dubbelklicka för att återställa.",
+        "tour_account_title": "Kontomeny",
+        "tour_account_subtitle": "Klicka här för att komma åt Inställningar, Kontoinformation, Granskningslogg och mer.",
+        "suggestion_image_ready": "Bilden laddad — redo att bearbetas",
+        "suggestion_image_ready_sub": "Klicka på Bearbeta för att starta AI-analysen.",
+        "suggestion_pdf_ready": "Resultatet klart — exportera som PDF?",
+        "suggestion_pdf_ready_sub": "Spara en professionell medicinsk rapport med ett klick.",
+        "suggestion_gradcam_hint": "Nyfiken på vad AI:n såg?",
+        "suggestion_gradcam_hint_sub": "Se uppmärksamhetsvärmekartan över bilden.",
+        "suggestion_repeated_grid": "Du får alltid {grid}",
+        "suggestion_repeated_grid_sub": "Öppna panelen för att se fördelningen.",
+        "suggestion_history_hint": "Din historik växer",
+        "suggestion_history_hint_sub": "Bläddra bland dina senaste 20 analyserade bilder.",
+        "suggestion_dashboard_hint": "Din panel har intressant statistik",
+        "suggestion_dashboard_hint_sub": "Totaler, medelvärden och fördelning i ett ögonkast.",
+        "suggestion_settings_hint": "Anpassa appen",
+        "suggestion_settings_hint_sub": "Ändra språk, tema, typsnitt och aktivera 2FA.",
+        "suggestion_idle_help": "Behöver du en snabbguide?",
+        "suggestion_idle_help_sub": "Spela upp rundturen igen när som helst.",
+        "image_not_liver_warning": "Den här bilden ser inte ut som ett leverultraljud.\n\nVänligen infoga en korrekt leverultraljudsbild.",
+        "result_not_confident": "AI kunde inte med säkerhet identifiera den här bilden som ett leverultraljud.\n\nVänligen infoga en korrekt leverultraljudsbild och försök igen.",
+        "not_liver_title": "Inte ett leverultraljud",
+        "not_liver_hint": "Vänligen använd en korrekt leverultraljudsbild (sonogram)",
+        "voice_welcome": "Välkommen, {user}",
+        "voice_goodbye": "Hej då",
+        "voice_logged_out": "Utloggningen lyckades",
+        "voice_image_loaded": "Bilden laddades framgångsrikt",
+        "voice_image_rejected": "Detta är inte ett leverultraljud",
+        "voice_inference_result": "{grid_name}, konfidens {conf} procent",
+        "voice_pdf_saved": "PDF-rapporten sparades framgångsrikt",
+        "voice_error": "Ett fel uppstod",
+        "voice_settings_applied": "Inställningarna tillämpades",
+        "voice_language_changed": "Språket ändrades till {lang}",
+        "voice_theme_changed": "Temat ändrades",
+        "voice_2fa_enabled": "Tvåfaktorsautentisering aktiverad",
+        "voice_2fa_disabled": "Tvåfaktorsautentisering inaktiverad",
+        "voice_locked": "Sessionen låstes",
+        "voice_unlocked": "Sessionen låstes upp",
+        "voice_processing": "Bearbetar bild",
+        "voice_processing_done": "Bearbetningen slutfördes",
+        "voice_voice_enabled": "Röstfeedback aktiverad",
+        "voice_voice_disabled": "Röstfeedback inaktiverad",
     },
     "Wales": {
         "app_title": "Afu AI-babak",
@@ -4790,6 +8889,186 @@ TRANSLATIONS = {
         "install_failed": "Methodd y gosodiad. Mae eich hen fersiwn yn ddiogel.",
         "download_failed": "Methodd y llwytho i lawr.",
         "source_update_requires_zip": "Mae diweddariad ffynhonnell angen ffeil .zip.",
+        "session_locked": "Sesiwn Wedi'i Gloi",
+        "locked_for_user": "Wedi'i gloi ar gyfer {user}",
+        "unlock": "Datgloi",
+        "session_unlocked": "Sesiwn wedi'i datgloi",
+        "auto_lock_notice": "Bydd y sesiwn yn cloi ar ôl 2 funud o anweithgarwch.",
+        "audit_log_title": "Cofnod Archwilio",
+        "audit_export": "Allforio",
+        "audit_exported": "Allforiwyd yn llwyddiannus",
+        "audit_export_failed": "Methodd yr allforio",
+        "audit_search_placeholder": "Chwilio gweithredoedd neu fanylion...",
+        "audit_col_time": "Amser",
+        "audit_col_level": "Lefel",
+        "audit_col_category": "Categori",
+        "audit_col_action": "Gweithred",
+        "audit_col_user": "Defnyddiwr",
+        "audit_details_title": "Manylion Digwyddiad",
+        "audit_status": "Yn dangos {count} o {total} digwyddiad",
+        "strength_very_weak": "Gwan iawn",
+        "strength_weak": "Gwan",
+        "strength_medium": "Canolig",
+        "strength_strong": "Cryf",
+        "strength_very_strong": "Cryf iawn",
+        "strength_rule_length": "8-16 nod",
+        "strength_rule_lowercase": "Llythyren fach",
+        "strength_rule_uppercase": "Llythyren fawr",
+        "strength_rule_digits": "Digidau",
+        "strength_rule_special": "Nodau arbennig",
+        "strength_add_chars": "Ychwanegwch {n} nod arall",
+        "strength_remove_chars": "Tynnwch {n} nod",
+        "strength_need_digits": "Ychwanegwch {n} digid arall",
+        "strength_need_special": "Ychwanegwch {n} nod arbennig arall",
+        "strength_common_pattern": "Osgowch eiriau cyffredin",
+        "strength_common_year": "Osgowch flynyddoedd cyffredin",
+        "strength_has_sequence": "Osgowch ddilyniannau (1234, abcd)",
+        "strength_has_repeats": "Osgowch ailadroddiadau (aaaa, 1111)",
+        "passwords_match": "Mae'r cyfrineiriau'n cyfateb",
+        "2fa_setup_title": "Galluogi Dilysu Dau Ffactor",
+        "2fa_setup_subtitle": "Sganiwch y cod QR gyda Google Authenticator, Authy neu Microsoft Authenticator.",
+        "2fa_manual_secret": "Neu nodwch y cod hwn â llaw:",
+        "2fa_enter_code": "Nodwch y cod 6 digid o'ch ap:",
+        "2fa_verify_btn": "Gwirio",
+        "2fa_backup_codes_title": "Cadwch y codau wrth gefn hyn!",
+        "2fa_backup_codes_hint": "Gellir defnyddio pob cod unwaith yn unig. Cadwch nhw mewn man diogel.",
+        "2fa_done_btn": "Wedi gorffen",
+        "2fa_secret_copied": "Cod cyfrinachol wedi'i gopïo i'r clipfwrdd",
+        "2fa_invalid_code": "Cod annilys. Rhowch gynnig arall arni.",
+        "2fa_invalid_code_format": "Rhaid i'r cod fod yn 6 digid.",
+        "2fa_verify_title": "Dilysu Dau Ffactor",
+        "2fa_verify_subtitle": "Nodwch y cod 6 digid o'ch ap dilysu.",
+        "2fa_enter_code_hint": "Nodwch god os gwelwch yn dda.",
+        "2fa_use_backup_code": "Defnyddio cod wrth gefn",
+        "2fa_use_totp_code": "Defnyddio cod yr ap",
+        "2fa_enter_backup_code": "Nodwch un o'ch codau wrth gefn.",
+        "2fa_section_title": "Diogelwch",
+        "2fa_enabled_status": "Mae Dilysu Dau Ffactor wedi'i alluogi",
+        "2fa_disabled_status": "Mae Dilysu Dau Ffactor wedi'i analluogi",
+        "2fa_enable_btn": "Galluogi 2FA",
+        "2fa_disable_btn": "Analluogi 2FA",
+        "2fa_disable_title": "Analluogi 2FA",
+        "2fa_disable_confirm": "Ydych chi'n siŵr? Bydd eich cyfrif yn llai diogel.",
+        "2fa_disabled_success": "Dilysu Dau Ffactor wedi'i analluogi",
+        "2fa_enabled_success": "Dilysu Dau Ffactor wedi'i alluogi",
+        "2fa_hint_title": "Sut i ddefnyddio'r cod QR hwn",
+        "2fa_hint_step1": "Gosodwch ap dilysu: Google Authenticator, Microsoft Authenticator neu Authy.",
+        "2fa_hint_step2": "Agorwch yr ap, tapiwch y botwm \"+\" ac yna dewiswch \"Sganio cod QR\".",
+        "2fa_hint_step3": "Pwyntiwch gamera eich ffôn at y cod QR uchod (defnyddiwch gamera'r ap, nid ap camera eich ffôn).",
+        "2fa_hint_step4": "Bydd yr ap yn dangos cod 6 digid. Nodwch ef yn y blwch isod.",
+        "2fa_manual_secret_hint": "Methu sganio? Copïwch yr allwedd isod a'i hychwanegu â llaw yn eich ap (\"Nodi allwedd gosod\").",
+        "auto_lock_section_title": "Cloi Awtomatig",
+        "auto_lock_enable": "Cloi ar ôl anweithgarwch",
+        "auto_lock_timeout_label": "Cloi ar ôl:",
+        "auto_lock_warning_title": "Rhybudd Cloi Awtomatig",
+        "auto_lock_warning_body": "Bydd eich sesiwn yn cael ei chloi mewn {seconds} eiliad oherwydd anweithgarwch.",
+        "lock_now": "Cloi Nawr",
+        "font_section_title": "Ffont",
+        "font_family_label": "Teulu ffont",
+        "font_size_label": "Maint sylfaenol",
+        "font_scale_label": "Graddfa arddangos",
+        "font_scale_small": "Bach",
+        "font_scale_normal": "Arferol",
+        "font_scale_large": "Mawr",
+        "font_scale_xlarge": "Mawr iawn",
+        "font_scale_xxlarge": "Enfawr",
+        "font_preview_text": "Mae'r llwynog brown cyflym yn neidio dros y ci diog — 1234567890",
+        "font_reset": "Ailosod i'r rhagosodedig",
+        "font_applied": "Ffont wedi'i ddiweddaru",
+        "motion_section_title": "Cynnig ac Animeiddiadau",
+        "reduce_motion_label": "Lleihau cynnig",
+        "reduce_motion_hint": "Analluogwch animeiddiadau os ydyn nhw'n gwneud ichi deimlo'n anghyfforddus.",
+        "empty_history_empty_title": "Dim hanes eto",
+        "empty_history_empty_subtitle": "Proseswch eich delwedd gyntaf i'w gweld yma",
+        "empty_history_empty_hint": "Mae pob canlyniad yn cael ei gadw'n awtomatig",
+        "empty_history_no_user_title": "Mewngofnodwch i weld hanes",
+        "empty_history_no_user_subtitle": "Bydd eich canlyniadau wedi'u cadw yn ymddangos yma",
+        "empty_history_no_user_hint": "Mae hanes yn breifat i bob cyfrif",
+        "empty_dash_no_results_title": "Dim canlyniadau eto",
+        "empty_dash_no_results_subtitle": "Bydd eich dadansoddiadau diweddar yn ymddangos yma",
+        "empty_dash_no_results_hint": "Proseswch ddelwedd i ddechrau",
+        "empty_dash_no_dist_title": "Dim data dosbarthiad",
+        "empty_dash_no_dist_subtitle": "Bydd ystadegau'n llenwi wrth brosesu delweddau",
+        "empty_dash_no_dist_hint": "Mae pob dadansoddiad yn cyfrif",
+        "empty_image_empty_title": "Dim delwedd wedi'i mewnosod",
+        "empty_image_empty_subtitle": "Llusgwch a gollwng delwedd yma, neu cliciwch Mewnosod",
+        "empty_image_empty_hint": "Yn cefnogi PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Gollwng i ddadansoddi",
+        "empty_image_drop_hint_subtitle": "Rhyddhewch y ddelwedd i'w llwytho",
+        "empty_image_drop_hint_hint": "Bydd y fformat yn cael ei ganfod yn awtomatig",
+        "empty_processing_wait_title": "Wrthi'n prosesu...",
+        "empty_processing_wait_subtitle": "Mae AI yn dadansoddi eich delwedd",
+        "empty_processing_wait_hint": "Mae hyn fel arfer yn cymryd ychydig eiliadau",
+        "tour_show_again": "Dangos y daith eto",
+        "tour_completed_msg": "Taith wedi'i chwblhau! Rydych chi'n barod.",
+        "tour_skipped_msg": "Taith wedi'i hepgor. Gallwch ei hailchwarae o'r ddewislen Cyfrif.",
+        "tour_btn_next": "Nesaf",
+        "tour_btn_prev": "Yn ôl",
+        "tour_btn_skip": "Hepgor",
+        "tour_btn_finish": "Gorffen ✓",
+        "tour_guest_login_title": "Mewngofnodi",
+        "tour_guest_login_subtitle": "Cliciwch yma i fewngofnodi a datgloi'r holl nodweddion.",
+        "tour_guest_signup_title": "Creu cyfrif",
+        "tour_guest_signup_subtitle": "Yn newydd yma? Cliciwch yma i greu cyfrif mewn eiliadau.",
+        "tour_insert_title": "Mewnosod delwedd",
+        "tour_insert_subtitle": "Llwythwch ddelwedd sono o'r disg, neu lusgwch a gollwng unrhyw le yn y ffenestr.",
+        "tour_process_title": "Prosesu delwedd",
+        "tour_process_subtitle": "Rhedeg dadansoddiad AI ar y ddelwedd a lwythwyd. Mae canlyniadau'n ymddangos mewn ychydig eiliadau.",
+        "tour_export_title": "Allforio PDF",
+        "tour_export_subtitle": "Cadwch y canlyniad presennol fel adroddiad meddygol PDF proffesiynol.",
+        "tour_gradcam_title": "Map gwres sylw",
+        "tour_gradcam_subtitle": "Gwelwch ble mae'r AI yn edrych — map gwres dros y ddelwedd a ddadansoddwyd.",
+        "tour_dashboard_title": "Dangosfwrdd",
+        "tour_dashboard_subtitle": "Dangos/cuddio panel ystadegau: cyfanswm delweddau, hyder cyfartalog, dosbarthiad gradd.",
+        "tour_history_title": "Hanes",
+        "tour_history_subtitle": "Pori eich 20 delwedd a ddadansoddwyd diwethaf. Cliciwch ar unrhyw fân-lun i ail-lwytho ei ganlyniad.",
+        "tour_visit_title": "Ymweld â'r wefan",
+        "tour_visit_subtitle": "Agorwch dudalen GitHub y prosiect yn eich porwr ar gyfer dogfennaeth a diweddariadau.",
+        "tour_mute_title": "Tawelu cerddoriaeth",
+        "tour_mute_subtitle": "Oedi neu ailddechrau'r gerddoriaeth gefndir ar unrhyw adeg.",
+        "tour_zoom_title": "Rheolyddion chwyddo",
+        "tour_zoom_subtitle": "Defnyddiwch olwyn y llygoden i chwyddo, llusgwch i symud, a chliciwch ddwywaith i ailosod.",
+        "tour_account_title": "Dewislen cyfrif",
+        "tour_account_subtitle": "Cliciwch yma i gyrchu Gosodiadau, Gwybodaeth Cyfrif, Cofnod Archwilio, a mwy.",
+        "suggestion_image_ready":      "Delwedd wedi'i llwytho — yn barod i'w phrosesu",
+        "suggestion_image_ready_sub":  "Cliciwch Prosesu i redeg dadansoddiad AI.",
+        "suggestion_pdf_ready":        "Canlyniad yn barod — allforio fel PDF?",
+        "suggestion_pdf_ready_sub":    "Cadwch adroddiad meddygol proffesiynol gydag un clic.",
+        "suggestion_gradcam_hint":     "Yn chwilfrydig beth welodd yr AI?",
+        "suggestion_gradcam_hint_sub": "Gwelwch y map gwres sylw dros y ddelwedd.",
+        "suggestion_repeated_grid":    "Rydych chi bob amser yn cael {grid}",
+        "suggestion_repeated_grid_sub":"Agorwch y dangosfwrdd i weld y dosbarthiad.",
+        "suggestion_history_hint":     "Mae eich hanes yn tyfu",
+        "suggestion_history_hint_sub": "Pori eich 20 delwedd a ddadansoddwyd diwethaf.",
+        "suggestion_dashboard_hint":   "Mae gan eich dangosfwrdd ystadegau diddorol",
+        "suggestion_dashboard_hint_sub":"Cyfansymiau, cyfartaleddau a dosbarthiad ar unwaith.",
+        "suggestion_settings_hint":    "Personolwch yr ap",
+        "suggestion_settings_hint_sub":"Newidiwch iaith, thema, ffont a galluogi 2FA.",
+        "suggestion_idle_help":        "Angen canllaw cyflym?",
+        "suggestion_idle_help_sub":    "Ailchwarae'r daith gynefino unrhyw bryd.",
+        "image_not_liver_warning": "Nid yw'r ddelwedd hon yn edrych fel uwchsain afu.\n\nRhowch ddelwedd uwchsain afu briodol.",
+        "result_not_confident": "Ni allai'r AI adnabod y ddelwedd hon yn hyderus fel uwchsain afu.\n\nRhowch ddelwedd uwchsain afu briodol a rhowch gynnig arall arni.",
+        "not_liver_title": "Nid yw'n uwchsain afu",
+        "not_liver_hint": "Defnyddiwch ddelwedd uwchsain (sonogram) afu briodol",
+        "voice_welcome": "Croeso, {user}",
+        "voice_goodbye": "Hwyl fawr",
+        "voice_logged_out": "Allgofnodwyd yn llwyddiannus",
+        "voice_image_loaded": "Delwedd wedi'i llwytho'n llwyddiannus",
+        "voice_image_rejected": "Nid yw hwn yn uwchsain afu",
+        "voice_inference_result": "{grid_name}, hyder {conf} y cant",
+        "voice_pdf_saved": "Adroddiad PDF wedi'i gadw'n llwyddiannus",
+        "voice_error": "Digwyddodd gwall",
+        "voice_settings_applied": "Gosodiadau wedi'u cymhwyso",
+        "voice_language_changed": "Iaith wedi newid i {lang}",
+        "voice_theme_changed": "Thema wedi newid",
+        "voice_2fa_enabled": "Dilysu dau ffactor wedi'i alluogi",
+        "voice_2fa_disabled": "Dilysu dau ffactor wedi'i analluogi",
+        "voice_locked": "Sesiwn wedi'i chloi",
+        "voice_unlocked": "Sesiwn wedi'i datgloi",
+        "voice_processing": "Wrthi'n prosesu delwedd",
+        "voice_processing_done": "Prosesu wedi'i gwblhau",
+        "voice_voice_enabled": "Adborth llais wedi'i alluogi",
+        "voice_voice_disabled": "Adborth llais wedi'i analluogi",
     },
     "Nederland": {
         "app_title": "Lever AI-babak",
@@ -4989,6 +9268,186 @@ TRANSLATIONS = {
         "install_failed": "Installatie mislukt. Uw oude versie is veilig.",
         "download_failed": "Download mislukt.",
         "source_update_requires_zip": "Bron-update vereist een .zip-bestand.",
+        "session_locked": "Sessie Vergrendeld",
+        "locked_for_user": "Vergrendeld voor {user}",
+        "unlock": "Ontgrendelen",
+        "session_unlocked": "Sessie ontgrendeld",
+        "auto_lock_notice": "De sessie wordt vergrendeld na 2 minuten inactiviteit.",
+        "audit_log_title": "Auditlogboek",
+        "audit_export": "Exporteren",
+        "audit_exported": "Succesvol geëxporteerd",
+        "audit_export_failed": "Export mislukt",
+        "audit_search_placeholder": "Zoek acties of details...",
+        "audit_col_time": "Tijd",
+        "audit_col_level": "Niveau",
+        "audit_col_category": "Categorie",
+        "audit_col_action": "Actie",
+        "audit_col_user": "Gebruiker",
+        "audit_details_title": "Gebeurtenisdetails",
+        "audit_status": "{count} van {total} gebeurtenissen weergegeven",
+        "strength_very_weak": "Zeer zwak",
+        "strength_weak": "Zwak",
+        "strength_medium": "Gemiddeld",
+        "strength_strong": "Sterk",
+        "strength_very_strong": "Zeer sterk",
+        "strength_rule_length": "8-16 tekens",
+        "strength_rule_lowercase": "Kleine letter",
+        "strength_rule_uppercase": "Hoofdletter",
+        "strength_rule_digits": "Cijfers",
+        "strength_rule_special": "Speciale tekens",
+        "strength_add_chars": "Voeg nog {n} teken(s) toe",
+        "strength_remove_chars": "Verwijder {n} teken(s)",
+        "strength_need_digits": "Voeg nog {n} cijfer(s) toe",
+        "strength_need_special": "Voeg nog {n} speciaal/speciale teken(s) toe",
+        "strength_common_pattern": "Vermijd veelvoorkomende woorden",
+        "strength_common_year": "Vermijd veelvoorkomende jaartallen",
+        "strength_has_sequence": "Vermijd reeksen (1234, abcd)",
+        "strength_has_repeats": "Vermijd herhalingen (aaaa, 1111)",
+        "passwords_match": "Wachtwoorden komen overeen",
+        "2fa_setup_title": "Tweefactorauthenticatie inschakelen",
+        "2fa_setup_subtitle": "Scan de QR-code met Google Authenticator, Authy of Microsoft Authenticator.",
+        "2fa_manual_secret": "Of voer deze code handmatig in:",
+        "2fa_enter_code": "Voer de 6-cijferige code uit uw app in:",
+        "2fa_verify_btn": "Verifiëren",
+        "2fa_backup_codes_title": "Bewaar deze back-upcodes!",
+        "2fa_backup_codes_hint": "Elke code kan slechts één keer worden gebruikt. Bewaar ze op een veilige plek.",
+        "2fa_done_btn": "Klaar",
+        "2fa_secret_copied": "Geheime code gekopieerd naar klembord",
+        "2fa_invalid_code": "Ongeldige code. Probeer het opnieuw.",
+        "2fa_invalid_code_format": "De code moet 6 cijfers bevatten.",
+        "2fa_verify_title": "Tweefactorauthenticatie",
+        "2fa_verify_subtitle": "Voer de 6-cijferige code uit uw authenticator-app in.",
+        "2fa_enter_code_hint": "Voer een code in.",
+        "2fa_use_backup_code": "Een back-upcode gebruiken",
+        "2fa_use_totp_code": "App-code gebruiken",
+        "2fa_enter_backup_code": "Voer een van uw back-upcodes in.",
+        "2fa_section_title": "Beveiliging",
+        "2fa_enabled_status": "Tweefactorauthenticatie is ingeschakeld",
+        "2fa_disabled_status": "Tweefactorauthenticatie is uitgeschakeld",
+        "2fa_enable_btn": "2FA inschakelen",
+        "2fa_disable_btn": "2FA uitschakelen",
+        "2fa_disable_title": "2FA uitschakelen",
+        "2fa_disable_confirm": "Weet u het zeker? Uw account wordt minder veilig.",
+        "2fa_disabled_success": "Tweefactorauthenticatie uitgeschakeld",
+        "2fa_enabled_success": "Tweefactorauthenticatie ingeschakeld",
+        "2fa_hint_title": "Hoe u deze QR-code gebruikt",
+        "2fa_hint_step1": "Installeer een authenticator-app: Google Authenticator, Microsoft Authenticator of Authy.",
+        "2fa_hint_step2": "Open de app, tik op de \"+\"-knop en kies \"QR-code scannen\".",
+        "2fa_hint_step3": "Richt de camera van uw telefoon op de QR-code hierboven (gebruik de camera van de app, niet de camera-app van uw telefoon).",
+        "2fa_hint_step4": "De app toont een 6-cijferige code. Voer deze in het vak hieronder in.",
+        "2fa_manual_secret_hint": "Kunt u niet scannen? Kopieer de sleutel hieronder en voeg deze handmatig toe in uw app (\"Instelsleutel invoeren\").",
+        "auto_lock_section_title": "Automatische vergrendeling",
+        "auto_lock_enable": "Vergrendelen na inactiviteit",
+        "auto_lock_timeout_label": "Vergrendelen na:",
+        "auto_lock_warning_title": "Waarschuwing automatische vergrendeling",
+        "auto_lock_warning_body": "Uw sessie wordt over {seconds} seconden vergrendeld wegens inactiviteit.",
+        "lock_now": "Nu vergrendelen",
+        "font_section_title": "Lettertype",
+        "font_family_label": "Lettertypefamilie",
+        "font_size_label": "Basisgrootte",
+        "font_scale_label": "Weergaveschaal",
+        "font_scale_small": "Klein",
+        "font_scale_normal": "Normaal",
+        "font_scale_large": "Groot",
+        "font_scale_xlarge": "Extra groot",
+        "font_scale_xxlarge": "Enorm",
+        "font_preview_text": "Pa's wijze lynx bezag vroom het fikse aquaduct — 1234567890",
+        "font_reset": "Terug naar standaard",
+        "font_applied": "Lettertype bijgewerkt",
+        "motion_section_title": "Beweging en animaties",
+        "reduce_motion_label": "Beweging verminderen",
+        "reduce_motion_hint": "Schakel animaties uit als ze u ongemakkelijk maken.",
+        "empty_history_empty_title": "Nog geen geschiedenis",
+        "empty_history_empty_subtitle": "Verwerk uw eerste afbeelding om deze hier te zien",
+        "empty_history_empty_hint": "Elk resultaat wordt automatisch opgeslagen",
+        "empty_history_no_user_title": "Log in om geschiedenis te zien",
+        "empty_history_no_user_subtitle": "Uw opgeslagen resultaten verschijnen hier",
+        "empty_history_no_user_hint": "Geschiedenis is privé voor elk account",
+        "empty_dash_no_results_title": "Nog geen resultaten",
+        "empty_dash_no_results_subtitle": "Uw recente analyses verschijnen hier",
+        "empty_dash_no_results_hint": "Verwerk een afbeelding om te beginnen",
+        "empty_dash_no_dist_title": "Geen distributiegegevens",
+        "empty_dash_no_dist_subtitle": "Statistieken vullen zich terwijl u afbeeldingen verwerkt",
+        "empty_dash_no_dist_hint": "Elke analyse telt",
+        "empty_image_empty_title": "Geen afbeelding ingevoegd",
+        "empty_image_empty_subtitle": "Sleep een afbeelding hierheen, of klik op Invoegen",
+        "empty_image_empty_hint": "Ondersteunt PNG, JPG, JPEG, BMP, DCM",
+        "empty_image_drop_hint_title": "Sleep om te analyseren",
+        "empty_image_drop_hint_subtitle": "Laat de afbeelding los om te laden",
+        "empty_image_drop_hint_hint": "Het formaat wordt automatisch gedetecteerd",
+        "empty_processing_wait_title": "Verwerken...",
+        "empty_processing_wait_subtitle": "AI analyseert uw afbeelding",
+        "empty_processing_wait_hint": "Dit duurt meestal een paar seconden",
+        "tour_show_again": "Tour opnieuw tonen",
+        "tour_completed_msg": "Tour voltooid! Je bent klaar.",
+        "tour_skipped_msg": "Tour overgeslagen. Je kunt hem opnieuw bekijken via het Account-menu.",
+        "tour_btn_next": "Volgende",
+        "tour_btn_prev": "Terug",
+        "tour_btn_skip": "Overslaan",
+        "tour_btn_finish": "Voltooien ✓",
+        "tour_guest_login_title": "Inloggen",
+        "tour_guest_login_subtitle": "Klik hier om in te loggen en alle functies te ontgrendelen.",
+        "tour_guest_signup_title": "Account aanmaken",
+        "tour_guest_signup_subtitle": "Nieuw hier? Klik hier om in enkele seconden een account aan te maken.",
+        "tour_insert_title": "Afbeelding invoegen",
+        "tour_insert_subtitle": "Laad een sono-afbeelding van schijf, of sleep deze naar een willekeurige plek in het venster.",
+        "tour_process_title": "Afbeelding verwerken",
+        "tour_process_subtitle": "Voer de AI-analyse uit op de geladen afbeelding. Resultaten verschijnen binnen enkele seconden.",
+        "tour_export_title": "PDF exporteren",
+        "tour_export_subtitle": "Sla het huidige resultaat op als een professioneel medisch PDF-rapport.",
+        "tour_gradcam_title": "Aandachtswarmtekaart",
+        "tour_gradcam_subtitle": "Bekijk waar de AI naar kijkt — een warmtekaart over de geanalyseerde afbeelding.",
+        "tour_dashboard_title": "Dashboard",
+        "tour_dashboard_subtitle": "Statistiekenpaneel tonen/verbergen: totaal afbeeldingen, gemiddeld vertrouwen, graadverdeling.",
+        "tour_history_title": "Geschiedenis",
+        "tour_history_subtitle": "Blader door je laatste 20 geanalyseerde afbeeldingen. Klik op een miniatuur om het resultaat opnieuw te laden.",
+        "tour_visit_title": "Bezoek website",
+        "tour_visit_subtitle": "Open de GitHub-pagina van het project in je browser voor documentatie en updates.",
+        "tour_mute_title": "Muziek dempen",
+        "tour_mute_subtitle": "Pauzeer of hervat de achtergrondmuziek op elk moment.",
+        "tour_zoom_title": "Zoom-besturing",
+        "tour_zoom_subtitle": "Gebruik het muiswiel om te zoomen, sleep om te pannen, en dubbelklik om te resetten.",
+        "tour_account_title": "Accountmenu",
+        "tour_account_subtitle": "Klik hier voor Instellingen, Accountinformatie, Auditlogboek en meer.",
+        "suggestion_image_ready": "Afbeelding geladen — klaar om te verwerken",
+        "suggestion_image_ready_sub": "Klik op Verwerken om de AI-analyse uit te voeren.",
+        "suggestion_pdf_ready": "Resultaat klaar — exporteren als PDF?",
+        "suggestion_pdf_ready_sub": "Sla een professioneel medisch rapport op met één klik.",
+        "suggestion_gradcam_hint": "Nieuwsgierig wat de AI zag?",
+        "suggestion_gradcam_hint_sub": "Bekijk de aandachtswarmtekaart over de afbeelding.",
+        "suggestion_repeated_grid": "Je krijgt altijd {grid}",
+        "suggestion_repeated_grid_sub": "Open het dashboard om de verdeling te zien.",
+        "suggestion_history_hint": "Je geschiedenis groeit",
+        "suggestion_history_hint_sub": "Blader door je laatste 20 geanalyseerde afbeeldingen.",
+        "suggestion_dashboard_hint": "Je dashboard heeft interessante statistieken",
+        "suggestion_dashboard_hint_sub": "Totalen, gemiddelden en verdeling in één oogopslag.",
+        "suggestion_settings_hint": "Personaliseer de app",
+        "suggestion_settings_hint_sub": "Wijzig taal, thema, lettertype en schakel 2FA in.",
+        "suggestion_idle_help": "Een snelle gids nodig?",
+        "suggestion_idle_help_sub": "Herhaal de onboarding-rondleiding op elk moment.",
+        "image_not_liver_warning": "Deze afbeelding lijkt geen lever-echografie te zijn.\n\nVoer een correcte lever-echografie-afbeelding in.",
+        "result_not_confident": "De AI kon deze afbeelding niet met zekerheid identificeren als een lever-echografie.\n\nVoer een correcte lever-echografie-afbeelding in en probeer het opnieuw.",
+        "not_liver_title": "Geen lever-echografie",
+        "not_liver_hint": "Gebruik een correcte lever-echografie (sonogram) afbeelding",
+        "voice_welcome": "Welkom, {user}",
+        "voice_goodbye": "Tot ziens",
+        "voice_logged_out": "Succesvol uitgelogd",
+        "voice_image_loaded": "Afbeelding succesvol geladen",
+        "voice_image_rejected": "Dit is geen lever-echografie",
+        "voice_inference_result": "{grid_name}, vertrouwen {conf} procent",
+        "voice_pdf_saved": "PDF-rapport succesvol opgeslagen",
+        "voice_error": "Er is een fout opgetreden",
+        "voice_settings_applied": "Instellingen toegepast",
+        "voice_language_changed": "Taal gewijzigd naar {lang}",
+        "voice_theme_changed": "Thema gewijzigd",
+        "voice_2fa_enabled": "Tweefactorauthenticatie ingeschakeld",
+        "voice_2fa_disabled": "Tweefactorauthenticatie uitgeschakeld",
+        "voice_locked": "Sessie vergrendeld",
+        "voice_unlocked": "Sessie ontgrendeld",
+        "voice_processing": "Afbeelding verwerken",
+        "voice_processing_done": "Verwerking voltooid",
+        "voice_voice_enabled": "Spraakfeedback ingeschakeld",
+        "voice_voice_disabled": "Spraakfeedback uitgeschakeld",
     },
 
 }
@@ -5630,9 +10089,27 @@ class UserDB:
 
     def __init__(self, path: str = USERS_DB_PATH):
         self.path = path
+        # ✅ Use encrypted store
+        try:
+            from core.crypto import EncryptedJSONStore
+            self._store = EncryptedJSONStore(path, default={"users": {}})
+        except Exception as e:
+            print(f"⚠️ Failed to init EncryptedJSONStore: {e}")
+            self._store = None
         self.data = self._load()
 
     def _load(self) -> Dict:
+        if self._store is not None:
+            try:
+                data = self._store.load()
+                if not isinstance(data, dict) or "users" not in data:
+                    data = {"users": {}}
+                return data
+            except Exception as e:
+                print(f"⚠️ EncryptedJSONStore.load failed: {e}")
+                return {"users": {}}
+
+        # ✅ Fallback: raw JSON
         if os.path.exists(self.path):
             try:
                 with open(self.path, "r", encoding="utf-8") as f:
@@ -5642,6 +10119,14 @@ class UserDB:
         return {"users": {}}
 
     def _save(self):
+        if self._store is not None:
+            try:
+                self._store.save(self.data)
+                return
+            except Exception as e:
+                print(f"⚠️ EncryptedJSONStore.save failed: {e}")
+
+        # ✅ Fallback: raw JSON
         tmp_path = self.path + ".tmp"
         try:
             with open(tmp_path, "w", encoding="utf-8") as f:
@@ -5732,6 +10217,1063 @@ class UserDB:
             self._save()
             return True
         return False
+    # ============================================================
+    # ✅ 2FA (Two-Factor Authentication)
+    # ============================================================
+
+    def get_2fa_status(self, username: str) -> dict:
+        """
+        Return 2FA status for a user.
+
+        Returns:
+            {
+                "enabled": bool,
+                "secret": str | "",
+                "backup_codes_hashed": list[str],
+                "last_used_step": int | None,
+                "enabled_at": str | "",
+            }
+        """
+        users = self.data.get("users", {})
+        user = users.get(username, {})
+        return {
+            "enabled": bool(user.get("2fa_enabled", False)),
+            "secret": user.get("2fa_secret", ""),
+            "backup_codes_hashed": list(user.get("2fa_backup_codes", [])),
+            "last_used_step": user.get("2fa_last_step"),
+            "enabled_at": user.get("2fa_enabled_at", ""),
+        }
+
+    def set_2fa_secret(self, username: str, secret: str) -> bool:
+        """
+        Store a pending 2FA secret (not yet enabled).
+        Called during setup, before user verifies first code.
+        """
+        users = self.data.get("users", {})
+        if username not in users:
+            return False
+        users[username]["2fa_secret"] = secret
+        users[username]["2fa_enabled"] = False
+        self._save()
+        return True
+
+    def enable_2fa(self, username: str, backup_codes_hashed: list) -> bool:
+        """
+        Enable 2FA after user successfully verified first code.
+        """
+        users = self.data.get("users", {})
+        if username not in users:
+            return False
+        user = users[username]
+        if not user.get("2fa_secret"):
+            return False
+        user["2fa_enabled"] = True
+        user["2fa_backup_codes"] = list(backup_codes_hashed)
+        user["2fa_last_step"] = None
+        user["2fa_enabled_at"] = datetime.now().isoformat()
+        self._save()
+        return True
+
+    def disable_2fa(self, username: str) -> bool:
+        """Disable 2FA and remove all 2FA data."""
+        users = self.data.get("users", {})
+        if username not in users:
+            return False
+        user = users[username]
+        user.pop("2fa_secret", None)
+        user.pop("2fa_backup_codes", None)
+        user.pop("2fa_enabled", None)
+        user.pop("2fa_last_step", None)
+        user.pop("2fa_enabled_at", None)
+        self._save()
+        return True
+
+    def update_2fa_last_step(self, username: str, step: int) -> bool:
+        """Store the last accepted time-step (replay protection)."""
+        users = self.data.get("users", {})
+        if username not in users:
+            return False
+        users[username]["2fa_last_step"] = int(step)
+        self._save()
+        return True
+
+    def use_backup_code(self, username: str, index: int) -> bool:
+        """Remove a used backup code (single-use)."""
+        users = self.data.get("users", {})
+        if username not in users:
+            return False
+        codes = users[username].get("2fa_backup_codes", [])
+        if 0 <= index < len(codes):
+            codes.pop(index)
+            users[username]["2fa_backup_codes"] = codes
+            self._save()
+            return True
+        return False
+
+    def regenerate_2fa_backup_codes(self, username: str, new_hashed: list) -> bool:
+        """Replace backup codes (invalidates old ones)."""
+        users = self.data.get("users", {})
+        if username not in users:
+            return False
+        if not users[username].get("2fa_enabled"):
+            return False
+        users[username]["2fa_backup_codes"] = list(new_hashed)
+        self._save()
+        return True
+
+class TwoFactorSetupDialog(QDialog):
+    """
+    Two-step setup dialog with full user guidance.
+
+    Step 1: Instructions + QR code + manual secret + code input
+    Step 2: Backup codes (one-time display)
+    """
+    setup_completed = pyqtSignal(str, list)
+
+    def __init__(self, db: UserDB, username: str, theme: Dict,
+                 lang: str = "English", parent=None):
+        super().__init__(parent)
+        self.db = db
+        self.username = username
+        self.theme = theme
+        self.lang = lang
+        self._secret = ""
+        self._backup_codes_plain = []
+        self._step = 1
+
+        self.setWindowTitle(tr(lang, "2fa_setup_title"))
+        # ✅ بزرگ‌تر — چون محتوای بیشتری داره (hints)
+        self.setFixedSize(580, 820)
+        self.setMinimumSize(580, 700)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+
+        self._setup_ui()
+        self._apply_theme()
+
+        try:
+            from gui.dialogs.update_dialogs import _with_backdrop
+            _with_backdrop(self, parent, theme)
+        except Exception as e:
+            print(f"⚠️ TwoFactorSetupDialog backdrop failed: {e}")
+
+        QTimer.singleShot(0, lambda: animate_dialog_open(self))
+
+    def _setup_ui(self):
+        main = QVBoxLayout(self)
+        main.setContentsMargins(0, 0, 0, 0)
+
+        self.container = QFrame()
+        self.container.setObjectName("container")
+        main.addWidget(self.container)
+
+        # ✅ ScrollArea — چون محتوا بیشتر از ارتفاع می‌شه
+        container_layout = QVBoxLayout(self.container)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(0)
+
+        self.scroll = QScrollArea()
+        self.scroll.setObjectName("tfa_scroll")
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.NoFrame)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        self.scroll_content = QWidget()
+        self.scroll_content.setObjectName("tfa_scroll_content")
+
+        layout = QVBoxLayout(self.scroll_content)
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(18)
+
+        # ============================================================
+        # Title
+        # ============================================================
+        self.title_label = QLabel("🔐 " + tr(self.lang, "2fa_setup_title"))
+        self.title_label.setObjectName("title")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setWordWrap(True)
+        layout.addWidget(self.title_label)
+
+        self.subtitle_label = QLabel(tr(self.lang, "2fa_setup_subtitle"))
+        self.subtitle_label.setObjectName("subtitle")
+        self.subtitle_label.setAlignment(Qt.AlignCenter)
+        self.subtitle_label.setWordWrap(True)
+        layout.addWidget(self.subtitle_label)
+
+        # ============================================================
+        # ✅ HINT BOX — راهنمای کامل برای کاربر
+        # ============================================================
+        self.hint_box = QFrame()
+        self.hint_box.setObjectName("hint_box")
+        hint_layout = QVBoxLayout(self.hint_box)
+        hint_layout.setContentsMargins(14, 12, 14, 12)
+        hint_layout.setSpacing(8)
+
+        hint_title = QLabel("💡 " + tr(self.lang, "2fa_hint_title"))
+        hint_title.setObjectName("hint_title")
+        hint_layout.addWidget(hint_title)
+
+        # ۴ مرحله راهنما
+        steps = [
+            ("1️⃣", "2fa_hint_step1"),
+            ("2️⃣", "2fa_hint_step2"),
+            ("3️⃣", "2fa_hint_step3"),
+            ("4️⃣", "2fa_hint_step4"),
+        ]
+        for icon, key in steps:
+            step_row = QHBoxLayout()
+            step_row.setSpacing(8)
+            icon_lbl = QLabel(icon)
+            icon_lbl.setObjectName("hint_icon")
+            icon_lbl.setFixedWidth(24)
+            icon_lbl.setAlignment(Qt.AlignTop)
+            text_lbl = QLabel(tr(self.lang, key))
+            text_lbl.setObjectName("hint_text")
+            text_lbl.setWordWrap(True)
+            step_row.addWidget(icon_lbl)
+            step_row.addWidget(text_lbl, 1)
+            hint_layout.addLayout(step_row)
+
+        layout.addWidget(self.hint_box)
+
+        # ============================================================
+        # QR Code
+        # ============================================================
+        self.qr_label = QLabel()
+        self.qr_label.setAlignment(Qt.AlignCenter)
+        self.qr_label.setObjectName("qr_label")
+        self.qr_label.setFixedSize(280, 280)
+        layout.addWidget(self.qr_label, 0, Qt.AlignCenter)
+
+        # ============================================================
+        # Manual secret (fallback)
+        # ============================================================
+        self.manual_hint = QLabel(
+            "📋 " + tr(self.lang, "2fa_manual_secret_hint")
+        )
+        self.manual_hint.setObjectName("manual_hint")
+        self.manual_hint.setWordWrap(True)
+        layout.addWidget(self.manual_hint)
+
+        secret_row = QHBoxLayout()
+        secret_row.setSpacing(8)
+
+        self.secret_label = QLabel(tr(self.lang, "2fa_manual_secret"))
+        self.secret_label.setObjectName("field_label")
+        secret_row.addWidget(self.secret_label)
+
+        self.secret_display = QLineEdit()
+        self.secret_display.setReadOnly(True)
+        self.secret_display.setObjectName("secret_input")
+        secret_row.addWidget(self.secret_display, 1)
+
+        self.copy_secret_btn = QPushButton("📋")
+        self.copy_secret_btn.setObjectName("icon_btn")
+        self.copy_secret_btn.setFixedSize(36, 36)
+        self.copy_secret_btn.setCursor(Qt.PointingHandCursor)
+        self.copy_secret_btn.clicked.connect(self._copy_secret)
+        secret_row.addWidget(self.copy_secret_btn)
+
+        layout.addLayout(secret_row)
+
+        # ============================================================
+        # Code input
+        # ============================================================
+        layout.addSpacing(6)
+
+        self.code_label = QLabel(tr(self.lang, "2fa_enter_code"))
+        self.code_label.setObjectName("field_label")
+        self.code_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.code_label)
+
+        self.code_input = QLineEdit()
+        self.code_input.setObjectName("code_input")
+        self.code_input.setPlaceholderText("000000")
+        self.code_input.setMaxLength(6)
+        self.code_input.setAlignment(Qt.AlignCenter)
+        self.code_input.setFixedHeight(54)
+        self.code_input.returnPressed.connect(self._on_confirm_code)
+        layout.addWidget(self.code_input)
+
+        self.error_label = QLabel("")
+        self.error_label.setObjectName("error_label")
+        self.error_label.setAlignment(Qt.AlignCenter)
+        self.error_label.setWordWrap(True)
+        self.error_label.setVisible(False)
+        layout.addWidget(self.error_label)
+
+        # ============================================================
+        # Backup codes container (hidden initially)
+        # ============================================================
+        self.backup_container = QFrame()
+        self.backup_container.setObjectName("backup_container")
+        backup_layout = QVBoxLayout(self.backup_container)
+        backup_layout.setContentsMargins(14, 14, 14, 14)
+        backup_layout.setSpacing(8)
+
+        backup_title = QLabel("🔑 " + tr(self.lang, "2fa_backup_codes_title"))
+        backup_title.setObjectName("backup_title")
+        backup_title.setWordWrap(True)
+        backup_layout.addWidget(backup_title)
+
+        backup_hint = QLabel(tr(self.lang, "2fa_backup_codes_hint"))
+        backup_hint.setObjectName("backup_hint")
+        backup_hint.setWordWrap(True)
+        backup_layout.addWidget(backup_hint)
+
+        self.backup_codes_label = QLabel("")
+        self.backup_codes_label.setObjectName("backup_codes")
+        self.backup_codes_label.setAlignment(Qt.AlignCenter)
+        self.backup_codes_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.backup_codes_label.setWordWrap(True)
+        backup_layout.addWidget(self.backup_codes_label)
+
+        self.backup_container.setVisible(False)
+        layout.addWidget(self.backup_container)
+
+        layout.addStretch()
+
+        self.scroll.setWidget(self.scroll_content)
+        container_layout.addWidget(self.scroll)
+
+        # ============================================================
+        # ✅ Buttons — بیرون از scroll (همیشه دیده بشه)
+        # ============================================================
+        button_bar = QFrame()
+        button_bar.setObjectName("button_bar")
+        button_bar_layout = QHBoxLayout(button_bar)
+        button_bar_layout.setContentsMargins(30, 12, 30, 18)
+        button_bar_layout.setSpacing(10)
+
+        self.cancel_btn = QPushButton("✕  " + tr(self.lang, "cancel"))
+        self.cancel_btn.setObjectName("secondary_btn")
+        self.cancel_btn.setMinimumHeight(44)
+        self.cancel_btn.setCursor(Qt.PointingHandCursor)
+        self.cancel_btn.clicked.connect(self._on_cancel)
+        button_bar_layout.addWidget(self.cancel_btn)
+
+        self.confirm_btn = QPushButton("✓  " + tr(self.lang, "2fa_verify_btn"))
+        self.confirm_btn.setObjectName("primary_btn")
+        self.confirm_btn.setMinimumHeight(44)
+        self.confirm_btn.setCursor(Qt.PointingHandCursor)
+        self.confirm_btn.clicked.connect(self._on_confirm_code)
+        button_bar_layout.addWidget(self.confirm_btn, 1)
+
+        container_layout.addWidget(button_bar)
+
+        # ✅ Close button
+        close_btn = QPushButton("✕")
+        close_btn.setObjectName("close_btn")
+        close_btn.setFixedSize(30, 30)
+        close_btn.clicked.connect(self._on_cancel)
+        close_btn.setParent(self.container)
+        close_btn.move(540, 10)
+        close_btn.raise_()
+
+    def _apply_theme(self):
+        t = self.theme
+
+        # ============================================================
+        # ✅ Container + close button + button_bar (بیرون از scroll)
+        # ============================================================
+        self.container.setStyleSheet(f"""
+            QFrame#container {{
+                background: {t['glass_bg']};
+                border: 2px solid {t['glass_border']};
+                border-radius: 20px;
+            }}
+            QPushButton#close_btn {{
+                background: transparent;
+                color: {t['text_dim']};
+                border: none;
+                font-size: 18px;
+                font-weight: bold;
+            }}
+            QPushButton#close_btn:hover {{
+                color: {t['danger']};
+            }}
+        """)
+
+        # ============================================================
+        # ✅ ScrollArea — شفاف کامل (بدون سفیدی)
+        # ============================================================
+        self.scroll.setStyleSheet(f"""
+            QScrollArea#tfa_scroll {{
+                background: transparent;
+                border: none;
+            }}
+            QScrollArea#tfa_scroll > QWidget > QWidget {{
+                background: transparent;
+            }}
+            QScrollArea#tfa_scroll > QScrollBar:vertical {{
+                background: transparent;
+                width: 8px;
+                margin: 0px;
+                border: none;
+            }}
+            QScrollBar:vertical {{
+                background: transparent;
+                width: 8px;
+                border: none;
+                margin: 0px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {t['glass_border']};
+                border-radius: 4px;
+                min-height: 30px;
+                margin: 2px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {t['primary']};
+            }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0px;
+                background: transparent;
+                border: none;
+            }}
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: transparent;
+            }}
+            QScrollBar:horizontal {{
+                background: transparent;
+                height: 0px;
+                border: none;
+            }}
+        """)
+
+        # ============================================================
+        # ✅ Scroll content — همه‌ی المان‌های داخل
+        # ============================================================
+        self.scroll_content.setStyleSheet(f"""
+            QWidget#tfa_scroll_content {{
+                background: transparent;
+            }}
+            QLabel {{
+                color: {t['text']};
+                background: transparent;
+            }}
+            QLabel#title {{
+                font-size: 20px;
+                font-weight: bold;
+                color: {t['primary']};
+                padding-bottom: 2px;
+            }}
+            QLabel#subtitle {{
+                font-size: 12px;
+                color: {t['text_dim']};
+                padding-bottom: 4px;
+            }}
+
+            /* ============ HINT BOX ============ */
+            QFrame#hint_box {{
+                background: {t['input_bg']};
+                border: 2px solid {t['primary']};
+                border-left: 5px solid {t['primary']};
+                border-radius: 14px;
+            }}
+            QLabel#hint_title {{
+                font-size: 13px;
+                font-weight: bold;
+                color: {t['primary']};
+                padding-bottom: 2px;
+            }}
+            QLabel#hint_icon {{
+                font-size: 16px;
+            }}
+            QLabel#hint_text {{
+                font-size: 12px;
+                color: {t['text']};
+                line-height: 1.6;
+            }}
+
+            /* ============ QR CODE ============ */
+            QLabel#qr_label {{
+                background: white;
+                border: 8px solid white;
+                padding: 0px;
+                border-radius: 0px;
+            }}
+
+            QLabel#manual_hint {{
+                font-size: 11px;
+                color: {t['warning']};
+                font-style: italic;
+                padding: 6px 0px;
+            }}
+            QLabel#field_label {{
+                font-size: 12px;
+                font-weight: bold;
+                color: {t['text']};
+                padding-top: 6px;
+                padding-bottom: 2px;
+            }}
+
+            /* ============ SECRET INPUT ============ */
+            QLineEdit#secret_input {{
+                background: {t['input_bg']};
+                border: 2px solid {t['input_border']};
+                border-radius: 10px;
+                padding: 10px 12px;
+                font-family: 'Courier New', monospace;
+                font-size: 13px;
+                font-weight: bold;
+                color: {t['primary']};
+                letter-spacing: 1px;
+            }}
+            QLineEdit#secret_input:focus {{
+                border: 2px solid {t['primary']};
+            }}
+
+            /* ============ CODE INPUT ============ */
+            QLineEdit#code_input {{
+                background: {t['input_bg']};
+                border: 2px solid {t['input_border']};
+                border-radius: 12px;
+                padding: 10px;
+                font-size: 26px;
+                font-weight: bold;
+                letter-spacing: 10px;
+                color: {t['primary']};
+            }}
+            QLineEdit#code_input:focus {{
+                border: 2px solid {t['primary']};
+                background: {t['glass_highlight']};
+            }}
+
+            /* ============ ERROR ============ */
+            QLabel#error_label {{
+                font-size: 11px;
+                font-weight: bold;
+                color: {t['danger']};
+                padding: 4px 0px;
+            }}
+
+            /* ============ BACKUP CODES ============ */
+            QFrame#backup_container {{
+                background: {t['input_bg']};
+                border: 2px solid {t['warning']};
+                border-radius: 14px;
+            }}
+            QLabel#backup_title {{
+                font-size: 14px;
+                font-weight: bold;
+                color: {t['warning']};
+                padding-bottom: 4px;
+            }}
+            QLabel#backup_hint {{
+                font-size: 11px;
+                color: {t['text_dim']};
+                padding-bottom: 6px;
+            }}
+            QLabel#backup_codes {{
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+                font-weight: bold;
+                color: {t['text']};
+                padding: 14px;
+                background: {t['glass_highlight']};
+                border: 1px solid {t['glass_border']};
+                border-radius: 10px;
+                line-height: 1.6;
+            }}
+
+            /* ============ ICON BUTTON (📋) ============ */
+            QPushButton#icon_btn {{
+                background: {t['input_bg']};
+                color: {t['primary']};
+                border: 2px solid {t['input_border']};
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: bold;
+            }}
+            QPushButton#icon_btn:hover {{
+                background: {t['primary']};
+                color: {t['button_text']};
+                border-color: {t['primary']};
+            }}
+            QPushButton#icon_btn:pressed {{
+                background: {t['secondary']};
+            }}
+        """)
+
+        # ============================================================
+        # ✅ BUTTON BAR — جدا از scroll (همیشه دیده می‌شه)
+        # ============================================================
+        # ⚠️ button_bar خودش یه QFrame با objectName="button_bar" هست
+        #    ولی چون توی container هست (نه توی scroll_content)،
+        #    باید از طریق container's stylesheet استایل بدیم
+        #    ولی container.setStyleSheet قبلاً ست شده — پس از
+        #    findChild استفاده می‌کنیم و مستقیم روش ست می‌کنیم
+
+        if hasattr(self, "confirm_btn"):
+            self.confirm_btn.setStyleSheet(f"""
+                QPushButton {{
+                    background: qlineargradient(
+                        x1:0, y1:0, x2:1, y2:1,
+                        stop:0 {t['primary']},
+                        stop:0.5 {t['accent']},
+                        stop:1 {t['secondary']}
+                    );
+                    color: {t['button_text']};
+                    border: none;
+                    border-radius: 12px;
+                    padding: 12px 24px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    min-width: 140px;
+                }}
+                QPushButton:hover {{
+                    background: {t['button_hover']};
+                }}
+                QPushButton:pressed {{
+                    background: {t['accent']};
+                }}
+            """)
+
+        if hasattr(self, "cancel_btn"):
+            self.cancel_btn.setStyleSheet(f"""
+                QPushButton {{
+                    background: {t['input_bg']};
+                    color: {t['text']};
+                    border: 2px solid {t['input_border']};
+                    border-radius: 12px;
+                    padding: 12px 24px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    min-width: 100px;
+                }}
+                QPushButton:hover {{
+                    background: {t['danger']};
+                    color: {t['button_text']};
+                    border-color: {t['danger']};
+                }}
+                QPushButton:pressed {{
+                    background: {t['danger']};
+                }}
+            """)
+
+        # ✅ استایل button_bar (خط جداکننده بالاش)
+        try:
+            button_bar = self.container.findChild(QFrame, "button_bar")
+            if button_bar is not None:
+                button_bar.setStyleSheet(f"""
+                    QFrame#button_bar {{
+                        background: transparent;
+                        border-top: 1px solid {t['glass_border']};
+                        border-bottom: none;
+                        border-left: none;
+                        border-right: none;
+                    }}
+                """)
+        except Exception as e:
+            print(f"⚠️ button_bar style failed: {e}")
+
+    def _generate_secret_and_qr(self):
+        """Generate secret + QR on first show."""
+        try:
+            from core.security.totp import (
+                generate_secret, build_provisioning_uri, generate_qr_pixmap,
+            )
+            self._secret = generate_secret()
+            self.db.set_2fa_secret(self.username, self._secret)
+
+            uri = build_provisioning_uri(
+                self._secret, self.username,
+                email=self.db.get_user_info(self.username).get("email", ""),
+            )
+            pixmap = generate_qr_pixmap(uri, size=300)
+            if pixmap:
+                self.qr_label.setPixmap(pixmap)
+            else:
+                self.qr_label.setText("QR unavailable")
+                self.qr_label.setStyleSheet(
+                    "color: #f87171; font-size: 14px; background: white;"
+                )
+
+            self.secret_display.setText(self._secret)
+        except Exception as e:
+            print(f"⚠️ _generate_secret_and_qr failed: {e}")
+            show_message(
+                self, "critical",
+                tr(self.lang, "error"),
+                f"2FA setup failed:\n{e}",
+            )
+            self.reject()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self._step == 1 and not self._secret:
+            self._generate_secret_and_qr()
+
+    def _copy_secret(self):
+        try:
+            QApplication.clipboard().setText(self._secret)
+            SoundManager.get().play("ok_sound")
+            self._show_error(tr(self.lang, "2fa_secret_copied"), success=True)
+        except Exception:
+            pass
+
+    def _on_confirm_code(self):
+        try:
+            from core.security.totp import (
+                verify_code, generate_backup_codes, hash_backup_codes,
+            )
+            code = self.code_input.text().strip()
+            if len(code) != 6:
+                self._show_error(tr(self.lang, "2fa_invalid_code_format"))
+                return
+
+            ok, step = verify_code(self._secret, code)
+            if not ok:
+                SoundManager.get().play("warningSound")
+                self._show_error(tr(self.lang, "2fa_invalid_code"))
+                self.code_input.clear()
+                self.code_input.setFocus()
+                return
+
+            self._backup_codes_plain = generate_backup_codes()
+            hashed = hash_backup_codes(self._backup_codes_plain)
+            self.db.enable_2fa(self.username, hashed)
+            self.db.update_2fa_last_step(self.username, step)
+
+            self._show_backup_codes()
+            SoundManager.get().play("ok_sound")
+        except Exception as e:
+            print(f"⚠️ _on_confirm_code failed: {e}")
+            self._show_error(f"Error: {e}")
+
+    def _show_backup_codes(self):
+        """Switch UI to step 2 (show backup codes)."""
+        self._step = 2
+
+        # مخفی کردن المان‌های step 1
+        self.code_input.setVisible(False)
+        self.code_label.setVisible(False)
+        self.qr_label.setVisible(False)
+        self.secret_display.setVisible(False)
+        self.secret_label.setVisible(False)
+        self.copy_secret_btn.setVisible(False)
+        self.subtitle_label.setVisible(False)
+        self.hint_box.setVisible(False)
+        self.manual_hint.setVisible(False)
+
+        # نمایش backup codes
+        codes_text = "\n".join(self._backup_codes_plain)
+        self.backup_codes_label.setText(codes_text)
+        self.backup_container.setVisible(True)
+
+        # تغییر دکمه
+        self.confirm_btn.setText("✓  " + tr(self.lang, "2fa_done_btn"))
+        try:
+            self.confirm_btn.clicked.disconnect()
+        except TypeError:
+            pass
+        self.confirm_btn.clicked.connect(self._on_done)
+        self.cancel_btn.setVisible(False)
+
+        # اسکرول به بالا
+        try:
+            self.scroll.verticalScrollBar().setValue(0)
+        except Exception:
+            pass
+
+    def _on_done(self):
+        try:
+            SoundManager.get().play("ok_sound")
+            self.setup_completed.emit(self.username, self._backup_codes_plain)
+        except Exception:
+            pass
+        animate_dialog_close(self, on_finished=self.accept)
+
+    def _on_cancel(self):
+        try:
+            if self._step == 1:
+                self.db.disable_2fa(self.username)
+        except Exception:
+            pass
+        SoundManager.get().play("simpleClick")
+        animate_dialog_close(self, on_finished=self.reject)
+
+    def _show_error(self, msg: str, success: bool = False):
+        try:
+            color = "#34d399" if success else "#f87171"
+            self.error_label.setText(("✓  " if success else "⚠️  ") + msg)
+            self.error_label.setStyleSheet(
+                f"color: {color}; font-size: 11px; font-weight: bold;"
+                "background: transparent;"
+            )
+            self.error_label.setVisible(True)
+            QTimer.singleShot(4000, lambda: self.error_label.setVisible(False))
+        except Exception:
+            pass
+
+class TwoFactorVerifyDialog(QDialog):
+    """
+    Shown during login when user has 2FA enabled.
+    Accepts either 6-digit TOTP or backup code.
+    """
+    verified = pyqtSignal(str)  # emits username on success
+
+    def __init__(self, db: UserDB, username: str, theme: Dict,
+                 lang: str = "English", parent=None):
+        super().__init__(parent)
+        self.db = db
+        self.username = username
+        self.theme = theme
+        self.lang = lang
+        self._attempts = []
+        self._use_backup_mode = False
+
+        self.setWindowTitle(tr(lang, "2fa_verify_title"))
+        self.setFixedSize(460, 480)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+
+        self._setup_ui()
+        self._apply_theme()
+
+        try:
+            from gui.dialogs.update_dialogs import _with_backdrop
+            _with_backdrop(self, parent, theme)
+        except Exception as e:
+            print(f"⚠️ TwoFactorVerifyDialog backdrop failed: {e}")
+
+        QTimer.singleShot(0, lambda: animate_dialog_open(self))
+
+    def _setup_ui(self):
+        main = QVBoxLayout(self)
+        main.setContentsMargins(0, 0, 0, 0)
+
+        self.container = QFrame()
+        self.container.setObjectName("container")
+        main.addWidget(self.container)
+
+        layout = QVBoxLayout(self.container)
+        layout.setContentsMargins(36, 36, 36, 36)
+        layout.setSpacing(14)
+
+        # Icon
+        icon = QLabel("🔐")
+        icon.setObjectName("icon")
+        icon.setAlignment(Qt.AlignCenter)
+        layout.addWidget(icon)
+
+        # Title
+        title = QLabel(tr(self.lang, "2fa_verify_title"))
+        title.setObjectName("title")
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
+
+        # Subtitle
+        self.subtitle = QLabel(tr(self.lang, "2fa_verify_subtitle"))
+        self.subtitle.setObjectName("subtitle")
+        self.subtitle.setAlignment(Qt.AlignCenter)
+        self.subtitle.setWordWrap(True)
+        layout.addWidget(self.subtitle)
+
+        layout.addSpacing(10)
+
+        # Code input
+        self.code_input = QLineEdit()
+        self.code_input.setObjectName("code_input")
+        self.code_input.setPlaceholderText("000000")
+        self.code_input.setMaxLength(9)  # 6 for TOTP, 9 for backup (XXXX-XXXX)
+        self.code_input.setAlignment(Qt.AlignCenter)
+        self.code_input.setFixedHeight(56)
+        self.code_input.returnPressed.connect(self._on_verify)
+        layout.addWidget(self.code_input)
+
+        # Error
+        self.error_label = QLabel("")
+        self.error_label.setObjectName("error_label")
+        self.error_label.setAlignment(Qt.AlignCenter)
+        self.error_label.setVisible(False)
+        layout.addWidget(self.error_label)
+
+        # Toggle backup mode
+        self.backup_toggle_btn = QPushButton(
+            "🔑 " + tr(self.lang, "2fa_use_backup_code")
+        )
+        self.backup_toggle_btn.setObjectName("link_btn")
+        self.backup_toggle_btn.setCursor(Qt.PointingHandCursor)
+        self.backup_toggle_btn.clicked.connect(self._toggle_backup_mode)
+        layout.addWidget(self.backup_toggle_btn, 0, Qt.AlignCenter)
+
+        layout.addStretch()
+
+        # Buttons
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(10)
+
+        self.cancel_btn = QPushButton("✕  " + tr(self.lang, "cancel"))
+        self.cancel_btn.setObjectName("secondary_btn")
+        self.cancel_btn.setMinimumHeight(44)
+        self.cancel_btn.clicked.connect(self._on_cancel)
+        btn_row.addWidget(self.cancel_btn)
+
+        self.verify_btn = QPushButton("✓  " + tr(self.lang, "2fa_verify_btn"))
+        self.verify_btn.setObjectName("primary_btn")
+        self.verify_btn.setMinimumHeight(44)
+        self.verify_btn.clicked.connect(self._on_verify)
+        btn_row.addWidget(self.verify_btn, 1)
+
+        layout.addLayout(btn_row)
+
+        # Close
+        close_btn = QPushButton("✕")
+        close_btn.setObjectName("close_btn")
+        close_btn.setFixedSize(30, 30)
+        close_btn.clicked.connect(self._on_cancel)
+        close_btn.setParent(self.container)
+        close_btn.move(420, 10)
+
+    def _apply_theme(self):
+        t = self.theme
+        self.container.setStyleSheet(f"""
+            QFrame#container {{
+                background: {t['glass_bg']};
+                border: 2px solid {t['glass_border']};
+                border-radius: 20px;
+            }}
+            QLabel#icon {{ font-size: 48px; background: transparent; }}
+            QLabel#title {{
+                font-size: 20px; font-weight: bold;
+                color: {t['primary']}; background: transparent;
+            }}
+            QLabel#subtitle {{
+                font-size: 12px; color: {t['text_dim']};
+                background: transparent;
+            }}
+            QLineEdit#code_input {{
+                background: {t['input_bg']};
+                border: 2px solid {t['input_border']};
+                border-radius: 12px; padding: 8px;
+                font-size: 24px; font-weight: bold;
+                letter-spacing: 6px; color: {t['primary']};
+            }}
+            QLineEdit#code_input:focus {{
+                border: 2px solid {t['primary']};
+            }}
+            QLabel#error_label {{
+                font-size: 11px; font-weight: bold;
+                color: {t['danger']}; background: transparent;
+            }}
+            QPushButton#link_btn {{
+                background: transparent; color: {t['primary']};
+                border: none; font-size: 11px;
+                text-decoration: underline;
+            }}
+            QPushButton#link_btn:hover {{ color: {t['secondary']}; }}
+            QPushButton#primary_btn {{
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 {t['primary']}, stop:0.5 {t['accent']}, stop:1 {t['secondary']}
+                );
+                color: {t['button_text']}; border: none;
+                border-radius: 12px; padding: 12px 20px;
+                font-size: 14px; font-weight: bold;
+            }}
+            QPushButton#primary_btn:hover {{ background: {t['button_hover']}; }}
+            QPushButton#secondary_btn {{
+                background: {t['input_bg']}; color: {t['text']};
+                border: 2px solid {t['input_border']};
+                border-radius: 12px; padding: 12px 20px;
+                font-size: 14px; font-weight: bold;
+            }}
+            QPushButton#secondary_btn:hover {{
+                background: {t['danger']}; color: {t['button_text']};
+            }}
+            QPushButton#close_btn {{
+                background: transparent; color: {t['text_dim']};
+                border: none; font-size: 18px; font-weight: bold;
+            }}
+            QPushButton#close_btn:hover {{ color: {t['danger']}; }}
+        """)
+
+    def _toggle_backup_mode(self):
+        self._use_backup_mode = not self._use_backup_mode
+        if self._use_backup_mode:
+            self.subtitle.setText(tr(self.lang, "2fa_enter_backup_code"))
+            self.code_input.setPlaceholderText("XXXX-XXXX")
+            self.code_input.setMaxLength(9)
+            self.backup_toggle_btn.setText(
+                "📱 " + tr(self.lang, "2fa_use_totp_code")
+            )
+        else:
+            self.subtitle.setText(tr(self.lang, "2fa_verify_subtitle"))
+            self.code_input.setPlaceholderText("000000")
+            self.code_input.setMaxLength(6)
+            self.backup_toggle_btn.setText(
+                "🔑 " + tr(self.lang, "2fa_use_backup_code")
+            )
+        self.code_input.clear()
+        self.code_input.setFocus()
+
+    def _on_verify(self):
+        import time
+        now = time.time()
+        self._attempts = [t for t in self._attempts if now - t < 300]
+        if len(self._attempts) >= 5:
+            self._show_error(tr(self.lang, "too_many_attempts"))
+            return
+
+        code = self.code_input.text().strip()
+        if not code:
+            self._show_error(tr(self.lang, "2fa_enter_code_hint"))
+            return
+
+        status = self.db.get_2fa_status(self.username)
+        secret = status.get("secret", "")
+        last_step = status.get("last_used_step")
+
+        cleaned = code.replace("-", "").replace(" ", "")
+        looks_like_backup = ("-" in code) or (len(cleaned) > 6)
+
+        verified = False
+
+        if self._use_backup_mode or looks_like_backup:
+            from core.security.totp import verify_backup_code
+            ok, idx = verify_backup_code(
+                code, status.get("backup_codes_hashed", [])
+            )
+            if ok:
+                self.db.use_backup_code(self.username, idx)
+                verified = True
+        else:
+            from core.security.totp import verify_code
+            ok, step = verify_code(secret, code, last_used_step=last_step)
+            if ok:
+                self.db.update_2fa_last_step(self.username, step)
+                verified = True
+
+        if verified:
+            SoundManager.get().play("ok_sound")
+            self.verified.emit(self.username)
+            animate_dialog_close(self, on_finished=self.accept)
+            return
+
+        self._attempts.append(now)
+        SoundManager.get().play("warningSound")
+        self._show_error(tr(self.lang, "2fa_invalid_code"))
+        self.code_input.clear()
+        self.code_input.setFocus()
+
+    def _on_cancel(self):
+        SoundManager.get().play("simpleClick")
+        animate_dialog_close(self, on_finished=self.reject)
+
+    def _show_error(self, msg: str):
+        try:
+            self.error_label.setText(f"⚠️  {msg}")
+            self.error_label.setVisible(True)
+            QTimer.singleShot(4000, lambda: self.error_label.setVisible(False))
+        except Exception:
+            pass
+
+
 
 # ================================================================
 # ✅ USER STATS (JSON-based per-user statistics)
@@ -6462,11 +12004,13 @@ class HistoryPanel(QFrame):
         main_layout.addWidget(self._scroll, 1)
 
         # ---------- Empty State ----------
-        self._empty_label = QLabel("🕐\n\nNo history yet")
+        self._empty_label = QLabel()
         self._empty_label.setObjectName("hist_empty")
         self._empty_label.setAlignment(Qt.AlignCenter)
         self._empty_label.setWordWrap(True)
+        self._empty_label.setTextFormat(Qt.RichText)
         self._empty_label.setVisible(False)
+        self._update_empty_text()
         main_layout.addWidget(self._empty_label, 1)
 
     def _apply_theme(self):
@@ -6539,6 +12083,11 @@ class HistoryPanel(QFrame):
                 th.set_theme(theme)
             except Exception:
                 pass
+        # ✅ آپدیت Empty State با تم جدید
+        try:
+            self._update_empty_text()
+        except Exception:
+            pass
         # ✅ به‌روزرسانی tooltipها
         try:
             self.set_tooltips(theme, self._lang)
@@ -6550,7 +12099,8 @@ class HistoryPanel(QFrame):
         self._lang = lang
         try:
             self._title.setText("🕐 " + tr(lang, "history_title"))
-            self._empty_label.setText("🕐\n\n" + tr(lang, "history_empty"))
+            # ✅ آپدیت Empty State با HTML
+            self._update_empty_text()
         except Exception:
             pass
         for th in self._thumbnails:
@@ -6567,6 +12117,32 @@ class HistoryPanel(QFrame):
     def set_username(self, username: str):
         """تغییر کاربر فعلی (بعد از login/logout)."""
         self._username = username
+        # ✅ آپدیت Empty State (ممکنه از "no user" به "empty" یا برعکس بره)
+        try:
+            self._update_empty_text()
+        except Exception:
+            pass
+
+    def _update_empty_text(self):
+        """آپدیت متن Empty State — متفاوت اگه لاگین نیست."""
+        try:
+            # ✅ تشخیص: کاربر لاگین هست یا نه
+            key = "history_empty" if self._username else "history_no_user"
+            html = make_empty_state_html(
+                key=key,
+                theme=self._theme,
+                lang=self._lang,
+            )
+            if html:
+                self._empty_label.setText(html)
+            else:
+                self._empty_label.setText(tr(self._lang, "history_empty"))
+        except Exception as e:
+            print(f"⚠️ HistoryPanel._update_empty_text failed: {e}")
+            try:
+                self._empty_label.setText(tr(self._lang, "history_empty"))
+            except Exception:
+                pass
 
     # ============================================================
     # ✅ Smart tooltips
@@ -7883,11 +13459,15 @@ class GlassmorphismBackground(QWidget):
             small_w = max(1, int(w * self.DOWNSCALE))
             small_h = max(1, int(h * self.DOWNSCALE))
 
-            # ✅ AnimatedBackground رو رندر کن
+            # ✅ رندر با QPainter دستی (به‌جای render که همزمان painter ایجاد می‌کنه)
             small_pixmap = QPixmap(small_w, small_h)
             small_pixmap.fill(Qt.transparent)
             self._bg_inner.setGeometry(0, 0, small_w, small_h)
-            self._bg_inner.render(small_pixmap, QPoint(0, 0), QRegion(0, 0, small_w, small_h))
+            _p = QPainter(small_pixmap)
+            try:
+                self._bg_inner.render(_p, QPoint(0, 0), QRegion(0, 0, small_w, small_h))
+            finally:
+                _p.end()
 
             # ✅ blur با QGraphicsBlurEffect
             scene = QGraphicsScene()
@@ -8196,12 +13776,17 @@ class ZoomableImageView(QWidget):
         self._placeholder.setStyleSheet(f"""
             QLabel#zoom_placeholder {{
                 color: {t['text_dim']};
-                font-size: 22px;
                 background: transparent;
                 border: 2px dashed {t['glass_border']};
                 border-radius: 20px;
+                padding: 20px;
             }}
         """)
+        # ✅ Empty state HTML برای placeholder
+        try:
+            self._update_placeholder_text()
+        except Exception:
+            pass
         self._controls.setStyleSheet(f"""
             QFrame#zoom_controls {{
                 background: {t['input_bg']};
@@ -8230,7 +13815,30 @@ class ZoomableImageView(QWidget):
     # ============================================================
     def set_placeholder_text(self, text: str):
         self._placeholder_text = text
-        self._placeholder.setText(text)
+        # ✅ از HTML زیبا استفاده کن اگه text شامل \n هست
+        try:
+            self._update_placeholder_text()
+        except Exception:
+            self._placeholder.setText(text)
+
+    def _update_placeholder_text(self):
+        """ساخت HTML زیبا برای placeholder."""
+        try:
+            html = make_empty_state_html(
+                key="image_empty",
+                theme=self._theme,
+                lang=self._lang,
+                custom_title=self._placeholder_text.split("\n")[-1].strip()
+                    if "\n" in self._placeholder_text else "",
+            )
+            if html:
+                self._placeholder.setText(html)
+                self._placeholder.setTextFormat(Qt.RichText)
+            else:
+                self._placeholder.setText(self._placeholder_text)
+        except Exception as e:
+            print(f"⚠️ _update_placeholder_text failed: {e}")
+            self._placeholder.setText(self._placeholder_text)
 
     # ============================================================
     # Image control
@@ -8848,7 +14456,7 @@ class ProcessingProgressBar(QWidget):
 
         # ✅ شروع شبیه‌سازی و pulse
         self._tick_timer.start(self.TICK_MS)
-        self._pulse_timer.start(80)  # هر ۸۰ms یه pulse کوچیک
+        self._pulse_timer.start(80)
 
     def finish_success(self):
         """پایان موفق — پرش به ۱۰۰٪ سبز، بعد محو."""
@@ -9096,10 +14704,13 @@ class DashboardPanel(QFrame):
         self._recent_layout.setContentsMargins(0, 0, 0, 0)
         self._recent_layout.setSpacing(5)
 
-        # ✅ برچسب «هنوز نتیجه‌ای نیست»
-        self._recent_empty = QLabel("No results yet")
+        # ✅ برچسب «هنوز نتیجه‌ای نیست» (Empty State)
+        self._recent_empty = QLabel()
         self._recent_empty.setObjectName("dash_empty")
         self._recent_empty.setAlignment(Qt.AlignCenter)
+        self._recent_empty.setWordWrap(True)
+        self._recent_empty.setTextFormat(Qt.RichText)
+        self._update_recent_empty()
         self._recent_layout.addWidget(self._recent_empty)
 
         layout.addWidget(self._recent_container, 1)
@@ -9172,12 +14783,45 @@ class DashboardPanel(QFrame):
             dist = self._stats.get("distribution", {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0})
             recent = self._stats.get("recent", [])
 
-            # ✅ Total
-            self._total_value.setText(str(total))
+            # ✅ Total (count-up)
+            try:
+                prev_total = 0
+                if hasattr(self, "_last_total"):
+                    prev_total = self._last_total
+                self._last_total = total
+                if prev_total != total:
+                    animate_count_up(
+                        self._total_value,
+                        from_value=float(prev_total),
+                        to_value=float(total),
+                        duration_ms=600,
+                        decimals=0,
+                    )
+                else:
+                    self._total_value.setText(str(total))
+            except Exception:
+                self._total_value.setText(str(total))
 
             # ✅ Average confidence + رنگ‌بندی
             if total > 0:
-                self._avg_value.setText(f"{avg * 100:.1f}%")
+                try:
+                    prev_avg = 0.0
+                    if hasattr(self, "_last_avg"):
+                        prev_avg = self._last_avg
+                    self._last_avg = avg * 100
+                    if abs(prev_avg - avg * 100) > 0.05:
+                        animate_count_up(
+                            self._avg_value,
+                            from_value=prev_avg,
+                            to_value=avg * 100,
+                            duration_ms=700,
+                            decimals=1,
+                            suffix="%",
+                        )
+                    else:
+                        self._avg_value.setText(f"{avg * 100:.1f}%")
+                except Exception:
+                    self._avg_value.setText(f"{avg * 100:.1f}%")
                 if avg >= 0.85:
                     color = "#34d399"  # سبز — عالی
                 elif avg >= 0.70:
@@ -9207,6 +14851,25 @@ class DashboardPanel(QFrame):
             self._update_recent(recent)
         except Exception as e:
             print(f"⚠️ DashboardPanel.update_stats failed: {e}")
+
+    def _update_recent_empty(self):
+        """آپدیت متن Empty State برای recent list."""
+        try:
+            html = make_empty_state_html(
+                key="dash_no_results",
+                theme=self._theme,
+                lang=self._lang,
+            )
+            if html:
+                self._recent_empty.setText(html)
+            else:
+                self._recent_empty.setText(tr(self._lang, "dash_no_results"))
+        except Exception as e:
+            print(f"⚠️ _update_recent_empty failed: {e}")
+            try:
+                self._recent_empty.setText(tr(self._lang, "dash_no_results"))
+            except Exception:
+                pass
 
     def _set_bar_width(self, row: Dict, percent: float):
         """عرض نوار افقی رو بر اساس درصد تنظیم می‌کنه."""
@@ -9334,6 +14997,11 @@ class DashboardPanel(QFrame):
                 )
         except Exception:
             pass
+        # ✅ آپدیت Empty State با تم جدید
+        try:
+            self._update_recent_empty()
+        except Exception:
+            pass
 
     def set_lang(self, lang: str):
         """متن‌ها رو با زبان جدید هماهنگ می‌کنه."""
@@ -9344,7 +15012,8 @@ class DashboardPanel(QFrame):
             self._avg_label.setText(tr(lang, "dash_avg_conf"))
             self._dist_title.setText(tr(lang, "dash_distribution"))
             self._recent_title.setText(tr(lang, "dash_last_5"))
-            self._recent_empty.setText(tr(lang, "dash_no_results"))
+            # ✅ آپدیت Empty State با HTML
+            self._update_recent_empty()
             # ✅ رفرش recent
             if self._stats is not None:
                 self._update_recent(self._stats.get("recent", []))
@@ -9820,6 +15489,11 @@ def add_click_animation(widget):
 def decorate_button(widget, theme: Dict):
     add_hover_animation(widget, theme.get("shadow", "rgba(0, 200, 255, 0.5)"))
     add_click_animation(widget)
+    # ✅ Micro-interaction: press scale
+    try:
+        button_press_scale(widget, pressed_scale=0.96, duration_ms=90)
+    except Exception:
+        pass
     # ✅ اگه AnimatedIconButton هست، theme رو ست کن
     try:
         if isinstance(widget, AnimatedIconButton):
@@ -10205,15 +15879,31 @@ class PreloadThread(QThread):
             self.msleep(400)
 
             # ============================================================
-            # مرحله ۲: مدل (60%)
+            # ✅ مرحله ۱.۵: Image Guard (خیلی سریع — از pkl)
+            # ============================================================
+            self.progress.emit(18, "Loading image guard...")
+            try:
+                from core.security.image_guard import _get_liver_model
+                guard_model = _get_liver_model()
+                if guard_model is not None:
+                    print(f"✅ Image Guard ready ({guard_model.n_samples} samples)")
+                else:
+                    print("⚠️ Image Guard in fail-open mode (no pkl)")
+            except Exception as e:
+                print(f"⚠️ Image Guard preload failed: {e}")
+            self.progress.emit(22, "Image guard ready")
+
+            # ============================================================
+            # مرحله ۲: مدل (60%) — از این‌جا به بعد دست نزن
             # ============================================================
             if self._skip:
                 self.progress.emit(60, "Skipped model load")
                 self.finished_signal.emit(True, "Skipped")
                 return
 
-            self.progress.emit(20, "Loading AI model...")
+            self.progress.emit(25, "Loading AI model...")  # ← از ۲۰ به ۲۵ (چون guard ۲۲٪ گرفت)
             self.msleep(300)
+            # ... بقیه دقیقاً همان‌طور که بود
 
             if not HAS_TORCH:
                 # ✅ PyTorch نیست → Skip کن
@@ -10269,12 +15959,20 @@ class LoginDialog(QDialog):
         self.lang = lang
 
         self.setWindowTitle(tr(lang, "login"))
-        self.setFixedSize(450, 480)   # ← از 400 به 480
+        self.setFixedSize(450, 480)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         self._setup_ui()
         self._apply_theme()
+
+        # ✅ Add backdrop (exactly like UpdateAvailableDialog)
+        try:
+            from gui.dialogs.update_dialogs import _with_backdrop
+            _with_backdrop(self, parent, theme)
+        except Exception as e:
+            print(f"⚠️ LoginDialog backdrop failed: {e}")
+
         # ✅ انیمیشن باز شدن
         QTimer.singleShot(0, lambda: animate_dialog_open(self))
 
@@ -10424,19 +16122,52 @@ class LoginDialog(QDialog):
                 return
             main_window.login_attempts[username] = attempts
 
-        if self.db.verify(username, password):
-            if main_window is not None and hasattr(main_window, "login_attempts"):
-                main_window.login_attempts[username] = []
-            self.password_input.clear()
-            self.login_success.emit(username)
-            # ✅ انیمیشن بسته شدن + accept
-            animate_dialog_close(self, on_finished=self.accept)
-        else:
+        if not self.db.verify(username, password):
             if main_window is not None and hasattr(main_window, "login_attempts"):
                 now = time.time()
                 main_window.login_attempts.setdefault(username, []).append(now)
             show_message(self, "warning", "Error", tr(self.lang, "invalid_credentials"))
             self.password_input.clear()
+            # ✅ Micro-interaction: shake on error
+            try:
+                highlight_widget_error(self.password_input, self.theme)
+                shake_widget(self)
+            except Exception:
+                pass
+            # (forgot-password disabled — 2FA is the recovery method)
+            return
+
+        if main_window is not None and hasattr(main_window, "login_attempts"):
+            main_window.login_attempts[username] = []
+        self.password_input.clear()
+
+        status = self.db.get_2fa_status(username)
+        needs_2fa = status.get("enabled", False)
+
+        if needs_2fa:
+            self.hide()
+
+            verified = {"ok": False}
+
+            try:
+                verify_dlg = TwoFactorVerifyDialog(
+                    db=self.db,
+                    username=username,
+                    theme=self.theme,
+                    lang=self.lang,
+                    parent=main_window,
+                )
+                verify_dlg.verified.connect(lambda u: verified.update({"ok": True}))
+                verify_dlg.exec_()
+            except Exception as e:
+                print(f"⚠️ TwoFactorVerifyDialog failed: {e}")
+
+            if not verified["ok"]:
+                self.show()
+                return
+
+        self.login_success.emit(username)
+        animate_dialog_close(self, on_finished=self.accept)
 
     def _open_signup(self):
         try:
@@ -10668,6 +16399,13 @@ class Toast(QFrame):
 # ✅ NOTIFICATION CENTER (v3.0 — manager for toasts)
 # ================================================================
 
+def _motion_ok_safe() -> bool:
+    """Safe wrapper for motion check."""
+    try:
+        return not MotionSettings.get().is_reduced()
+    except Exception:
+        return True
+
 class NotificationCenter(QObject):
     """
     مدیر toastها.
@@ -10734,7 +16472,24 @@ class NotificationCenter(QObject):
             self._reposition()
 
             # fade-in
-            toast.fade_in(QPoint(x, start_y), QPoint(x, self._get_y_for_index(len(self._toasts) - 1)))
+            # ✅ Micro-interaction: bounce-in (toast)
+            end_pos = QPoint(x, self._get_y_for_index(len(self._toasts) - 1))
+            bounce_in(toast, QPoint(x, start_y), end_pos, duration_ms=350)
+            # Also fade opacity
+            try:
+                toast.setVisible(True)
+                toast.raise_()
+                if hasattr(toast, "_opacity_effect"):
+                    toast._opacity_effect.setOpacity(0.0)
+                    fade_anim = QPropertyAnimation(toast._opacity_effect, b"opacity", toast)
+                    fade_anim.setDuration(280)
+                    fade_anim.setStartValue(0.0)
+                    fade_anim.setEndValue(1.0)
+                    fade_anim.setEasingCurve(QEasingCurve.OutCubic)
+                    fade_anim.start()
+                    toast._fade_in_anim = fade_anim
+            except Exception:
+                pass
 
         except Exception as e:
             print(f"⚠️ NotificationCenter.push failed: {e}")
@@ -10748,7 +16503,7 @@ class NotificationCenter(QObject):
         return y
 
     def _reposition(self):
-        """بازچینش همه‌ی toastها."""
+        """Smoothly reposition all toasts."""
         try:
             parent_w = self._parent.width()
             y = self.MARGIN_TOP
@@ -10757,7 +16512,20 @@ class NotificationCenter(QObject):
                     continue
                 x = max(10, parent_w - toast.width() - self.MARGIN_RIGHT)
                 try:
-                    toast.move(x, y)
+                    # ✅ Smooth move (if position differs)
+                    current = toast.pos()
+                    target = QPoint(x, y)
+                    if current != target:
+                        if _motion_ok_safe():
+                            move_anim = QPropertyAnimation(toast, b"pos", toast)
+                            move_anim.setDuration(220)
+                            move_anim.setStartValue(current)
+                            move_anim.setEndValue(target)
+                            move_anim.setEasingCurve(QEasingCurve.OutCubic)
+                            move_anim.start()
+                            toast._reposition_anim = move_anim
+                        else:
+                            toast.move(target)
                 except Exception:
                     pass
                 y += toast.height() + self.SPACING
@@ -10808,6 +16576,14 @@ class SignupDialog(QDialog):
 
         self._setup_ui()
         self._apply_theme()
+
+        # ✅ Add backdrop (exactly like UpdateAvailableDialog)
+        try:
+            from gui.dialogs.update_dialogs import _with_backdrop
+            _with_backdrop(self, parent, theme)
+        except Exception as e:
+            print(f"⚠️ SignupDialog backdrop failed: {e}")
+
         # ✅ انیمیشن باز شدن
         QTimer.singleShot(0, lambda: animate_dialog_open(self))
 
@@ -10868,13 +16644,56 @@ class SignupDialog(QDialog):
         self.password.setPlaceholderText(tr(self.lang, "password"))
         self.password.setEchoMode(QLineEdit.Password)
         self.password.setObjectName("input")
-        layout.addWidget(self.password)
+        # ✅ Password row: input + eye button
+        pwd_row = QHBoxLayout()
+        pwd_row.setSpacing(4)
+        pwd_row.addWidget(self.password, 1)
+
+        self._eye_btn = QPushButton("👁")
+        self._eye_btn.setObjectName("eye_btn")
+        self._eye_btn.setFixedSize(36, 36)
+        self._eye_btn.setCursor(Qt.PointingHandCursor)
+        self._eye_btn.setCheckable(True)
+        self._eye_btn.toggled.connect(self._toggle_password_visibility)
+        pwd_row.addWidget(self._eye_btn)
+
+        layout.addLayout(pwd_row)
+
+        # ✅ PasswordStrengthMeter (زیر فیلد پسورد)
+        try:
+            from gui.widgets.password_strength_meter import PasswordStrengthMeter
+            self._strength_meter = PasswordStrengthMeter(
+                theme=self.theme,
+                lang=self.lang,
+            )
+            self.password.textChanged.connect(self._strength_meter.set_password)
+            layout.addWidget(self._strength_meter)
+        except Exception as e:
+            print(f"⚠️ PasswordStrengthMeter init failed: {e}")
+            self._strength_meter = None
+
+        # ✅ Show password toggle (کنار فیلد پسورد)
+        # (اینو می‌تونی توی یه HBoxLayout بذاری، یا یه دکمه‌ی چشم کنار فیلد)
 
         self.repeat_password = QLineEdit()
         self.repeat_password.setPlaceholderText(tr(self.lang, "repeat_password"))
         self.repeat_password.setEchoMode(QLineEdit.Password)
         self.repeat_password.setObjectName("input")
         layout.addWidget(self.repeat_password)
+
+        # ✅ PasswordMatchIndicator (زیر فیلد repeat)
+        try:
+            from gui.widgets.password_match_indicator import PasswordMatchIndicator
+            self._match_indicator = PasswordMatchIndicator(
+                theme=self.theme,
+                lang=self.lang,
+            )
+            self.password.textChanged.connect(self._update_match)
+            self.repeat_password.textChanged.connect(self._update_match)
+            layout.addWidget(self._match_indicator)
+        except Exception as e:
+            print(f"⚠️ PasswordMatchIndicator init failed: {e}")
+            self._match_indicator = None
 
         rules = QLabel(tr(self.lang, "password_rule"))
         rules.setObjectName("rules")
@@ -10906,6 +16725,30 @@ class SignupDialog(QDialog):
         close_btn.setParent(self.container)
         close_btn.move(460, 10)
         close_btn.raise_()
+
+    def _update_match(self):
+        """Update password match indicator."""
+        try:
+            if getattr(self, "_match_indicator", None) is not None:
+                self._match_indicator.set_passwords(
+                    self.password.text(),
+                    self.repeat_password.text(),
+                )
+        except Exception:
+            pass
+
+    def _toggle_password_visibility(self, checked: bool):
+        """Toggle password visibility (mask vs plain)."""
+        try:
+            mode = QLineEdit.Normal if checked else QLineEdit.Password
+            self.password.setEchoMode(mode)
+            # ✅ هم repeat_password
+            if hasattr(self, "repeat_password"):
+                self.repeat_password.setEchoMode(mode)
+            # ✅ آیکون رو عوض کن
+            self._eye_btn.setText("🙈" if checked else "👁")
+        except Exception:
+            pass
 
     def _apply_theme(self):
         t = self.theme
@@ -11012,6 +16855,21 @@ class SignupDialog(QDialog):
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
                 height: 0px;
             }}
+            QPushButton#eye_btn {{
+                background: transparent;
+                color: {t['text_dim']};
+                border: 1px solid {t['input_border']};
+                border-radius: 8px;
+                font-size: 14px;
+            }}
+            QPushButton#eye_btn:hover {{
+                background: {t['primary']};
+                color: {t['button_text']};
+            }}
+            QPushButton#eye_btn:checked {{
+                background: {t['primary']};
+                color: {t['button_text']};
+            }}
         """)
 
     def _do_signup(self):
@@ -11034,10 +16892,18 @@ class SignupDialog(QDialog):
 
             if not validate_email(email):
                 show_message(self, "warning", "Error", tr(self.lang, "invalid_email"))
+                try:
+                    highlight_widget_error(self.email, self.theme)
+                except Exception:
+                    pass
                 return
 
             if password != repeat:
                 show_message(self, "warning", "Error", tr(self.lang, "passwords_dont_match"))
+                try:
+                    highlight_widget_error(self.repeat_password, self.theme)
+                except Exception:
+                    pass
                 return
 
             ok, msg = validate_password(password)
@@ -11093,13 +16959,36 @@ class SettingsDialog(QDialog):
         self.current_glassmorphism = glassmorphism
 
         self.setWindowTitle(tr(current_lang, "settings"))
-        self.setFixedSize(560, 720)   # ← بزرگ‌تر شد
-        self.setMinimumSize(560, 600)  # ← حداقل ارتفاع
+        self.setFixedSize(560, 720)
+        self.setMinimumSize(560, 600)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
+        # ✅ Auto-lock config
+        try:
+            self._auto_lock_config = load_auto_lock_config()
+        except Exception:
+            self._auto_lock_config = AutoLockConfig()
+
+        # ✅ Font settings
+        try:
+            self._font_settings = load_font_settings()
+        except Exception:
+            self._font_settings = FontSettings()
+
         self._setup_ui()
         self._apply_theme()
+
+        # ✅ Add backdrop (same as LoginDialog / SignupDialog / UpdateAvailableDialog)
+        try:
+            from gui.dialogs.update_dialogs import _with_backdrop
+            _with_backdrop(
+                self, parent,
+                THEMES.get(self.current_theme, THEMES["theme_dark_aqua"]),
+            )
+        except Exception as e:
+            print(f"⚠️ SettingsDialog backdrop failed: {e}")
+
         # ✅ انیمیشن باز شدن
         QTimer.singleShot(0, lambda: animate_dialog_open(self))
 
@@ -11185,6 +17074,13 @@ class SettingsDialog(QDialog):
         self.follow_system_checkbox.setToolTip(
             tr(self.current_lang, "follow_system_theme_desc")
         )
+
+        # ✅ Connect checkbox to enable/disable theme combo
+        self.follow_system_checkbox.toggled.connect(self._on_follow_system_toggled)
+
+        # ✅ Initial state
+        self._on_follow_system_toggled(self.follow_system_checkbox.isChecked())
+
         layout.addWidget(self.follow_system_checkbox)
 
         layout.addSpacing(8)
@@ -11197,6 +17093,198 @@ class SettingsDialog(QDialog):
             "Real blur effect. Disable if the app feels slow."
         )
         layout.addWidget(self.glassmorphism_checkbox)
+
+        layout.addSpacing(14)
+
+        # ============================================================
+        # ✅ Auto-Lock section
+        # ============================================================
+        autolock_sep = QFrame()
+        autolock_sep.setObjectName("update_separator")
+        autolock_sep.setFixedHeight(1)
+        layout.addWidget(autolock_sep)
+
+        layout.addSpacing(10)
+
+        autolock_title = QLabel("🔒 " + tr(self.current_lang, "auto_lock_section_title"))
+        autolock_title.setObjectName("label")
+        layout.addWidget(autolock_title)
+
+        self.auto_lock_checkbox = QCheckBox(
+            tr(self.current_lang, "auto_lock_enable")
+        )
+        self.auto_lock_checkbox.setObjectName("checkbox")
+        self.auto_lock_checkbox.setChecked(self._auto_lock_config.enabled)
+        layout.addWidget(self.auto_lock_checkbox)
+
+        self.auto_lock_timeout_label = QLabel(
+            tr(self.current_lang, "auto_lock_timeout_label")
+        )
+        self.auto_lock_timeout_label.setObjectName("label")
+        layout.addWidget(self.auto_lock_timeout_label)
+
+        self.auto_lock_timeout_combo = QComboBox()
+        self.auto_lock_timeout_combo.setObjectName("combo")
+        timeout_options = [
+            (1, "1 min"),
+            (2, "2 min"),
+            (5, "5 min"),
+            (10, "10 min"),
+            (15, "15 min"),
+            (30, "30 min"),
+            (60, "60 min"),
+        ]
+        for mins, label in timeout_options:
+            self.auto_lock_timeout_combo.addItem(label, mins)
+        idx = self.auto_lock_timeout_combo.findData(
+            self._auto_lock_config.timeout_minutes
+        )
+        if idx >= 0:
+            self.auto_lock_timeout_combo.setCurrentIndex(idx)
+        self.auto_lock_timeout_combo.setEnabled(self._auto_lock_config.enabled)
+        layout.addWidget(self.auto_lock_timeout_combo)
+
+        self.auto_lock_checkbox.toggled.connect(
+            self.auto_lock_timeout_combo.setEnabled
+        )
+
+        layout.addSpacing(14)
+
+        # ============================================================
+        # ✅ Font section
+        # ============================================================
+        font_sep = QFrame()
+        font_sep.setObjectName("update_separator")
+        font_sep.setFixedHeight(1)
+        layout.addWidget(font_sep)
+
+        layout.addSpacing(10)
+
+        font_title = QLabel("🔤 " + tr(self.current_lang, "font_section_title"))
+        font_title.setObjectName("label")
+        layout.addWidget(font_title)
+
+        # ✅ Family
+        family_label = QLabel(tr(self.current_lang, "font_family_label"))
+        family_label.setObjectName("label")
+        layout.addWidget(family_label)
+
+        self.font_family_combo = QComboBox()
+        self.font_family_combo.setObjectName("combo")
+        self.font_family_combo.setEditable(False)
+        try:
+            fonts = list_available_fonts()
+            for fam in fonts[:80]:  # limit to avoid huge list
+                self.font_family_combo.addItem(display_name_for(fam), fam)
+            # ✅ Select current
+            idx = self.font_family_combo.findData(self._font_settings.family)
+            if idx < 0:
+                idx = self.font_family_combo.findData(DEFAULT_FAMILY)
+            if idx >= 0:
+                self.font_family_combo.setCurrentIndex(idx)
+        except Exception as e:
+            print(f"⚠️ font list failed: {e}")
+        self.font_family_combo.currentIndexChanged.connect(
+            self._preview_font
+        )
+        layout.addWidget(self.font_family_combo)
+
+        # ✅ Size
+        size_label = QLabel(tr(self.current_lang, "font_size_label"))
+        size_label.setObjectName("label")
+        layout.addWidget(size_label)
+
+        self.font_size_combo = QComboBox()
+        self.font_size_combo.setObjectName("combo")
+        for size in range(MIN_SIZE, MAX_SIZE + 1):
+            self.font_size_combo.addItem(f"{size} pt", size)
+        idx = self.font_size_combo.findData(self._font_settings.size)
+        if idx >= 0:
+            self.font_size_combo.setCurrentIndex(idx)
+        self.font_size_combo.currentIndexChanged.connect(
+            self._preview_font
+        )
+        layout.addWidget(self.font_size_combo)
+
+        # ✅ Scale
+        scale_label = QLabel(tr(self.current_lang, "font_scale_label"))
+        scale_label.setObjectName("label")
+        layout.addWidget(scale_label)
+
+        self.font_scale_combo = QComboBox()
+        self.font_scale_combo.setObjectName("combo")
+        scale_options = [
+            (0.85, tr(self.current_lang, "font_scale_small")),
+            (1.0,  tr(self.current_lang, "font_scale_normal")),
+            (1.15, tr(self.current_lang, "font_scale_large")),
+            (1.30, tr(self.current_lang, "font_scale_xlarge")),
+            (1.50, tr(self.current_lang, "font_scale_xxlarge")),
+        ]
+        for val, label in scale_options:
+            self.font_scale_combo.addItem(label, val)
+        # find closest
+        best_idx = 1
+        for i, (val, _lbl) in enumerate(scale_options):
+            if abs(val - self._font_settings.scale) < 0.05:
+                best_idx = i
+                break
+        self.font_scale_combo.setCurrentIndex(best_idx)
+        self.font_scale_combo.currentIndexChanged.connect(
+            self._preview_font
+        )
+        layout.addWidget(self.font_scale_combo)
+
+        # ✅ Preview label
+        self.font_preview = QLabel(
+            tr(self.current_lang, "font_preview_text")
+        )
+        self.font_preview.setObjectName("font_preview")
+        self.font_preview.setWordWrap(True)
+        self.font_preview.setMinimumHeight(50)
+        self.font_preview.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.font_preview)
+
+        # ✅ Reset button
+        self.font_reset_btn = QPushButton(
+            "↺ " + tr(self.current_lang, "font_reset")
+        )
+        self.font_reset_btn.setObjectName("secondary_btn")
+        self.font_reset_btn.setMinimumHeight(38)
+        self.font_reset_btn.setCursor(Qt.PointingHandCursor)
+        self.font_reset_btn.clicked.connect(self._reset_font_defaults)
+        layout.addWidget(self.font_reset_btn)
+
+        # ✅ Reduced motion toggle
+        layout.addSpacing(14)
+
+        motion_sep = QFrame()
+        motion_sep.setObjectName("update_separator")
+        motion_sep.setFixedHeight(1)
+        layout.addWidget(motion_sep)
+
+        layout.addSpacing(10)
+
+        motion_title = QLabel("✨ " + tr(self.current_lang, "motion_section_title"))
+        motion_title.setObjectName("label")
+        layout.addWidget(motion_title)
+
+        self.reduce_motion_checkbox = QCheckBox(
+            tr(self.current_lang, "reduce_motion_label")
+        )
+        self.reduce_motion_checkbox.setObjectName("checkbox")
+        try:
+            self.reduce_motion_checkbox.setChecked(
+                MotionSettings.get().is_reduced()
+            )
+        except Exception:
+            pass
+        layout.addWidget(self.reduce_motion_checkbox)
+
+        motion_hint = QLabel(tr(self.current_lang, "reduce_motion_hint"))
+        motion_hint.setObjectName("rules")
+        motion_hint.setWordWrap(True)
+        layout.addWidget(motion_hint)
+
 
         layout.addSpacing(14)
 
@@ -11261,6 +17349,20 @@ class SettingsDialog(QDialog):
         close_btn.setParent(self.container)
         close_btn.move(525, 10)  # ← موقعیت جدید برای عرض ۵۶۰
         close_btn.raise_()
+
+    def _on_follow_system_toggled(self, checked: bool):
+        """When follow_system is checked, show system theme in combo (but keep it enabled)."""
+        try:
+            if checked:
+                # ✅ Show current system theme in the combo
+                system_theme = detect_system_theme()
+                idx = self.theme_combo.findData(system_theme)
+                if idx >= 0:
+                    self.theme_combo.setCurrentIndex(idx)
+            # ✅ DON'T disable the combo — user can still pick a theme
+            # (theme will be respected when user clicks Apply)
+        except Exception as e:
+            print(f"⚠️ _on_follow_system_toggled failed: {e}")
 
     def _apply_theme(self):
         t = THEMES.get(self.current_theme, THEMES["theme_dark_aqua"])
@@ -11394,6 +17496,49 @@ class SettingsDialog(QDialog):
             }}
         """)
 
+    def _preview_font(self):
+        """Live preview of font selection."""
+        try:
+            family = self.font_family_combo.currentData() or DEFAULT_FAMILY
+            size = self.font_size_combo.currentData() or DEFAULT_SIZE
+            scale = self.font_scale_combo.currentData() or DEFAULT_SCALE
+            effective = max(6, int(round(int(size) * float(scale))))
+            self.font_preview.setStyleSheet(f"""
+                QLabel#font_preview {{
+                    background: {self._get_theme()['input_bg']};
+                    color: {self._get_theme()['text']};
+                    border: 2px solid {self._get_theme()['primary']};
+                    border-radius: 10px;
+                    padding: 10px;
+                    font-family: '{family}', 'Noto Sans', sans-serif;
+                    font-size: {effective}pt;
+                }}
+            """)
+        except Exception as e:
+            print(f"⚠️ _preview_font failed: {e}")
+
+    def _get_theme(self):
+        """Return current theme dict (for preview)."""
+        try:
+            return THEMES.get(self.current_theme, THEMES["theme_dark_aqua"])
+        except Exception:
+            return THEMES["theme_dark_aqua"]
+
+    def _reset_font_defaults(self):
+        """Reset font combos to defaults."""
+        try:
+            idx = self.font_family_combo.findData(DEFAULT_FAMILY)
+            if idx >= 0:
+                self.font_family_combo.setCurrentIndex(idx)
+            idx = self.font_size_combo.findData(DEFAULT_SIZE)
+            if idx >= 0:
+                self.font_size_combo.setCurrentIndex(idx)
+            self.font_scale_combo.setCurrentIndex(1)  # 1.0 = normal
+            self._preview_font()
+        except Exception as e:
+            print(f"⚠️ _reset_font_defaults failed: {e}")
+
+
     def _check_for_updates(self):
         """One-click update flow with user confirmation."""
         try:
@@ -11453,19 +17598,81 @@ class SettingsDialog(QDialog):
             except Exception:
                 pass
 
-
     def _apply_settings(self):
         new_lang = self.lang_combo.currentData()
         new_theme = self.theme_combo.currentData()
         follow_system = self.follow_system_checkbox.isChecked()
         glassmorphism = self.glassmorphism_checkbox.isChecked()
-        self.settings_changed.emit(new_lang, new_theme)
+
+        # ✅ Auto-lock settings
+        auto_lock_enabled = self.auto_lock_checkbox.isChecked()
+        auto_lock_timeout = self.auto_lock_timeout_combo.currentData() or 5
+        try:
+            new_auto_lock_cfg = AutoLockConfig(
+                enabled=auto_lock_enabled,
+                timeout_minutes=int(auto_lock_timeout),
+            )
+            save_auto_lock_config(new_auto_lock_cfg)
+        except Exception as e:
+            print(f"⚠️ save auto_lock failed: {e}")
+            new_auto_lock_cfg = None
+
+        print(f"⚙️ _apply_settings: lang={new_lang}, theme={new_theme}, "
+              f"follow_system={follow_system}, glassmorphism={glassmorphism}")
+
+        # ✅ Micro-interaction: success check
+        try:
+            from core.ui.micro_interactions import show_success_check
+            theme_dict = THEMES.get(self.current_theme, THEMES["theme_dark_aqua"])
+            show_success_check(self, color=theme_dict.get("success", "#34d399"))
+        except Exception:
+            pass
+
+        # ✅ ONLY ONE path — no double emit
         parent = self.parent()
         if parent is not None and hasattr(parent, "_on_settings_applied"):
             try:
                 parent._on_settings_applied(new_lang, new_theme, follow_system, glassmorphism)
+                # ✅ Apply reduced motion
+                try:
+                    MotionSettings.get().set_reduced(
+                        self.reduce_motion_checkbox.isChecked()
+                    )
+                except Exception:
+                    pass
+                # ✅ Save + apply font settings
+                try:
+                    new_font_settings = FontSettings(
+                        family=self.font_family_combo.currentData() or DEFAULT_FAMILY,
+                        size=int(self.font_size_combo.currentData() or DEFAULT_SIZE),
+                        scale=float(self.font_scale_combo.currentData() or DEFAULT_SCALE),
+                    )
+                    save_font_settings(new_font_settings)
+                    # Apply globally
+                    FontManager.get().apply(new_font_settings)
+                    # Notify MainWindow
+                    if parent is not None and hasattr(parent, "_on_font_changed"):
+                        parent._on_font_changed(new_font_settings)
+                except Exception as e:
+                    print(f"⚠️ font apply failed: {e}")
+                # ✅ Apply auto-lock config live
+                if new_auto_lock_cfg is not None and parent is not None:
+                    try:
+                        if hasattr(parent, "_auto_lock_config"):
+                            parent._auto_lock_config = new_auto_lock_cfg
+                        if hasattr(parent, "_auto_lock") and parent._auto_lock is not None:
+                            parent._auto_lock.set_config(new_auto_lock_cfg)
+                            if new_auto_lock_cfg.enabled and parent.current_user:
+                                if not parent._auto_lock.is_active():
+                                    parent._auto_lock.start()
+                            elif not new_auto_lock_cfg.enabled:
+                                parent._auto_lock.stop()
+                    except Exception as e:
+                        print(f"⚠️ live auto_lock update failed: {e}")
             except Exception as e:
                 print(f"⚠️ _on_settings_applied failed: {e}")
+                import traceback
+                traceback.print_exc()
         # ✅ انیمیشن بسته شدن + accept
         animate_dialog_close(self, on_finished=self.accept)
 
@@ -11485,13 +17692,20 @@ class AccountInfoDialog(QDialog):
         self.lang = lang
 
         self.setWindowTitle(tr(lang, "account_info"))
-        self.setFixedSize(500, 500)
+        self.setFixedSize(540, 620)
+        self.setMinimumSize(540, 560)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         self._setup_ui()
         self._apply_theme()
-        # ✅ انیمیشن باز شدن
+
+        try:
+            from gui.dialogs.update_dialogs import _with_backdrop
+            _with_backdrop(self, parent, theme)
+        except Exception as e:
+            print(f"⚠️ AccountInfoDialog backdrop failed: {e}")
+
         QTimer.singleShot(0, lambda: animate_dialog_open(self))
 
     def _setup_ui(self):
@@ -11502,85 +17716,168 @@ class AccountInfoDialog(QDialog):
         self.container.setObjectName("container")
         main_layout.addWidget(self.container)
 
-        layout = QVBoxLayout(self.container)
-        layout.setContentsMargins(40, 40, 40, 40)
-        layout.setSpacing(15)
+        container_layout = QVBoxLayout(self.container)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(0)
 
+        # ✅ ScrollArea
+        self.scroll = QScrollArea()
+        self.scroll.setObjectName("account_scroll")
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.NoFrame)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        self.scroll_content = QWidget()
+        self.scroll_content.setObjectName("account_scroll_content")
+
+        layout = QVBoxLayout(self.scroll_content)
+        layout.setContentsMargins(36, 32, 36, 32)
+        layout.setSpacing(14)
+
+        # ---------- Title ----------
         title = QLabel(tr(self.lang, "account_info"))
         title.setObjectName("title")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
 
-        layout.addSpacing(20)
+        layout.addSpacing(10)
 
-        user_info = self.db.get_user_info(self.username) or {}
+        # ---------- First Name ----------
+        self.first_name_label = QLabel(tr(self.lang, "first_name"))
+        self.first_name_label.setObjectName("field_label")
+        layout.addWidget(self.first_name_label)
 
-        layout.addWidget(QLabel(tr(self.lang, "first_name")))
-        self.first_name = QLineEdit(user_info.get("first_name", ""))
+        self.first_name = QLineEdit()
         self.first_name.setObjectName("input")
+        self.first_name.setMinimumHeight(40)
         layout.addWidget(self.first_name)
 
-        layout.addWidget(QLabel(tr(self.lang, "last_name")))
-        self.last_name = QLineEdit(user_info.get("last_name", ""))
+        # ---------- Last Name ----------
+        self.last_name_label = QLabel(tr(self.lang, "last_name"))
+        self.last_name_label.setObjectName("field_label")
+        layout.addWidget(self.last_name_label)
+
+        self.last_name = QLineEdit()
         self.last_name.setObjectName("input")
+        self.last_name.setMinimumHeight(40)
         layout.addWidget(self.last_name)
 
-        layout.addWidget(QLabel(tr(self.lang, "email")))
-        self.email = QLineEdit(user_info.get("email", ""))
+        # ---------- Email ----------
+        self.email_label = QLabel(tr(self.lang, "email"))
+        self.email_label.setObjectName("field_label")
+        layout.addWidget(self.email_label)
+
+        self.email = QLineEdit()
         self.email.setObjectName("input")
+        self.email.setMinimumHeight(40)
         layout.addWidget(self.email)
 
-        layout.addSpacing(20)
+        # ✅ پر کردن مقادیر فعلی
+        user_info = self.db.get_user_info(self.username) or {}
+        self.first_name.setText(user_info.get("first_name", ""))
+        self.last_name.setText(user_info.get("last_name", ""))
+        self.email.setText(user_info.get("email", ""))
 
-        save_btn = QPushButton("💾 Save")
+        layout.addSpacing(10)
+
+        # ---------- Save button ----------
+        save_btn = QPushButton("💾 " + tr(self.lang, "save"))
         save_btn.setObjectName("primary_btn")
+        save_btn.setMinimumHeight(42)
+        save_btn.setCursor(Qt.PointingHandCursor)
         save_btn.clicked.connect(self._save)
         attach_sound(save_btn, "ok_sound")
         layout.addWidget(save_btn)
 
+        # ---------- 2FA Section ----------
+        layout.addSpacing(16)
+
+        twofa_sep = QFrame()
+        twofa_sep.setObjectName("sep")
+        twofa_sep.setFixedHeight(1)
+        layout.addWidget(twofa_sep)
+
+        layout.addSpacing(8)
+
+        twofa_title = QLabel("🔐 " + tr(self.lang, "2fa_section_title"))
+        twofa_title.setObjectName("section_title")
+        layout.addWidget(twofa_title)
+
+        # ✅ 2FA status card
+        self._build_2fa_section(layout)
+
+        layout.addStretch()
+
+        self.scroll.setWidget(self.scroll_content)
+        container_layout.addWidget(self.scroll)
+
+        # ✅ Close button
         close_btn = QPushButton("✕")
         close_btn.setObjectName("close_btn")
         close_btn.setFixedSize(30, 30)
         close_btn.clicked.connect(self.reject)
         attach_sound(close_btn, "simpleClick")
         close_btn.setParent(self.container)
-        close_btn.move(460, 10)
+        close_btn.move(505, 10)
+        close_btn.raise_()
+
+    def _build_2fa_section(self, parent_layout):
+        """بخش 2FA با ظاهر تمیز و هماهنگ با تم."""
+        # ---------- Status Card ----------
+        status_card = QFrame()
+        status_card.setObjectName("twofa_status_card")
+        status_card.setMinimumHeight(64)
+
+        status_layout = QHBoxLayout(status_card)
+        status_layout.setContentsMargins(14, 10, 10, 10)
+        status_layout.setSpacing(10)
+
+        # آیکون وضعیت
+        self.twofa_icon = QLabel("🔐")
+        self.twofa_icon.setObjectName("twofa_icon")
+        self.twofa_icon.setFixedSize(32, 32)
+        self.twofa_icon.setAlignment(Qt.AlignCenter)
+        status_layout.addWidget(self.twofa_icon)
+
+        # متن وضعیت
+        text_box = QVBoxLayout()
+        text_box.setContentsMargins(0, 0, 0, 0)
+        text_box.setSpacing(2)
+
+        self.twofa_title_label = QLabel(tr(self.lang, "2fa_section_title"))
+        self.twofa_title_label.setObjectName("twofa_card_title")
+
+        self.twofa_status_label = QLabel("")
+        self.twofa_status_label.setObjectName("twofa_status_text")
+        self.twofa_status_label.setWordWrap(True)
+
+        text_box.addWidget(self.twofa_title_label)
+        text_box.addWidget(self.twofa_status_label)
+        status_layout.addLayout(text_box, 1)
+
+        # دکمه
+        self.twofa_toggle_btn = QPushButton("")
+        self.twofa_toggle_btn.setObjectName("twofa_action_btn")
+        self.twofa_toggle_btn.setMinimumHeight(34)
+        self.twofa_toggle_btn.setMinimumWidth(110)
+        self.twofa_toggle_btn.setCursor(Qt.PointingHandCursor)
+        self.twofa_toggle_btn.clicked.connect(self._on_toggle_2fa)
+        attach_sound(self.twofa_toggle_btn, "simpleClick")
+        status_layout.addWidget(self.twofa_toggle_btn)
+
+        parent_layout.addWidget(status_card)
+
+        self._refresh_2fa_status()
 
     def _apply_theme(self):
         t = self.theme
+
         self.container.setStyleSheet(f"""
             QFrame#container {{
                 background: {t['glass_bg']};
                 border: 2px solid {t['glass_border']};
                 border-radius: 20px;
-            }}
-            QLabel {{
-                color: {t['text']};
-                font-size: 13px;
-                background: transparent;
-            }}
-            QLabel#title {{
-                font-size: 26px;
-                font-weight: bold;
-                color: {t['primary']};
-            }}
-            QLineEdit#input {{
-                background: {t['input_bg']};
-                border: 2px solid {t['input_border']};
-                border-radius: 10px;
-                padding: 10px;
-                font-size: 13px;
-                color: {t['text']};
-            }}
-            QPushButton#primary_btn {{
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 {t['primary']}, stop:0.5 {t['accent']}, stop:1 {t['secondary']});
-                color: {t['button_text']};
-                border: none;
-                border-radius: 10px;
-                padding: 12px;
-                font-size: 14px;
-                font-weight: bold;
             }}
             QPushButton#close_btn {{
                 background: transparent;
@@ -11594,6 +17891,241 @@ class AccountInfoDialog(QDialog):
             }}
         """)
 
+        self.scroll.setStyleSheet("""
+            QScrollArea#account_scroll {
+                background: transparent;
+                border: none;
+            }
+            QScrollArea#account_scroll > QWidget > QWidget {
+                background: transparent;
+            }
+        """)
+
+        self.scroll_content.setStyleSheet(f"""
+            QWidget#account_scroll_content {{
+                background: transparent;
+            }}
+            QLabel {{
+                color: {t['text']};
+                background: transparent;
+            }}
+            QLabel#title {{
+                font-size: 26px;
+                font-weight: bold;
+                color: {t['primary']};
+            }}
+            QLabel#field_label {{
+                font-size: 12px;
+                font-weight: bold;
+                color: {t['text']};
+                padding-top: 4px;
+            }}
+            QLabel#section_title {{
+                font-size: 14px;
+                font-weight: bold;
+                color: {t['primary']};
+            }}
+            QLineEdit#input {{
+                background: {t['input_bg']};
+                border: 2px solid {t['input_border']};
+                border-radius: 10px;
+                padding: 10px 12px;
+                font-size: 13px;
+                color: {t['text']};
+            }}
+            QLineEdit#input:focus {{
+                border: 2px solid {t['secondary']};
+            }}
+            QFrame#sep {{
+                background: {t['glass_border']};
+                border: none;
+            }}
+            QPushButton#primary_btn {{
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 {t['primary']}, stop:0.5 {t['accent']}, stop:1 {t['secondary']}
+                );
+                color: {t['button_text']};
+                border: none;
+                border-radius: 10px;
+                padding: 12px;
+                font-size: 14px;
+                font-weight: bold;
+            }}
+            QPushButton#primary_btn:hover {{
+                background: {t['button_hover']};
+            }}
+            QFrame#twofa_status_card {{
+                background: {t['input_bg']};
+                border: 2px solid {t['glass_border']};
+                border-radius: 12px;
+            }}
+            QLabel#twofa_icon {{
+                background: transparent;
+                font-size: 22px;
+            }}
+            QLabel#twofa_card_title {{
+                font-size: 13px;
+                font-weight: bold;
+                color: {t['text']};
+                background: transparent;
+            }}
+            QLabel#twofa_status_text {{
+                font-size: 11px;
+                color: {t['text_dim']};
+                background: transparent;
+            }}
+            QPushButton#twofa_action_btn {{
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 {t['primary']},
+                    stop:1 {t['secondary']}
+                );
+                color: {t['button_text']};
+                border: none;
+                border-radius: 8px;
+                padding: 6px 14px;
+                font-size: 12px;
+                font-weight: bold;
+            }}
+            QPushButton#twofa_action_btn:hover {{
+                background: {t['button_hover']};
+            }}
+            QScrollBar:vertical {{
+                background: transparent;
+                width: 6px;
+                border: none;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {t['glass_border']};
+                border-radius: 3px;
+                min-height: 20px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {t['primary']};
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                height: 0px;
+            }}
+        """)
+
+    def _refresh_2fa_status(self):
+        try:
+            status = self.db.get_2fa_status(self.username)
+            enabled = status.get("enabled", False)
+            t = self.theme
+
+            if enabled:
+                self.twofa_icon.setText("🔓")
+                self.twofa_status_label.setText(tr(self.lang, "2fa_enabled_status"))
+                self.twofa_status_label.setStyleSheet(
+                    f"color: {t['success']}; font-size: 11px; font-weight: bold;"
+                    "background: transparent;"
+                )
+                self.twofa_toggle_btn.setText("🔓 " + tr(self.lang, "2fa_disable_btn"))
+                self.twofa_toggle_btn.setStyleSheet(f"""
+                    QPushButton#twofa_action_btn {{
+                        background: {t['input_bg']};
+                        color: {t['danger']};
+                        border: 2px solid {t['danger']};
+                        border-radius: 8px;
+                        padding: 6px 14px;
+                        font-size: 12px;
+                        font-weight: bold;
+                    }}
+                    QPushButton#twofa_action_btn:hover {{
+                        background: {t['danger']};
+                        color: {t['button_text']};
+                    }}
+                """)
+            else:
+                self.twofa_icon.setText("🔐")
+                self.twofa_status_label.setText(tr(self.lang, "2fa_disabled_status"))
+                self.twofa_status_label.setStyleSheet(
+                    f"color: {t['text_dim']}; font-size: 11px;"
+                    "background: transparent;"
+                )
+                self.twofa_toggle_btn.setText("🔐 " + tr(self.lang, "2fa_enable_btn"))
+                self.twofa_toggle_btn.setStyleSheet(f"""
+                    QPushButton#twofa_action_btn {{
+                        background: qlineargradient(
+                            x1:0, y1:0, x2:1, y2:1,
+                            stop:0 {t['primary']},
+                            stop:1 {t['secondary']}
+                        );
+                        color: {t['button_text']};
+                        border: none;
+                        border-radius: 8px;
+                        padding: 6px 14px;
+                        font-size: 12px;
+                        font-weight: bold;
+                    }}
+                    QPushButton#twofa_action_btn:hover {{
+                        background: {t['button_hover']};
+                    }}
+                """)
+        except Exception as e:
+            print(f"⚠️ _refresh_2fa_status failed: {e}")
+
+    def _on_toggle_2fa(self):
+        try:
+            status = self.db.get_2fa_status(self.username)
+            enabled = status.get("enabled", False)
+
+            if enabled:
+                ok = ask_question(
+                    self,
+                    tr(self.lang, "2fa_disable_title"),
+                    tr(self.lang, "2fa_disable_confirm"),
+                )
+                if not ok:
+                    return
+                self.db.disable_2fa(self.username)
+                SoundManager.get().play("ok_sound")
+                self._refresh_2fa_status()
+                try:
+                    if hasattr(self.parent(), "_notify"):
+                        self.parent()._notify(
+                            "success",
+                            tr(self.lang, "2fa_disabled_success"),
+                            "",
+                            3000,
+                        )
+                except Exception:
+                    pass
+            else:
+                dlg = TwoFactorSetupDialog(
+                    db=self.db,
+                    username=self.username,
+                    theme=self.theme,
+                    lang=self.lang,
+                    parent=self,
+                )
+                dlg.setup_completed.connect(self._on_2fa_setup_done)
+                dlg.exec_()
+                self._refresh_2fa_status()
+        except Exception as e:
+            print(f"⚠️ _on_toggle_2fa failed: {e}")
+
+    def _on_2fa_setup_done(self, username, backup_codes):
+        try:
+            SoundManager.get().play("ok_sound")
+            # ✅ Micro-interaction: success check
+            show_success_check(self, color=self.theme.get("success", "#34d399"))
+            self._refresh_2fa_status()
+            try:
+                if hasattr(self.parent(), "_notify"):
+                    self.parent()._notify(
+                        "success",
+                        tr(self.lang, "2fa_enabled_success"),
+                        "",
+                        3000,
+                    )
+            except Exception:
+                pass
+        except Exception as e:
+            print(f"⚠️ _on_2fa_setup_done failed: {e}")
+
     def _save(self):
         self.db.update_user(
             self.username,
@@ -11602,8 +18134,13 @@ class AccountInfoDialog(QDialog):
             email=self.email.text().strip(),
         )
         self.info_updated.emit()
-        # ✅ انیمیشن بسته شدن + accept
-        animate_dialog_close(self, on_finished=self.accept)
+        # ✅ Micro-interaction: success check
+        try:
+            SoundManager.get().play("ok_sound")
+            show_success_check(self, color=self.theme.get("success", "#34d399"))
+            QTimer.singleShot(700, lambda: animate_dialog_close(self, on_finished=self.accept))
+        except Exception:
+            animate_dialog_close(self, on_finished=self.accept)
 
 
 # ================================================================
@@ -11706,6 +18243,15 @@ class MainWindow(QMainWindow):
 
         # ✅ بارگذاری تنظیمات ذخیره‌شده
         self._load_saved_settings()
+
+        # ✅ Font settings (loaded here so MainWindow knows them)
+        self._font_settings = load_font_settings()
+        # Apply immediately (though main() already did)
+        try:
+            FontManager.get().apply(self._font_settings)
+        except Exception as e:
+            print(f"⚠️ Font apply failed: {e}")
+
         # ✅ اگه follow_system فعاله، تم سیستم رو تشخیص بده
         if self.follow_system_theme:
             self.current_theme = detect_system_theme()
@@ -11715,10 +18261,52 @@ class MainWindow(QMainWindow):
         self._decorate_buttons()
         self._update_all_tooltips()   # ← اضافه شد
         self._setup_shortcuts()      # ← اضافه شد
+
+        # ✅ Auto-lock (replaces session timeout)
+        self._auto_lock = None
+        self._lock_screen = None
+        self._auto_lock_config = load_auto_lock_config()
+        self._setup_auto_lock()
+
+        # ✅ Onboarding Tour state
+        self._onboarding_storage = OnboardingStorage()
+        self._onboarding_tour = None
+        self._guest_tour_shown = False
+
+        # ✅ Smart Suggestions state
+        self._suggestion_storage = SuggestionStorage()
+        self._suggestion_engine = None
+        self._suggestion_bar = None
+        self._user_activity_times = {}  # برای track activity
+        self._image_loaded_at = None
+        self._result_at = None
+        self._consecutive_same_grid = 0
+        self._history_opened_ever = False
+        self._dashboard_opened_ever = False
+        self._settings_opened_ever = False
+        self._session_start_at = 0.0
+
+        # ✅ راه‌اندازی Smart Suggestions (بعد از تعریف state)
+        self._setup_smart_suggestions()
+
         self._start_music()
 
         # ✅ Initialize sound manager (loading sounds)
         SoundManager.get()
+
+        # ✅ Voice Feedback
+        self._voice_enabled = self._load_voice_enabled_setting()
+        if HAS_VOICE:
+            try:
+                self._voice = VoiceManager.get()
+                self._voice.set_enabled(self._voice_enabled)
+                self._voice.set_language(self.current_lang)
+                print(f"🔊 Voice Feedback initialized (enabled={self._voice_enabled})")
+            except Exception as e:
+                print(f"⚠️ VoiceManager init failed: {e}")
+                self._voice = None
+        else:
+            self._voice = None
 
         # در __init__:
         self.update_config = UpdateConfig()
@@ -11729,6 +18317,18 @@ class MainWindow(QMainWindow):
 
         # ✅ بارگذاری update config از settings
         self._load_update_config()
+
+        # ✅ Log app start
+        if audit_log is not None:
+            try:
+                import platform
+                audit_log.info(
+                    action="app_start",
+                    category="SYSTEM",
+                    details={"os": platform.platform(), "python": sys.version.split()[0]},
+                )
+            except Exception:
+                pass
 
     def _load_update_config(self):
         """Read update config from settings.json."""
@@ -11916,6 +18516,9 @@ class MainWindow(QMainWindow):
         central.setObjectName("centralWidget")
         self.setCentralWidget(central)
 
+        # ✅ Micro-interaction: focus glow on all QLineEdits
+        QTimer.singleShot(150, self._decorate_all_inputs)
+
         # ✅ Glassmorphism background (blur) یا AnimatedBackground ساده
         if getattr(self, "use_glassmorphism", True):
             self._bg_animation = GlassmorphismBackground(central, self.current_theme)
@@ -11955,6 +18558,176 @@ class MainWindow(QMainWindow):
         self._setup_center(main_layout)
         self._setup_bottombar(main_layout)
         self._setup_footer(main_layout)
+
+    # ============================================================
+    # ✅ SMART SUGGESTIONS
+    # ============================================================
+
+    def _setup_smart_suggestions(self):
+        """راه‌اندازی Smart Suggestions."""
+        try:
+            central = self.centralWidget()
+            if central is None:
+                return
+
+            # ✅ Suggestion bar
+            self._suggestion_bar = SmartSuggestionBar(
+                central,
+                theme=THEMES[self.current_theme],
+                lang=self.current_lang,
+            )
+            self._suggestion_bar.action_clicked.connect(
+                self._on_suggestion_action
+            )
+            self._suggestion_bar.dismissed.connect(
+                self._on_suggestion_dismissed
+            )
+            self._suggestion_bar.setVisible(False)
+
+            # ✅ Engine
+            self._suggestion_engine = SuggestionEngine(
+                storage=self._suggestion_storage,
+                lang=self.current_lang,   # ← ← ← اضافه شد
+                parent=self,
+            )
+            self._suggestion_engine.suggestion_ready.connect(
+                self._on_suggestion_ready
+            )
+
+            # ✅ Activity tracker
+            self._activity_timer = QTimer(self)
+            self._activity_timer.timeout.connect(self._update_suggestion_context)
+            self._activity_timer.start(2000)
+
+            # ✅ نصب event filter برای track activity
+            QApplication.instance().installEventFilter(self)
+
+            print("✅ Smart Suggestions initialized")
+        except Exception as e:
+            print(f"⚠️ _setup_smart_suggestions failed: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _update_suggestion_context(self):
+        """آپدیت context موتور با وضعیت فعلی."""
+        try:
+            if self._suggestion_engine is None:
+                return
+            now = datetime.now().timestamp()
+            self._suggestion_engine.update_context(
+                username=self.current_user or "",
+                has_image=bool(self.current_image_path),
+                image_loaded_at=self._image_loaded_at,
+                has_result=self._last_result_grid is not None,
+                result_at=self._result_at,
+                has_pdf=getattr(self, "_pdf_exported_ever", False),
+                has_gradcam=getattr(self, "_gradcam_shown_ever", False),
+                last_grid=self._last_result_grid,
+                consecutive_same_grid=self._consecutive_same_grid,
+                results_count=self._get_total_results_count(),
+                history_opened=self._history_opened_ever,
+                dashboard_opened=self._dashboard_opened_ever,
+                settings_opened=self._settings_opened_ever,
+                session_start_at=self._session_start_at,  # ← ← ← اضافه شد
+                last_activity_at=self._user_activity_times.get("last", 0.0),
+                current_time=now,
+            )
+        except Exception as e:
+            print(f"⚠️ _update_suggestion_context failed: {e}")
+
+    def _get_total_results_count(self) -> int:
+        """تعداد کل نتایج کاربر."""
+        try:
+            if not self.current_user:
+                return 0
+            stats = self.stats.get_stats(self.current_user)
+            return int(stats.get("total", 0))
+        except Exception:
+            return 0
+
+    def _on_suggestion_ready(self, suggestion: Suggestion):
+        """وقتی یه پیشنهاد آماده‌ست، نشونش بده."""
+        try:
+            if self._suggestion_bar is None:
+                return
+            # اگه Tour بازه، پیشنهاد نشون نده
+            if self._onboarding_tour is not None:
+                return
+            self._suggestion_bar.show_suggestion(suggestion)
+        except Exception as e:
+            print(f"⚠️ _on_suggestion_ready failed: {e}")
+
+    def _on_suggestion_action(self, rule_id: str):
+        """کاربر روی دکمه‌ی action کلیک کرد."""
+        try:
+            if rule_id == "image_ready":
+                self._process_image()
+            elif rule_id == "pdf_ready":
+                self._export_pdf()
+            elif rule_id == "gradcam_hint":
+                self._show_gradcam()
+            elif rule_id == "repeated_grid":
+                self._show_dashboard()
+            elif rule_id == "history_hint":
+                self._show_history()
+            elif rule_id == "dashboard_hint":
+                self._show_dashboard()
+            elif rule_id == "settings_hint":
+                self._open_settings()
+            elif rule_id == "idle_help":
+                if self.current_user:
+                    self._show_tour_again()
+            # dismiss
+            if self._suggestion_engine is not None:
+                self._suggestion_engine.dismiss_current()
+        except Exception as e:
+            print(f"⚠️ _on_suggestion_action failed: {e}")
+
+    def _on_suggestion_dismissed(self, rule_id: str):
+        """کاربر پیشنهاد رو dismiss کرد."""
+        try:
+            if self.current_user:
+                self._suggestion_storage.mark_ignored(
+                    self.current_user, rule_id
+                )
+            if self._suggestion_engine is not None:
+                self._suggestion_engine.dismiss_current()
+        except Exception as e:
+            print(f"⚠️ _on_suggestion_dismissed failed: {e}")
+
+    def eventFilter(self, obj, event):
+        """ردیابی فعالیت کاربر."""
+        try:
+            from PyQt5.QtCore import QEvent
+            if event.type() in (
+                QEvent.MouseButtonPress,
+                QEvent.KeyPress,
+                QEvent.Wheel,
+            ):
+                self._user_activity_times["last"] = datetime.now().timestamp()
+        except Exception:
+            pass
+        return super().eventFilter(obj, event)
+
+
+    def _decorate_all_inputs(self):
+        """Add focus glow + press scale to all existing widgets."""
+        try:
+            theme = THEMES.get(self.current_theme, THEMES["theme_dark_aqua"])
+            # ✅ QLineEdits
+            for w in self.findChildren(QLineEdit):
+                try:
+                    add_focus_glow(w, theme)
+                except Exception:
+                    pass
+            # ✅ QPushButtons (non-icon ones)
+            for w in self.findChildren(QPushButton):
+                try:
+                    button_press_scale(w, pressed_scale=0.96, duration_ms=90)
+                except Exception:
+                    pass
+        except Exception as e:
+            print(f"⚠️ _decorate_all_inputs failed: {e}")
 
     def _setup_topbar(self, parent_layout):
         topbar = QFrame()
@@ -12197,6 +18970,77 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"⚠️ _load_saved_settings failed: {e}")
 
+    def _load_voice_enabled_setting(self) -> bool:
+        """لود تنظیم voice از settings.json (پیشفرض: True)."""
+        try:
+            settings_path = os.path.join(PROJECT_ROOT, "settings.json")
+            if os.path.exists(settings_path):
+                with open(settings_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                return bool(data.get("voice_enabled", True))
+        except Exception:
+            pass
+        return True
+
+    def _save_voice_enabled_setting(self):
+        """ذخیرهی تنظیم voice در settings.json."""
+        try:
+            settings_path = os.path.join(PROJECT_ROOT, "settings.json")
+            data = {}
+            if os.path.exists(settings_path):
+                with open(settings_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            data["voice_enabled"] = bool(self._voice_enabled)
+            with open(settings_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+        except Exception as e:
+            print(f"⚠️ _save_voice_enabled_setting failed: {e}")
+
+    def _speak(self, key: str, **kwargs):
+        """
+        Helper: صداگذاری یک key با ترجمهی زبان فعلی.
+
+        Usage:
+            self._speak("voice_welcome", user="Babak")
+        """
+        try:
+            if not HAS_VOICE or self._voice is None:
+                return
+            if not self._voice_enabled:
+                return
+            text = tr(self.current_lang, key)
+            if text == key:
+                return  # key پیدا نشد
+            # ✅ format کردن
+            try:
+                text = text.format(**kwargs)
+            except Exception:
+                pass
+            self._voice.set_language(self.current_lang)
+            self._voice.speak(text)
+        except Exception as e:
+            print(f"⚠️ _speak failed: {e}")
+
+    def _toggle_voice(self):
+        """Toggle voice on/off (از Account menu یا Settings)."""
+        try:
+            self._voice_enabled = not self._voice_enabled
+            if self._voice is not None:
+                self._voice.set_enabled(self._voice_enabled)
+            self._save_voice_enabled_setting()
+            # ✅ فیدبک صوتی
+            self._speak("voice_voice_enabled" if self._voice_enabled else "voice_voice_disabled")
+            # ✅ Toast
+            self._notify(
+                "success" if self._voice_enabled else "info",
+                "🔊 Voice",
+                tr(self.current_lang, "voice_voice_enabled" if self._voice_enabled else "voice_voice_disabled"),
+                duration_ms=2500,
+            )
+        except Exception as e:
+            print(f"⚠️ _toggle_voice failed: {e}")
+
+
     def _save_settings(self):
         """ذخیره‌ی تنظیمات به فایل settings.json."""
         try:
@@ -12255,6 +19099,168 @@ class MainWindow(QMainWindow):
         # ✅ ذخیره در self برای جلوگیری از garbage collection
         self._shortcuts = shortcuts
 
+    def _setup_auto_lock(self):
+        """Initialize auto-lock manager."""
+        try:
+            # ✅ Force default timeout to 2 min if config has bad value
+            if not isinstance(self._auto_lock_config.timeout_minutes, int) \
+                    or self._auto_lock_config.timeout_minutes < 1 \
+                    or self._auto_lock_config.timeout_minutes > 60:
+                self._auto_lock_config.timeout_minutes = 2
+
+            self._auto_lock = AutoLockManager(
+                config=self._auto_lock_config,
+                parent=self,
+            )
+            self._auto_lock.timeout_reached.connect(self._lock_session)
+            self._auto_lock.timeout_warning.connect(self._on_auto_lock_warning)
+            print(f"✅ AutoLock manager ready (timeout={self._auto_lock_config.timeout_minutes} min)")
+
+            # ✅ If user is already logged in (e.g. restored session), start immediately
+            if self.current_user is not None:
+                self._auto_lock.start()
+                print(f"🔄 AutoLock started for existing session ({self.current_user})")
+        except Exception as e:
+            print(f"⚠️ _setup_auto_lock failed: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def showEvent(self, event):
+        """Start auto-lock whenever main window becomes visible."""
+        super().showEvent(event)
+        try:
+            if (self.current_user is not None
+                    and self._auto_lock is not None
+                    and not self._auto_lock.is_active()):
+                self._auto_lock.set_config(self._auto_lock_config)
+                self._auto_lock.start()
+                print(f"🔄 AutoLock restarted (timeout={self._auto_lock_config.timeout_minutes} min)")
+        except Exception as e:
+            print(f"⚠️ showEvent auto_lock start failed: {e}")
+
+    def _on_auto_lock_warning(self, seconds_left: int):
+        """Called 60s / 30s / 10s before lock."""
+        try:
+            if self._lock_screen is not None and self._lock_screen.isVisible():
+                return
+            self._notify(
+                "warning",
+                tr(self.current_lang, "auto_lock_warning_title"),
+                tr(self.current_lang, "auto_lock_warning_body").format(
+                    seconds=seconds_left
+                ),
+                duration_ms=5000,
+            )
+        except Exception:
+            pass
+
+    def _lock_session(self):
+        """Called when auto-lock timeout is reached."""
+        # ✅ اگه Tour بازه، ببندش
+        if self._onboarding_tour is not None:
+            try:
+                self._onboarding_tour._finish(skipped=True)
+            except Exception:
+                pass
+            self._onboarding_tour = None
+
+        if not self.current_user:
+            return
+        if self._lock_screen is not None and self._lock_screen.isVisible():
+            return
+
+        if audit_log is not None:
+            try:
+                audit_log.warning(
+                    action="session_locked",
+                    category="AUTH",
+                    user=self.current_user,
+                )
+            except Exception:
+                pass
+
+        try:
+            from gui.widgets.lock_screen import LockScreen
+
+            # ✅ Pause auto-lock while lock screen is open
+            if self._auto_lock is not None:
+                self._auto_lock.set_lock_screen_open(True)
+
+            self._lock_screen = LockScreen(
+                username=self.current_user,
+                db=self.db,
+                theme=THEMES[self.current_theme],
+                lang=self.current_lang,
+                parent=self,
+            )
+            self._lock_screen.unlock_successful.connect(self._on_unlock_success)
+            self._lock_screen.logout_requested.connect(self._on_lock_logout)
+            self._lock_screen.exec_()
+        except Exception as e:
+            print(f"⚠️ _lock_session failed: {e}")
+            import traceback
+            traceback.print_exc()
+        finally:
+            try:
+                if self._lock_screen is not None:
+                    self._lock_screen.deleteLater()
+            except Exception:
+                pass
+            self._lock_screen = None
+            # ✅ Resume auto-lock after lock screen closes
+            if self._auto_lock is not None:
+                self._auto_lock.set_lock_screen_open(False)
+
+    def _on_unlock_success(self):
+        """Called after successful unlock."""
+        if self._auto_lock is not None:
+            self._auto_lock.resume()
+
+        self._notify(
+            "success",
+            tr(self.current_lang, "session_unlocked"),
+            "",
+            duration_ms=2000,
+        )
+
+        if audit_log is not None:
+            try:
+                audit_log.info(
+                    action="session_unlocked",
+                    category="AUTH",
+                )
+            except Exception:
+                pass
+
+    def _on_lock_logout(self):
+        """Called when user clicks Logout on lock screen."""
+        try:
+            # ✅ Logout but DON'T delete account (fix old bug)
+            if self.current_user:
+                pass  # Don't delete — just log out
+            self.current_user = None
+            self.account_btn.setVisible(False)
+            self.login_btn.setVisible(True)
+            self.signup_btn.setVisible(True)
+            self._update_all_tooltips()
+
+            if self.history_panel is not None:
+                self.history_panel.set_username("")
+                self.history_panel.refresh([])
+
+            if self._auto_lock is not None:
+                self._auto_lock.stop()
+
+            self._notify(
+                "info",
+                tr(self.current_lang, "logout"),
+                "",
+                duration_ms=2500,
+            )
+        except Exception as e:
+            print(f"⚠️ _on_lock_logout failed: {e}")
+
+
     # ============================================================
     # ✅ DASHBOARD — Toggle, Show, Hide, Clear, Refresh
     # ============================================================
@@ -12270,6 +19276,7 @@ class MainWindow(QMainWindow):
 
     def _show_dashboard(self):
         """نمایش داشبورد با انیمیشن اسلاید."""
+        self._dashboard_opened_ever = True
         if self.dashboard is None:
             return
         try:
@@ -12382,6 +19389,15 @@ class MainWindow(QMainWindow):
                 "",
                 duration_ms=2500,
             )
+            # ✅ Audit log
+            if audit_log is not None:
+                try:
+                    audit_log.warning(
+                        action="stats_cleared",
+                        category="DATA",
+                    )
+                except Exception:
+                    pass
         except Exception as e:
             print(f"⚠️ clear_dashboard_stats failed: {e}")
 
@@ -12420,6 +19436,7 @@ class MainWindow(QMainWindow):
 
     def _show_history(self):
         """نمایش History Panel با انیمیشن اسلاید."""
+        self._history_opened_ever = True
         if self.history_panel is None:
             return
         try:
@@ -12583,6 +19600,16 @@ class MainWindow(QMainWindow):
                 )
             except Exception:
                 pass
+            # ✅ Audit log
+            if audit_log is not None:
+                try:
+                    audit_log.warning(
+                        action="history_cleared",
+                        category="DATA",
+                    )
+                except Exception:
+                    pass
+
         except Exception as e:
             print(f"⚠️ clear_history failed: {e}")
 
@@ -13081,6 +20108,16 @@ class MainWindow(QMainWindow):
 
     def _on_login_success(self, username: str):
         self.current_user = username
+
+        # ✅ ثبت زمان شروع session (برای rule 6 - settings_hint)
+        try:
+            self._session_start_at = datetime.now().timestamp()   # ← ← ← اضافه شد
+        except Exception:
+            self._session_start_at = 0.0
+
+        # ✅ کاربر لاگین شد — دیگه Tour مهمان لازم نیست
+        self._guest_tour_shown = True
+
         self.account_btn.setText(f"👤 {username} account")
         self.account_btn.setVisible(True)
         self.login_btn.setVisible(False)
@@ -13105,6 +20142,157 @@ class MainWindow(QMainWindow):
             "",
             duration_ms=3500,
         )
+        # ✅ Voice feedback
+        self._speak("voice_welcome", user=username)
+
+        # ✅ 🎉 Confetti خوش‌آمدگویی (فقط اگه اولین بار این session نباشه)
+        try:
+            if not getattr(self, "_login_celebrated_once", False):
+                self._login_celebrated_once = True
+                QTimer.singleShot(300, lambda: self._celebrate("welcome"))
+        except Exception:
+            pass
+
+        # ✅ Start session timeout
+        if self._auto_lock is not None and username:
+            self._auto_lock.set_config(self._auto_lock_config)
+            self._auto_lock.start()
+        # ✅ Onboarding Tour — فقط برای کاربر جدید
+        try:
+            if not self._onboarding_storage.has_completed(username):
+                # کاربر جدیده → Tour کامل
+                QTimer.singleShot(900, lambda u=username: self._start_full_tour(u))
+            else:
+                print(f"🎓 Onboarding Tour already completed for {username}")
+        except Exception as e:
+            print(f"⚠️ onboarding start failed: {e}")
+        # ✅ Smart Suggestions — شروع موتور
+        try:
+            if self._suggestion_engine is not None:
+                self._suggestion_engine.set_username(username)
+                self._suggestion_engine.start()
+            if self._suggestion_bar is not None:
+                self._suggestion_bar.set_lang(self.current_lang)
+        except Exception as e:
+            print(f"⚠️ suggestions start failed: {e}")
+        # ✅ Audit log
+        if audit_log is not None:
+            try:
+                audit_log.set_user(username)
+                audit_log.info(
+                    action="login_success",
+                    category="AUTH",
+                    user=username,
+                    details={"method": "password"},
+                )
+            except Exception:
+                pass
+
+    # ============================================================
+    # ✅ ONBOARDING TOUR
+    # ============================================================
+
+    def _start_full_tour(self, username: str):
+        """شروع Tour کامل برای کاربر جدید."""
+        try:
+            # اگه Tour قبلی بازه، ببندش
+            if self._onboarding_tour is not None:
+                try:
+                    self._onboarding_tour._finish(skipped=True)
+                except Exception:
+                    pass
+                self._onboarding_tour = None
+
+            print(f"🎓 Starting full onboarding tour for {username}")
+
+            self._onboarding_tour = OnboardingTour(
+                main_window=self,
+                steps=TOUR_STEPS_FULL,
+                theme=THEMES[self.current_theme],
+                lang=self.current_lang,
+                parent=self,
+            )
+            self._onboarding_tour.finished.connect(
+                lambda skipped, u=username: self._on_tour_finished(u, skipped)
+            )
+            self._onboarding_tour.start()
+        except Exception as e:
+            print(f"⚠️ _start_full_tour failed: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _start_guest_tour(self):
+        """شروع Tour کوتاه برای مهمان (2 مرحله: login + signup)."""
+        try:
+            if self._guest_tour_shown:
+                return
+            self._guest_tour_shown = True
+
+            print("🎓 Starting guest onboarding tour")
+
+            self._onboarding_tour = OnboardingTour(
+                main_window=self,
+                steps=TOUR_STEPS_GUEST,
+                theme=THEMES[self.current_theme],
+                lang=self.current_lang,
+                parent=self,
+            )
+            self._onboarding_tour.finished.connect(
+                lambda skipped: self._on_guest_tour_finished(skipped)
+            )
+            self._onboarding_tour.start()
+        except Exception as e:
+            print(f"⚠️ _start_guest_tour failed: {e}")
+
+    def _on_tour_finished(self, username: str, skipped: bool):
+        """وقتی Tour کامل شد (یا skip شد)."""
+        try:
+            # ✅ ثبت در فایل
+            self._onboarding_storage.mark_completed(username, skipped=skipped)
+            print(f"🎓 Onboarding tour {'skipped' if skipped else 'completed'} for {username}")
+
+            # ✅ Toast
+            try:
+                msg = (tr(self.current_lang, "tour_completed_msg")
+                       if not skipped
+                       else tr(self.current_lang, "tour_skipped_msg"))
+                if msg == "tour_completed_msg" or msg == "tour_skipped_msg":
+                    msg = "Tour completed!" if not skipped else "Tour skipped"
+                self._notify("success", "🎓", msg, duration_ms=3000)
+            except Exception:
+                pass
+        except Exception as e:
+            print(f"⚠️ _on_tour_finished failed: {e}")
+        finally:
+            self._onboarding_tour = None
+
+    def _on_guest_tour_finished(self, skipped: bool):
+        """وقتی Tour مهمان تموم شد."""
+        self._onboarding_tour = None
+
+    def _show_tour_again(self):
+        """نمایش مجدد Tour (از Account Menu)."""
+        if not self.current_user:
+            return
+        try:
+            # reset storage
+            self._onboarding_storage.reset(self.current_user)
+        except Exception:
+            pass
+        self._start_full_tour(self.current_user)
+
+    def _show_guest_tooltips(self):
+        """
+        برای مهمان: یه راهنمای خیلی ساده فقط روی login/signup.
+        (tooltip ساده، نه Tour)
+        """
+        try:
+            if self._guest_tour_shown:
+                return
+            # ✅ یه بار tooltip ساده نشون بده
+            self._guest_tour_shown = True
+        except Exception:
+            pass
 
     def _show_account_menu(self):
         menu = QMenu(self)
@@ -13129,23 +20317,92 @@ class MainWindow(QMainWindow):
             }}
         """)
 
-        action_settings = menu.addAction("⚙️ " + tr(self.current_lang, "settings"), self._open_settings)
-        action_settings.triggered.connect(lambda: SoundManager.get().play("simpleClick"))
+        # ✅ Lock Now
+        action_lock = menu.addAction(
+            "🔒 " + tr(self.current_lang, "lock_now"),
+            self._lock_session_now,
+        )
+        action_lock.triggered.connect(
+            lambda: SoundManager.get().play("logoutSound")
+        )
 
-        action_info = menu.addAction("ℹ️ " + tr(self.current_lang, "account_info"), self._open_account_info)
-        action_info.triggered.connect(lambda: SoundManager.get().play("simpleClick"))
+        # ✅ Show Tour Again (فقط اگه کاربر لاگینه)
+        if self.current_user:
+            try:
+                action_tour = menu.addAction(
+                    "🎓 " + tr(self.current_lang, "tour_show_again"),
+                    self._show_tour_again,
+                )
+                action_tour.triggered.connect(
+                    lambda: SoundManager.get().play("simpleClick")
+                )
+            except Exception:
+                pass
+
+        # ✅ Settings (فقط یک بار!)
+        action_settings = menu.addAction(
+            "⚙️ " + tr(self.current_lang, "settings"),
+            self._open_settings,
+        )
+        action_settings.triggered.connect(
+            lambda: SoundManager.get().play("simpleClick")
+        )
+        
+        # ✅ Voice toggle (فقط اگه VoiceManager موجود باشه)
+        if HAS_VOICE:
+            voice_icon = "🔊" if self._voice_enabled else "🔇"
+            voice_label_key = "voice_voice_disabled" if self._voice_enabled else "voice_voice_enabled"
+            # (برچسب دکمه: اگه فعاله، بزن «غیرفعال کن»)
+            action_voice = menu.addAction(
+                f"{voice_icon} {tr(self.current_lang, voice_label_key)}",
+                self._toggle_voice,
+            )
+            action_voice.triggered.connect(
+                lambda: SoundManager.get().play("simpleClick")
+            )
+
+        # ✅ Account Info
+        action_info = menu.addAction(
+            "ℹ️ " + tr(self.current_lang, "account_info"),
+            self._open_account_info,
+        )
+        action_info.triggered.connect(
+            lambda: SoundManager.get().play("simpleClick")
+        )
+
+        # ✅ Audit Log
+        action_audit = menu.addAction(
+            "📋 " + tr(self.current_lang, "audit_log_title"),
+            self._open_audit_log,
+        )
+        action_audit.triggered.connect(
+            lambda: SoundManager.get().play("simpleClick")
+        )
 
         menu.addSeparator()
 
-        action_logout = menu.addAction("🚪 " + tr(self.current_lang, "logout"), self._logout)
-        action_logout.triggered.connect(lambda: SoundManager.get().play("logoutSound"))
+        # ✅ Logout
+        action_logout = menu.addAction(
+            "🚪 " + tr(self.current_lang, "logout"),
+            self._logout,
+        )
+        action_logout.triggered.connect(
+            lambda: SoundManager.get().play("logoutSound")
+        )
 
-        action_exit = menu.addAction("❌ " + tr(self.current_lang, "exit"), self._exit_app)
-        action_exit.triggered.connect(lambda: SoundManager.get().play("signoutSound"))
+        # ✅ Exit
+        action_exit = menu.addAction(
+            "❌ " + tr(self.current_lang, "exit"),
+            self._exit_app,
+        )
+        action_exit.triggered.connect(
+            lambda: SoundManager.get().play("signoutSound")
+        )
 
         menu.exec_(self.account_btn.mapToGlobal(self.account_btn.rect().bottomLeft()))
 
     def _open_settings(self):
+        self._settings_opened_ever = True
         dialog = SettingsDialog(
             self.current_lang,
             self.current_theme,
@@ -13153,10 +20410,29 @@ class MainWindow(QMainWindow):
             glassmorphism=getattr(self, "use_glassmorphism", True),
             parent=self,
         )
-        dialog.settings_changed.connect(self._on_settings_changed)
+        # ❌ DON'T connect settings_changed — _on_settings_applied handles everything
         dialog.exec_()
 
+    def _open_audit_log(self):
+        """Open the audit log dialog."""
+        try:
+            from gui.dialogs.audit_log_dialog import AuditLogDialog
+            dialog = AuditLogDialog(
+                theme=THEMES[self.current_theme],
+                lang=self.current_lang,
+                current_user=self.current_user or "",
+                parent=self,
+            )
+            dialog.exec_()
+        except Exception as e:
+            print(f"⚠️ _open_audit_log failed: {e}")
+            import traceback
+            traceback.print_exc()
+
     def _on_settings_changed(self, lang: str, theme: str):
+        print(f"🎨 _on_settings_changed: lang={lang}, theme={theme}")
+        print(f"   Current theme before: {self.current_theme}")
+
         self.current_lang = lang
         # ✅ RTL / LTR بر اساس زبان
         try:
@@ -13168,8 +20444,15 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
         self.current_theme = theme
+        print(f"   Current theme after: {self.current_theme}")
+        print(f"   Themes available: {list(THEMES.keys())}")
+
         self._apply_theme()
+        print(f"   _apply_theme done")
+
         self._update_texts()
+        print(f"   _update_texts done")
+
         # ✅ استایل tooltip با تم جدید
         self._apply_tooltip_style()
         # ✅ هماهنگی پس‌زمینه با تم جدید
@@ -13195,13 +20478,24 @@ class MainWindow(QMainWindow):
         if hasattr(self, "history_panel") and self.history_panel is not None:
             self.history_panel.set_theme(THEMES[self.current_theme])
         # ✅ هماهنگی notification center با تم جدید
+        # ✅ هماهنگی smart suggestion bar با تم جدید
+        if hasattr(self, "_suggestion_bar") and self._suggestion_bar is not None:
+            self._suggestion_bar.set_theme(THEMES[self.current_theme])
+            self._suggestion_bar.set_lang(self.current_lang)
+            self._suggestion_bar.reposition()
+        # ✅ آپدیت زبان موتور (تا متن‌های تولیدشده ترجمه شوند)
+        if hasattr(self, "_suggestion_engine") and self._suggestion_engine is not None:
+            try:
+                self._suggestion_engine.set_lang(self.current_lang)   # ← ← ← اضافه شد
+            except Exception:
+                pass
         if hasattr(self, "notification_center") and self.notification_center is not None:
             self.notification_center.set_theme(THEMES[self.current_theme])
         # ✅ refresh shadow رنگ برای همه‌ی دکمه‌ها + set theme برای AnimatedIconButton
         t = THEMES.get(self.current_theme, THEMES["theme_dark_aqua"])
         for btn in (
-            self.login_btn, self.signup_btn, self.account_btn,
-            self.insert_btn, self.process_btn, self.visit_btn, self.mute_btn,
+                self.login_btn, self.signup_btn, self.account_btn,
+                self.insert_btn, self.process_btn, self.visit_btn, self.mute_btn,
         ):
             try:
                 refresh_button_shadow(btn, t)
@@ -13213,7 +20507,7 @@ class MainWindow(QMainWindow):
             except Exception:
                 pass
         self._decorate_buttons()
-        self._update_all_tooltips()  # ← اضافه شد (برای تم جدید)
+        self._update_all_tooltips()  # ← برای تم جدید
         self.update()
         self.repaint()
         # ✅ Toast
@@ -13223,25 +20517,77 @@ class MainWindow(QMainWindow):
             tr(self.current_lang, "settings_applied"),
             duration_ms=3000,
         )
+        # ✅ Audit log
+        if audit_log is not None:
+            try:
+                audit_log.info(
+                    action="settings_changed",
+                    category="SETTINGS",
+                    details={"lang": lang, "theme": theme},
+                )
+            except Exception:
+                pass
+
+    def _on_font_changed(self, font_settings: FontSettings):
+        """Called when font settings change (from Settings dialog)."""
+        try:
+            self._font_settings = font_settings
+            # Re-apply theme (which may reference font metrics)
+            self._apply_theme()
+            # Re-apply tooltips (they may use font)
+            self._apply_tooltip_style()
+            self._update_all_tooltips()
+            # Notify user
+            self._notify(
+                "success",
+                tr(self.current_lang, "font_applied"),
+                "",
+                duration_ms=2500,
+            )
+        except Exception as e:
+            print(f"⚠️ _on_font_changed failed: {e}")
+            import traceback
+            traceback.print_exc()
 
     def _on_settings_applied(self, lang: str, theme: str, follow_system: bool,
                              glassmorphism: bool = True):
-        """اعمال تنظیمات جدید (شامل follow_system + glassmorphism)."""
+        """Apply new settings (including follow_system + glassmorphism)."""
         try:
+            print(f"⚙️ _on_settings_applied: lang={lang}, theme={theme}, "
+                  f"follow_system={follow_system}, glassmorphism={glassmorphism}")
+
+            old_theme = self.current_theme
+            print(f"   old_theme = {old_theme}")
+
             self.follow_system_theme = bool(follow_system)
+
+            # ✅ If user explicitly changed the theme, respect their choice
+            # and turn OFF follow_system (so it doesn't override)
+            if self.follow_system_theme and theme != old_theme:
+                print(f"🎨 User explicitly chose theme: {theme} → disabling follow_system")
+                self.follow_system_theme = False
+
+            # ✅ If follow_system is still ON, apply system theme
             if self.follow_system_theme:
                 system_theme = detect_system_theme()
                 if system_theme != theme:
+                    print(f"🔄 Follow system theme: {theme} → {system_theme}")
                     theme = system_theme
+
             # ✅ glassmorphism toggle
             old_glass = getattr(self, "use_glassmorphism", True)
             self.use_glassmorphism = bool(glassmorphism)
             if old_glass != self.use_glassmorphism:
                 self._recreate_background()
+
+            # ✅ Now apply the theme
+            print(f"   → applying theme: {theme}")
             self._on_settings_changed(lang, theme)
             self._save_settings()
         except Exception as e:
             print(f"⚠️ _on_settings_applied failed: {e}")
+            import traceback
+            traceback.print_exc()
 
     def _recreate_background(self):
         """حذف و بازسازی پس‌زمینه (برای toggle glassmorphism)."""
@@ -13291,6 +20637,8 @@ class MainWindow(QMainWindow):
                     self._drop_overlay.setGeometry(central.rect())
                     if self._drop_overlay.isVisible():
                         self._drop_overlay.raise_()
+                if hasattr(self, "_suggestion_bar") and self._suggestion_bar is not None:
+                    self._suggestion_bar.reposition()
             except Exception:
                 pass
             # ✅ صدای resize اصلی QWidget
@@ -13300,6 +20648,12 @@ class MainWindow(QMainWindow):
 
     def _update_texts(self):
         self.setWindowTitle(tr(self.current_lang, "app_title"))
+        # ✅ آپدیت smart suggestion bar
+        try:
+            if self._suggestion_bar is not None:
+                self._suggestion_bar.set_lang(self.current_lang)
+        except Exception:
+            pass
         self.login_btn.setText(tr(self.current_lang, "login"))
         self.signup_btn.setText(tr(self.current_lang, "signup"))
 
@@ -13371,6 +20725,12 @@ class MainWindow(QMainWindow):
 
         # ✅ به‌روزرسانی همه‌ی tooltipها با زبان جدید
         self._update_all_tooltips()
+        # ✅ If lock screen is open, close and reopen it with new theme/lang
+        if self._lock_screen is not None and self._lock_screen.isVisible():
+            try:
+                self._lock_screen.reject()
+            except Exception:
+                pass
 
     # ============================================================
     # ✅ SMART TOOLTIPS — Update all in one place
@@ -13511,8 +20871,21 @@ class MainWindow(QMainWindow):
                     self.image_view.set_tooltips(t, lang)
                 except Exception:
                     pass
+            # ✅ Re-decorate inputs (theme may have changed)
+            self._decorate_all_inputs()
         except Exception as e:
             print(f"⚠️ _update_all_tooltips failed: {e}")
+
+    def _lock_session_now(self):
+        """Called from account menu — immediately lock."""
+        if not self.current_user:
+            return
+        try:
+            if self._auto_lock is not None:
+                self._auto_lock.pause()
+        except Exception:
+            pass
+        self._lock_session()
 
     def _open_account_info(self):
         if not self.current_user:
@@ -13525,19 +20898,40 @@ class MainWindow(QMainWindow):
 
     def _logout(self):
         if ask_question(
-            self, tr(self.current_lang, "logout"),
-            tr(self.current_lang, "logout_confirm"),
+                self, tr(self.current_lang, "logout"),
+                tr(self.current_lang, "logout_confirm"),
         ):
-            if self.current_user:
-                self.db.delete_user(self.current_user)
+            if audit_log is not None and self.current_user:
+                try:
+                    audit_log.info(
+                        action="logout",
+                        category="AUTH",
+                        user=self.current_user,
+                    )
+                    audit_log.clear_user()
+                except Exception:
+                    pass
+
+            # ✅ Don't delete the account — just log out
             self.current_user = None
+            # ✅ توقف Smart Suggestions
+            try:
+                if self._suggestion_engine is not None:
+                    self._suggestion_engine.stop()
+                    self._suggestion_engine.set_username("")
+                if self._suggestion_bar is not None:
+                    self._suggestion_bar.hide_suggestion()
+                self._image_loaded_at = None
+                self._result_at = None
+                self._consecutive_same_grid = 0
+                self._session_start_at = 0.0   # ← ← ← اضافه شد
+            except Exception:
+                pass
             self.account_btn.setVisible(False)
             self.login_btn.setVisible(True)
             self.signup_btn.setVisible(True)
-            # ✅ به‌روزرسانی tooltipها
             self._update_all_tooltips()
 
-            # ✅ پاک کردن history panel
             try:
                 if self.history_panel is not None:
                     self.history_panel.set_username("")
@@ -13545,7 +20939,6 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"⚠️ Failed to clear history panel on logout: {e}")
 
-            # ✅ Toast
             try:
                 self._notify(
                     "info",
@@ -13553,8 +20946,13 @@ class MainWindow(QMainWindow):
                     "",
                     duration_ms=2500,
                 )
+                # ✅ Voice feedback
+                self._speak("voice_logged_out")
             except Exception:
                 pass
+
+            if self._auto_lock is not None:
+                self._auto_lock.stop()
 
     def _exit_app(self):
         if ask_question(
@@ -13565,32 +20963,63 @@ class MainWindow(QMainWindow):
 
     def _load_image_from_path(self, path: str):
         """
-        بارگذاری تصویر از یک مسیر داده‌شده.
-        مشترک بین فایل‌دیالوگ (Ctrl+O) و Drag & Drop.
+        بارگذاری تصویر، کراپ دقیق بادبزن، حذف لیبل، و نمایش تصویر تمیز.
         """
         if not path or not os.path.isfile(path):
-            show_message(
-                self, "warning",
-                tr(self.current_lang, "warning"),
-                tr(self.current_lang, "drop_invalid"),
-            )
+            show_message(self, "warning", tr(self.current_lang, "warning"), tr(self.current_lang, "drop_invalid"))
             return
 
         if not self._is_valid_image_file(path):
-            show_message(
-                self, "warning",
-                tr(self.current_lang, "warning"),
-                tr(self.current_lang, "drop_invalid"),
-            )
+            show_message(self, "warning", tr(self.current_lang, "warning"), tr(self.current_lang, "drop_invalid"))
             return
 
-        # ✅ تلاش برای بارگذاری pixmap
-        pixmap = QPixmap(path)
+        # ============================================================
+        # STEP 1: تشخیص عکس‌های خام دستگاه سونوگرافی
+        # ============================================================
+        is_already_cropped = False
+        try:
+            _pm = QPixmap(path)
+            if not _pm.isNull():
+                w, h = _pm.width(), _pm.height()
+                # اگه عکس خیلی کوچیک یا مربع بود، کراپ شده است
+                if (w / max(1, h)) < 1.1 and w < 600:
+                    is_already_cropped = True
+        except Exception:
+            pass
 
-        # ✅ اگر QPixmap نتوانست (مثلاً DICOM)، با cv2 امتحان کن
+        # ============================================================
+        # STEP 2: Preprocess (Crop + Inpaint)
+        # ============================================================
+        cleaned_path = path
+        preprocess_info = None
+
+        if HAS_PREPROCESSOR:
+            try:
+                result = preprocess_medical_image(path, already_cropped=is_already_cropped)
+                if result.success and result.image is not None:
+                    preprocess_info = result
+                    import tempfile
+                    tmp_dir = tempfile.gettempdir()
+                    cleaned_path = os.path.join(tmp_dir,
+                                                f"liver_clean_{os.getpid()}_{int(datetime.now().timestamp() * 1000)}.png")
+
+                    if result.save(cleaned_path):
+                        print(f"🧹 Preprocessed: {result.original_shape} → {result.final_shape}")
+                        print(f"   Cropped: {result.cropped}, Labels removed: {result.labels_removed}")
+                    else:
+                        cleaned_path = path
+                        preprocess_info = None
+            except Exception as e:
+                print(f"⚠️ Preprocessing exception: {e}")
+
+        # ============================================================
+        # STEP 3: Load pixmap (از تصویر تمیز شده)
+        # ============================================================
+        pixmap = QPixmap(cleaned_path)
+
         if pixmap.isNull() and HAS_CV2:
             try:
-                img = cv2.imread(path)
+                img = cv2.imread(cleaned_path)
                 if img is not None:
                     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                     h, w, ch = img_rgb.shape
@@ -13602,44 +21031,70 @@ class MainWindow(QMainWindow):
 
         if pixmap.isNull():
             SoundManager.get().play("ErrorSound")
-            show_message(
-                self, "critical",
-                tr(self.current_lang, "error"),
-                f"Could not load image:\n{path}",
-            )
+            show_message(self, "critical", tr(self.current_lang, "error"), f"Could not load image:\n{path}")
             return
 
-        # ✅ موفق — اعمال تصویر (بدون scale دستی — ZoomableImageView خودش fit می‌کنه)
-        self.current_image_path = path
-        self.image_view.set_image(pixmap)
+        # ============================================================
+        # STEP 4: Guard check (بررسی با pkl روی تصویر تمیز)
+        # ============================================================
+        if HAS_IMAGE_GUARD:
+            try:
+                guard = guard_analyze_image(cleaned_path)
+                is_liver = guard.get("is_liver_like", True)
+                score = guard.get("score", 0.0)
 
-        # ✅ مخفی کردن نتیجه قبلی
+                print(f"🛡️ Guard: is_liver={is_liver}, score={score:.3f}")
+
+                if not is_liver:
+                    SoundManager.get().play("warningSound")
+                    msg = tr(self.current_lang, "image_not_liver_warning")
+                    if msg == "image_not_liver_warning":
+                        msg = "This image does not look like a liver ultrasound.\n\nPlease insert a proper liver ultrasound image."
+
+                    show_message(self, "warning", tr(self.current_lang, "warning"),
+                                 f"{msg}\n\nSimilarity: {score * 100:.1f}%")
+                    self._speak("voice_image_rejected")
+                    return
+            except Exception as e:
+                print(f"⚠️ Image guard failed: {e}")
+
+        # ============================================================
+        # STEP 5: نمایش در UI و ذخیره مسیر برای پردازش
+        # ============================================================
+        self.current_image_path = cleaned_path  # مدل این مسیر (عکس تمیز) رو می‌خونه
+        self._image_loaded_at = datetime.now().timestamp()
+        self.image_view.set_image(pixmap)  # کاربر این (عکس تمیز) رو می‌بینه
+
         self.result_label.setVisible(False)
         self._last_result_grid = None
         self._last_result_confidence = None
         self._last_all_probs = None
-        # ✅ مخفی کردن دکمه‌ی Export
         try:
             self.export_pdf_btn.setVisible(False)
-        except Exception:
-            pass
-        # ✅ مخفی کردن دکمه‌ی Grad-CAM
-        try:
             self.gradcam_btn.setVisible(False)
         except Exception:
             pass
 
-        # ✅ فیدبک صوتی + notify
         try:
             SoundManager.get().play("ok_sound")
         except Exception:
             pass
-        self._notify(
-            "success",
-            tr(self.current_lang, "image_loaded"),
-            os.path.basename(path),
-            duration_ms=3000,
-        )
+
+        success_title = tr(self.current_lang, "image_loaded")
+        success_detail = os.path.basename(path)
+        extras = []
+        if is_already_cropped:
+            extras.append("already-cropped")
+        if preprocess_info:
+            if preprocess_info.cropped:
+                extras.append("cropped")
+            if preprocess_info.inpainted and preprocess_info.labels_removed > 0:
+                extras.append(f"{preprocess_info.labels_removed} label(s) removed")
+        if extras:
+            success_detail += f" ({', '.join(extras)})"
+
+        self._notify("success", success_title, success_detail, duration_ms=3500)
+        self._speak("voice_image_loaded")
 
     def _insert_image(self):
         """دیالوگ باز کردن فایل — از Ctrl+O یا دکمه."""
@@ -13671,6 +21126,8 @@ class MainWindow(QMainWindow):
         # ✅ شروع progress bar
         try:
             self.progress_bar.start()
+            # ✅ Voice feedback
+            self._speak("voice_processing")
             # ✅ انیمیشن آیکون: ⚡ → ⏳
             self._start_icon_pulse(self.process_btn, "⏳ ", 1500)
         except Exception:
@@ -13684,11 +21141,96 @@ class MainWindow(QMainWindow):
     def _on_result_ready(self, grid: int, confidence: float, all_probs: dict = None, heatmap=None):
         # ✅ برگردوندن آیکون
         self._restore_icon(self.process_btn)
+
+        # ✅ 🛡️ چک نهایی: آیا نتیجه معتبره؟
+        if HAS_IMAGE_GUARD and self.current_image_path:
+            try:
+                is_valid, reason, guard_metrics = guard_is_confident_result(
+                    image_path=self.current_image_path,
+                    model_confidence=confidence,
+                    all_probs=all_probs,
+                )
+
+                if not is_valid:
+                    # ✅ نتیجه رو نشون نده
+                    SoundManager.get().play("warningSound")
+
+                    # ✅ progress bar → خطا
+                    try:
+                        self.progress_bar.finish_error()
+                    except Exception:
+                        pass
+
+                    # ✅ پیام
+                    msg = tr(self.current_lang, "result_not_confident")
+                    if msg == "result_not_confident":
+                        msg = (
+                            "The AI could not confidently identify this image as a liver ultrasound.\n\n"
+                            "Please insert a proper liver ultrasound image and try again."
+                        )
+
+                    detail = f"\n\n🔍 Reason: {reason}"
+
+                    # ✅ اگه مدل اطمینان کمی داشت، درصد رو هم نشون بده
+                    if "confidence too low" in reason.lower():
+                        detail += f"\n📊 Confidence: {confidence * 100:.1f}%"
+
+                    show_message(
+                        self, "warning",
+                        tr(self.current_lang, "warning"),
+                        msg + detail,
+                    )
+
+                    # ✅ مخفی کردن نتیجه
+                    self.result_label.setVisible(False)
+                    try:
+                        self.export_pdf_btn.setVisible(False)
+                        self.gradcam_btn.setVisible(False)
+                    except Exception:
+                        pass
+
+                    # ✅ Audit log
+                    if audit_log is not None and self.current_user:
+                        try:
+                            audit_log.warning(
+                                action="result_rejected_low_confidence",
+                                category="DATA",
+                                details={
+                                    "confidence": round(float(confidence), 3),
+                                    "reason": reason,
+                                    "metrics": guard_metrics,
+                                },
+                            )
+                        except Exception:
+                            pass
+
+                    # ✅ پاک کردن state
+                    self._last_result_grid = None
+                    self._last_result_confidence = None
+                    self._last_all_probs = None
+                    self._last_heatmap = None
+                    return
+            except Exception as e:
+                print(f"⚠️ Result validation failed (fail-open): {e}")
+
         self._last_result_grid = grid
         self._last_result_confidence = confidence
         self._last_all_probs = all_probs if all_probs else {}
         # ✅ ذخیره‌ی heatmap
         self._last_heatmap = heatmap
+        # ✅ ثبت زمان نتیجه برای Smart Suggestions
+        try:
+            self._result_at = datetime.now().timestamp()
+            self._image_loaded_at = None  # دیگه image_ready لازم نیست
+            # consecutive grid
+            prev_grid = getattr(self, "_prev_grid", None)
+            if prev_grid == grid:
+                self._consecutive_same_grid = getattr(self, "_consecutive_same_grid", 0) + 1
+            else:
+                self._consecutive_same_grid = 1
+            self._prev_grid = grid
+        except Exception:
+            pass
         SoundManager.get().play("ok_sound")
 
         # ✅ progress bar → پرش به ۱۰۰٪ سبز
@@ -13735,6 +21277,17 @@ class MainWindow(QMainWindow):
         self.result_label.setText(result_text)
         self.result_label.setVisible(True)
 
+        # ✅ Voice feedback (نتیجه)
+        try:
+            grid_name = tr(self.current_lang, f"grid_{grid}")
+            self._speak(
+                "voice_inference_result",
+                grid_name=grid_name,
+                conf=f"{confidence * 100:.0f}",
+            )
+        except Exception:
+            pass
+
         # ✅ نمایش دکمه‌ی Export PDF
         try:
             if HAS_REPORTLAB:
@@ -13751,6 +21304,12 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
 
+        # ✅ 🎉 Confetti Animation
+        try:
+            self._celebrate("success")
+        except Exception:
+            pass
+
         # ✅ Toast موفقیت
         try:
             grid_short = {0: "NL", 1: "G1", 2: "G2", 3: "G3"}.get(grid, f"G{grid}")
@@ -13763,6 +21322,21 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
 
+        # ✅ Audit log
+        if audit_log is not None and self.current_user:
+            try:
+                audit_log.info(
+                    action="inference_completed",
+                    category="DATA",
+                    details={
+                        "grid": int(grid),
+                        "confidence": round(float(confidence), 4),
+                        "image": os.path.basename(self.current_image_path or ""),
+                    },
+                )
+            except Exception:
+                pass
+
     def _on_error(self, error: str):
         # ✅ برگردوندن آیکون
         self._restore_icon(self.process_btn)
@@ -13770,6 +21344,8 @@ class MainWindow(QMainWindow):
         # ✅ progress bar → قرمز
         try:
             self.progress_bar.finish_error()
+            # ✅ Voice feedback
+            self._speak("voice_error")
         except Exception:
             pass
         # ✅ Toast خطا
@@ -13845,7 +21421,7 @@ class MainWindow(QMainWindow):
             ok = exporter.generate(
                 output_path=output_path,
                 username=self.current_user or "—",
-                image_path=self.current_image_path,
+                image_path=getattr(self, "_display_image_path", self.current_image_path),
                 grid=self._last_result_grid,
                 confidence=self._last_result_confidence or 0.0,
                 all_probs=self._last_all_probs,
@@ -13872,6 +21448,28 @@ class MainWindow(QMainWindow):
                     output_path,
                     duration_ms=4000,
                 )
+                # ✅ Voice feedback
+                self._speak("voice_pdf_saved")
+                # ✅ 🎉 Confetti (gentle — چون inference قبلاً جشن گرفته)
+                try:
+                    self._celebrate("gentle")
+                except Exception:
+                    pass
+                # ✅ ثبت pdf برای Smart Suggestions
+                try:
+                    self._pdf_exported_ever = True
+                except Exception:
+                    pass
+                # ✅ Audit log
+                if audit_log is not None:
+                    try:
+                        audit_log.info(
+                            action="pdf_exported",
+                            category="EXPORT",
+                            details={"path": output_path},
+                        )
+                    except Exception:
+                        pass
             else:
                 # ✅ خطا
                 try:
@@ -13915,12 +21513,18 @@ class MainWindow(QMainWindow):
                     duration_ms=3000,
                 )
                 return
+            # ✅ ثبت نمایش gradcam برای Smart Suggestions
+            try:
+                self._gradcam_shown_ever = True
+            except Exception:
+                pass
 
             if not self.current_image_path or not os.path.isfile(self.current_image_path):
                 return
 
             # ✅ تصویر اصلی
-            original_pixmap = QPixmap(self.current_image_path)
+            _display_path = getattr(self, "_display_image_path", self.current_image_path)
+            original_pixmap = QPixmap(_display_path)
             if original_pixmap.isNull():
                 return
 
@@ -13965,11 +21569,85 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"⚠️ _notify failed: {e}")
 
+    # ============================================================
+    # ✅ CONFETTI ANIMATION
+    # ============================================================
+
+    def _celebrate(
+        self,
+        event_type: str = "success",
+        pattern: Optional[str] = None,
+        particle_count: Optional[int] = None,
+        duration_ms: Optional[int] = None,
+    ):
+        """
+        نمایش انیمیشن confetti.
+
+        Args:
+            event_type: "success" | "gentle" | "achievement" | "welcome"
+            pattern: اگه داده بشه، از event_type استفاده نمی‌شه
+            particle_count: تعداد ذرات (پیش‌فرض بر اساس event_type)
+            duration_ms: مدت (پیش‌فرض بر اساس event_type)
+        """
+        try:
+            central = self.centralWidget()
+            if central is None:
+                return
+
+            # ✅ انتخاب pattern
+            if pattern is None:
+                pattern = get_pattern_for(event_type)
+
+            # ✅ تعداد و مدت بر اساس event_type
+            if particle_count is None:
+                particle_count = {
+                    "success": 150,
+                    "gentle": 70,
+                    "achievement": 130,
+                    "welcome": 100,
+                }.get(event_type, 120)
+
+            if duration_ms is None:
+                duration_ms = {
+                    "success": 2600,
+                    "gentle": 1600,
+                    "achievement": 2800,
+                    "welcome": 2200,
+                }.get(event_type, 2200)
+
+            celebrate(
+                parent=central,
+                theme=THEMES.get(self.current_theme, {}),
+                pattern=pattern,
+                particle_count=particle_count,
+                duration_ms=duration_ms,
+            )
+        except Exception as e:
+            print(f"⚠️ _celebrate failed: {e}")
+
     def _visit_webpage(self):
         import webbrowser
         webbrowser.open("https://github.com/babakyousefian/babakyousefian/")
 
     def closeEvent(self, event):
+        # ✅ توقف Smart Suggestions
+        try:
+            if self._suggestion_engine is not None:
+                self._suggestion_engine.stop()
+            if hasattr(self, "_activity_timer") and self._activity_timer.isActive():
+                self._activity_timer.stop()
+            QApplication.instance().removeEventFilter(self)
+        except Exception:
+            pass
+
+        # ✅ بستن Tour اگه بازه
+        try:
+            if self._onboarding_tour is not None:
+                self._onboarding_tour._finish(skipped=True)
+                self._onboarding_tour = None
+        except Exception:
+            pass
+
         # ✅ توقف انیمیشن پس‌زمینه
         try:
             if hasattr(self, "_bg_animation"):
@@ -13991,7 +21669,25 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
 
+        # ✅ Audit log
+        if audit_log is not None:
+            try:
+                audit_log.info(
+                    action="app_close",
+                    category="SYSTEM",
+                )
+                audit_log.flush()
+            except Exception:
+                pass
+
         event.accept()
+
+        # ✅ Stop session timeout manager
+        try:
+            if self._auto_lock is not None:
+                self._auto_lock.stop()
+        except Exception:
+            pass
 
 # ================================================================
 # ✅ FONT LOADER (Noto Sans for multilingual support)
@@ -14074,12 +21770,22 @@ def main():
 
     # ✅ Global Exception Handler (جلوگیری از کرش و هنگ)
     def _global_exception_handler(exc_type, exc_value, exc_tb):
-        """گرفتن همه‌ی خطاهای پیش‌بینی‌نشده و نمایش دیالوگ به‌جای کرش."""
         try:
             import traceback
             error_text = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
             print(f"❌ Unhandled exception:\n{error_text}")
-            # ✅ نشون دادن دیالوگ (اگه app هنوز زنده باشه)
+
+            # ✅ Audit log
+            if audit_log is not None:
+                try:
+                    audit_log.critical(
+                        action="unhandled_exception",
+                        category="SYSTEM",
+                        details={"type": exc_type.__name__, "message": str(exc_value)[:500]},
+                    )
+                except Exception:
+                    pass
+
             try:
                 if QApplication.instance() is not None:
                     box = QMessageBox()
@@ -14105,6 +21811,16 @@ def main():
     else:
         fallback = QFont("Segoe UI", 10)
         app.setFont(fallback)
+
+    # ✅ Apply saved font settings (overrides default)
+    try:
+        from core.ui.font_manager import load_font_settings, FontManager
+        saved_font = load_font_settings()
+        if saved_font.family or saved_font.size:
+            FontManager.get().apply(saved_font)
+            print(f"🎨 Saved font applied: {saved_font.family} {saved_font.size}pt")
+    except Exception as e:
+        print(f"⚠️ Failed to apply saved font: {e}")
 
     # ✅ ساخت splash و preload thread
     splash = SplashScreen()

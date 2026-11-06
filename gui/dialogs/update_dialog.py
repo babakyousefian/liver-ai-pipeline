@@ -529,197 +529,161 @@ class UpdateDialog(QDialog):
 def run_update_flow(parent, config, current_version: str,
                     theme: dict, lang: str = "English") -> bool:
     """
-    Full one-click update flow with user confirmation at each step.
-
-    Steps:
-        1. Check for updates (silent network)
-        2. If found → ask "Download?" → download with progress
-        3. If downloaded → ask "Install & Restart?" → install
-        4. If no update → show "You're up to date"
-
-    Args:
-        parent: parent widget (for dialogs)
-        config: UpdateConfig instance
-        current_version: current app version string
-        theme: theme dict
-        lang: language key
-
-    Returns:
-        True if update was installed (app should restart),
-        False otherwise.
+    Full one-click update flow using beautiful custom dialogs.
     """
-    from PyQt5.QtWidgets import QApplication, QProgressDialog
-    from PyQt5.QtCore import Qt, QTimer
+    from PyQt5.QtWidgets import QApplication, QDialog
+    from PyQt5.QtCore import QEventLoop, QTimer
     from core.updater import (
-        UpdateChecker, UpdateDownloader, verify_checksum,
-        verify_size, install_frozen, install_source,
+        UpdateChecker, verify_checksum,
+        install_frozen, install_source,
         is_frozen, get_app_dir,
+    )
+    from GUI_update import tr
+    from gui.dialogs.update_dialogs import (
+        UpdateAvailableDialog,
+        UpdateDownloadDialog,
+        ConfirmInstallDialog,
+        SimpleInfoDialog,
     )
 
     # ============================================================
-    # STEP 1: Check for updates
+    # STEP 1: Check for updates (silent)
     # ============================================================
     checker = UpdateChecker(
         config=config,
         current_version=current_version,
-        force=True,  # manual check = ignore interval
+        force=True,
     )
-
-    # We need synchronous behavior for this flow — use an event loop
-    # to wait for the thread's signal.
-    result = {"info": None, "done": False}
+    check_result = {"info": None, "error": None}
+    check_loop = QEventLoop()
 
     def _on_available(info):
-        result["info"] = info
-        result["done"] = True
+        check_result["info"] = info
+        check_loop.quit()
 
     def _on_uptodate():
-        result["info"] = None
-        result["done"] = True
+        check_result["info"] = None
+        check_loop.quit()
 
     def _on_failed(reason):
-        result["info"] = None
-        result["done"] = True
+        check_result["error"] = reason
+        check_loop.quit()
 
     checker.update_available.connect(_on_available)
     checker.up_to_date.connect(_on_uptodate)
     checker.check_failed.connect(_on_failed)
     checker.start()
 
-    # Wait for the thread to finish (with a timeout of 30 seconds)
-    import time as _t
-    timeout = _t.time() + 30
-    while not result["done"] and _t.time() < timeout:
-        QApplication.processEvents()
-        _t.sleep(0.05)
+    timeout_timer = QTimer()
+    timeout_timer.setSingleShot(True)
+    timeout_timer.timeout.connect(lambda: (
+        check_result.update({"error": "timeout"}),
+        check_loop.quit()
+    ))
+    timeout_timer.start(30_000)
 
-    if checker.isRunning():
-        checker.terminate()
-        checker.wait(2000)
+    check_loop.exec_()
+    timeout_timer.stop()
 
-    info = result["info"]
+    info = check_result["info"]
 
     # ============================================================
-    # STEP 2a: No update available
+    # STEP 2a: No update → beautiful info dialog
     # ============================================================
     if info is None:
-        from GUI_update import show_message, tr
-        show_message(
-            parent, "information",
-            tr(lang, "up_to_date"),
-            tr(lang, "you_have_latest"),
-        )
-        return False
-
-    # ============================================================
-    # STEP 2b: Ask "Download?"
-    # ============================================================
-    from GUI_update import ask_question, tr
-    want_download = ask_question(
-        parent,
-        tr(lang, "update_available"),
-        (
-            f"{tr(lang, 'update_available')}:\n\n"
-            f"v{current_version}  →  v{info.version}\n\n"
-            f"{tr(lang, 'whats_new')}:\n{info.changelog[:500]}\n\n"
-            f"{tr(lang, 'download_now')} ({info.human_size})?"
-        ),
-    )
-    if not want_download:
-        return False
-
-    # ============================================================
-    # STEP 3: Download with progress dialog
-    # ============================================================
-    progress = QProgressDialog(
-        tr(lang, "downloading"),
-        tr(lang, "cancel"),
-        0, 100, parent,
-    )
-    progress.setWindowTitle(tr(lang, "downloading"))
-    progress.setWindowModality(Qt.WindowModal)
-    progress.setMinimumDuration(0)
-    progress.setValue(0)
-
-    downloader = UpdateDownloader(
-        url=info.download_url,
-        expected_size=info.download_size,
-    )
-
-    downloaded_path = {"path": None, "error": None}
-
-    def _on_progress(percent, downloaded, total):
-        progress.setValue(percent)
-        if total > 0:
-            mb = downloaded / (1024 * 1024)
-            total_mb = total / (1024 * 1024)
-            progress.setLabelText(
-                f"{tr(lang, 'downloading')}\n{mb:.1f} / {total_mb:.1f} MB"
+        if check_result["error"]:
+            dlg = SimpleInfoDialog(
+                title=tr(lang, "update_check_failed"),
+                message=tr(lang, "check_internet") + f"\n\n({check_result['error']})",
+                theme=theme, lang=lang, icon="⚠️", parent=parent,
             )
+        else:
+            dlg = SimpleInfoDialog(
+                title=tr(lang, "up_to_date"),
+                message=tr(lang, "you_have_latest"),
+                theme=theme, lang=lang, icon="✅", parent=parent,
+            )
+        dlg.exec_()
+        return False
 
-    def _on_done(path):
-        downloaded_path["path"] = path
-        progress.close()
+    # ============================================================
+    # STEP 2b: Update available → beautiful dialog
+    # ============================================================
+    dlg = UpdateAvailableDialog(
+        info=info,
+        current_version=current_version,
+        theme=theme,
+        lang=lang,
+        parent=parent,
+    )
+    if dlg.exec_() != QDialog.Accepted:
+        return False
+
+    # ============================================================
+    # STEP 3: Download with beautiful progress dialog
+    # ============================================================
+    dl_dialog = UpdateDownloadDialog(
+        info=info, theme=theme, lang=lang, parent=parent,
+    )
+
+    download_path = {"path": None, "error": None}
+    dl_loop = QEventLoop()
+
+    def _on_ready(path):
+        download_path["path"] = path
+        dl_loop.quit()
 
     def _on_failed(reason):
-        downloaded_path["error"] = reason
-        progress.close()
+        download_path["error"] = reason
+        dl_loop.quit()
 
-    downloader.progress.connect(_on_progress)
-    downloader.finished_ok.connect(_on_done)
-    downloader.failed.connect(_on_failed)
-    downloader.start()
+    def _on_canceled():
+        download_path["error"] = "canceled_by_user"
+        dl_loop.quit()
 
-    # Wait for download
-    while downloader.isRunning():
-        QApplication.processEvents()
-        if progress.wasCanceled():
-            downloader.cancel()
-            downloader.wait(2000)
-            progress.close()
-            return False
-        _t.sleep(0.05)
+    dl_dialog.download_ready.connect(_on_ready)
+    dl_dialog.download_failed.connect(_on_failed)
+    dl_dialog.canceled.connect(_on_canceled)
 
-    progress.close()
+    # Start download + show dialog
+    QTimer.singleShot(100, dl_dialog.start_download)
+    dl_dialog.exec_()  # blocks until dialog closes
 
-    if downloaded_path["error"] or not downloaded_path["path"]:
-        from GUI_update import show_message
-        show_message(
-            parent, "critical",
-            tr(lang, "error"),
-            f"{tr(lang, 'download_failed')}\n{downloaded_path['error'] or ''}",
-        )
+    # Check if user canceled
+    if download_path["error"] == "canceled_by_user":
         return False
 
-    path = downloaded_path["path"]
+    # Check if download failed
+    if download_path["error"] or not download_path["path"]:
+        err = download_path["error"] or "unknown"
+        SimpleInfoDialog(
+            title=tr(lang, "error"),
+            message=f"{tr(lang, 'download_failed')}\n\nError: {err}",
+            theme=theme, lang=lang, icon="❌", parent=parent,
+        ).exec_()
+        return False
+
+    path = download_path["path"]
 
     # ============================================================
     # STEP 4: Verify checksum
     # ============================================================
     if info.checksum_sha256:
-        ok_checksum = verify_checksum(path, info.checksum_sha256)
-        if not ok_checksum:
-            from GUI_update import show_message
-            show_message(
-                parent, "critical",
-                tr(lang, "error"),
-                tr(lang, "install_failed") + "\n(checksum mismatch)",
-            )
+        if not verify_checksum(path, info.checksum_sha256):
+            SimpleInfoDialog(
+                title=tr(lang, "error"),
+                message=tr(lang, "install_failed") + "\n\nChecksum mismatch",
+                theme=theme, lang=lang, icon="❌", parent=parent,
+            ).exec_()
             return False
 
     # ============================================================
-    # STEP 5: Ask "Install & Restart?"
+    # STEP 5: Confirm install
     # ============================================================
-    want_install = ask_question(
-        parent,
-        tr(lang, "update_ready"),
-        (
-            f"{tr(lang, 'update_ready')}!\n\n"
-            f"{tr(lang, 'app_will_restart')}\n\n"
-            f"{tr(lang, 'install_now')}?"
-        ),
+    install_dlg = ConfirmInstallDialog(
+        info=info, theme=theme, lang=lang, parent=parent,
     )
-    if not want_install:
+    if install_dlg.exec_() != QDialog.Accepted:
         return False
 
     # ============================================================
@@ -729,15 +693,13 @@ def run_update_flow(parent, config, current_version: str,
         if is_frozen():
             ok = install_frozen(path, target_version=info.version)
         else:
-            # Source mode: expect a .zip
             import zipfile
             if not zipfile.is_zipfile(path):
-                from GUI_update import show_message
-                show_message(
-                    parent, "warning",
-                    tr(lang, "error"),
-                    tr(lang, "source_update_requires_zip"),
-                )
+                SimpleInfoDialog(
+                    title=tr(lang, "error"),
+                    message=tr(lang, "source_update_requires_zip"),
+                    theme=theme, lang=lang, icon="⚠️", parent=parent,
+                ).exec_()
                 return False
             ok = install_source(
                 path,
@@ -746,29 +708,27 @@ def run_update_flow(parent, config, current_version: str,
             )
 
         if ok:
-            from GUI_update import show_message
-            show_message(
-                parent, "information",
-                tr(lang, "update_ready"),
-                tr(lang, "app_will_restart"),
-            )
-            # Close app — the new version will start via the installer
+            SimpleInfoDialog(
+                title=tr(lang, "update_ready"),
+                message=tr(lang, "app_will_restart"),
+                theme=theme, lang=lang, icon="✅", parent=parent,
+            ).exec_()
             QTimer.singleShot(1000, QApplication.quit)
             return True
         else:
-            from GUI_update import show_message
-            show_message(
-                parent, "critical",
-                tr(lang, "error"),
-                tr(lang, "install_failed"),
-            )
+            SimpleInfoDialog(
+                title=tr(lang, "error"),
+                message=tr(lang, "install_failed"),
+                theme=theme, lang=lang, icon="❌", parent=parent,
+            ).exec_()
             return False
     except Exception as e:
         print(f"⚠️ Install failed: {e}")
-        from GUI_update import show_message
-        show_message(
-            parent, "critical",
-            tr(lang, "error"),
-            f"{tr(lang, 'install_failed')}\n{e}",
-        )
+        import traceback
+        traceback.print_exc()
+        SimpleInfoDialog(
+            title=tr(lang, "error"),
+            message=f"{tr(lang, 'install_failed')}\n\n{e}",
+            theme=theme, lang=lang, icon="❌", parent=parent,
+        ).exec_()
         return False

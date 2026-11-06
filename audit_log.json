@@ -1,0 +1,3560 @@
+[
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-04T08:15:01.828010",
+    "id": "4c90901b-db71-415d-a1d1-a2f6874c228c"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "0642b69a-5f16-4b0f-838f-1698c95773f7",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-04T08:15:24.784587",
+    "id": "219903e1-dcb8-4f3f-9cad-46fe68400656"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "0642b69a-5f16-4b0f-838f-1698c95773f7",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-04T08:15:47.547814",
+    "id": "9ac0c1dc-7325-4d78-8627-4be8a6dbce40"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "0642b69a-5f16-4b0f-838f-1698c95773f7",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9786,
+      "image": "Liver006.png"
+    },
+    "timestamp": "2026-11-04T08:16:05.694502",
+    "id": "db20a659-b29c-48ed-b4be-f39171b54ce4"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "0642b69a-5f16-4b0f-838f-1698c95773f7",
+    "details": {},
+    "timestamp": "2026-11-04T08:16:13.282871",
+    "id": "b920d55a-92b5-4656-8310-3aa1666703aa"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-04T08:17:29.728048",
+    "id": "a785d889-a4ae-446c-a10a-c9a9a4544264"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "c339c620-bbe7-4716-8b04-ed331ff0299a",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-04T08:17:45.553096",
+    "id": "1106b451-45fa-4d19-b6ea-00d9b6eb9d60"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "c339c620-bbe7-4716-8b04-ed331ff0299a",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9957,
+      "image": "Liver079.png"
+    },
+    "timestamp": "2026-11-04T08:18:01.900338",
+    "id": "3127c523-c41b-4e6c-afc6-beb2a9f2035e"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "c339c620-bbe7-4716-8b04-ed331ff0299a",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_solarized_dark"
+    },
+    "timestamp": "2026-11-04T08:19:35.712119",
+    "id": "59bce521-c5b5-4089-ac90-21b7f63bae31"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "c339c620-bbe7-4716-8b04-ed331ff0299a",
+    "details": {},
+    "timestamp": "2026-11-04T08:20:04.608932",
+    "id": "8978dd9a-3e09-4ce5-9e01-912cecbe6c4c"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T02:13:38.230735",
+    "id": "d4949359-44f6-4be0-a561-f6a7b73ea6e2"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "94867091-5e3f-471f-a976-c56ac45ec715",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T02:13:57.109974",
+    "id": "c10c0265-cf0e-42d9-871f-86efad41f438"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "94867091-5e3f-471f-a976-c56ac45ec715",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_forest"
+    },
+    "timestamp": "2026-11-05T02:15:28.724745",
+    "id": "8641ae68-3e8d-4a6f-a906-af9067169251"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "94867091-5e3f-471f-a976-c56ac45ec715",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-05T02:16:03.763699",
+    "id": "42e0fdbc-bec5-43fc-ad5e-f18eac07267c"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "94867091-5e3f-471f-a976-c56ac45ec715",
+    "details": {
+      "grid": 2,
+      "confidence": 0.849,
+      "image": "Liver775.png"
+    },
+    "timestamp": "2026-11-05T02:16:29.411252",
+    "id": "7bbc99a1-3063-4f63-952f-b8d5d19e81e8"
+  },
+  {
+    "action": "logout",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bob",
+    "session_id": "94867091-5e3f-471f-a976-c56ac45ec715",
+    "details": {},
+    "timestamp": "2026-11-05T02:17:16.229080",
+    "id": "b1ef5b49-7984-4c87-99c5-7e3e7d32ada9"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-05T02:17:38.225560",
+    "id": "fcca249a-0737-436b-94f5-47ab6ce2eedb"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T02:25:56.623283",
+    "id": "aeccf56d-3c4b-40ae-83e7-9ab04c90e9dc"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "babak",
+    "session_id": "cb4b33dd-696c-465c-9369-9b2e73faf7e1",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T02:29:35.823018",
+    "id": "b1a12f7e-5585-47f5-a916-f4efa5db61f0"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "babak",
+    "session_id": "cb4b33dd-696c-465c-9369-9b2e73faf7e1",
+    "details": {},
+    "timestamp": "2026-11-05T02:31:00.238550",
+    "id": "dd8b4f8c-3b65-4ddf-a277-224b1af6972d"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T02:40:44.752622",
+    "id": "dfd47cf5-dd4f-4eec-aca8-93f2cfcb7d86"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "babak",
+    "session_id": "51791566-fa3a-4d2f-b920-185cf45c534e",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T02:41:12.485827",
+    "id": "7e24b04b-3a0f-4882-b1ae-2d40331ba41a"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "babak",
+    "session_id": "51791566-fa3a-4d2f-b920-185cf45c534e",
+    "details": {
+      "grid": 0,
+      "confidence": 0.8283,
+      "image": "Liver019.png"
+    },
+    "timestamp": "2026-11-05T02:42:14.672533",
+    "id": "63b9faa6-b685-4355-977a-4dd308a58d84"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "babak",
+    "session_id": "51791566-fa3a-4d2f-b920-185cf45c534e",
+    "details": {},
+    "timestamp": "2026-11-05T02:44:50.640202",
+    "id": "11503622-ba81-4507-aa9a-94d9cd4bb4c0"
+  },
+  {
+    "action": "session_unlocked",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "babak",
+    "session_id": "51791566-fa3a-4d2f-b920-185cf45c534e",
+    "details": {},
+    "timestamp": "2026-11-05T02:45:08.342887",
+    "id": "e8cbd4f6-3c3a-4ff5-9d37-0b7a1f8010e9"
+  },
+  {
+    "action": "logout",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "babak",
+    "session_id": "51791566-fa3a-4d2f-b920-185cf45c534e",
+    "details": {},
+    "timestamp": "2026-11-05T02:45:14.463491",
+    "id": "6b6dc511-ce10-4ca9-813c-42df73f0f128"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-05T02:45:46.279791",
+    "id": "a89c1381-677e-4247-9de8-00936c690cbe"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T03:29:43.900001",
+    "id": "14a27fb9-d7b2-49e1-8ce9-c375b399498e"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "7ca24a4c-9d6c-48fc-9d67-c6eccaf13745",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T03:31:34.818098",
+    "id": "5efab829-61eb-43c4-b2ce-4cc8af2504f9"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "7ca24a4c-9d6c-48fc-9d67-c6eccaf13745",
+    "details": {},
+    "timestamp": "2026-11-05T03:33:31.778378",
+    "id": "e1c0829b-4100-43d1-b8c3-b4f96260444b"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T03:50:06.984956",
+    "id": "6a2b1b24-a735-44ce-968a-d6ae154e7872"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "d3022e6a-6902-403a-91fe-c471fcd5185e",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T03:51:31.203005",
+    "id": "83e04578-5c33-48eb-bba0-d7ba08a24a0f"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "d3022e6a-6902-403a-91fe-c471fcd5185e",
+    "details": {},
+    "timestamp": "2026-11-05T03:52:29.423485",
+    "id": "ffcf55fd-a2a7-46c8-953a-3b3a88df5a0b"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T04:40:22.254847",
+    "id": "70c1b0f1-be3e-492d-b82d-edb8ee185576"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "e7adad86-3b24-4b3e-b877-033ebdf1eec7",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T04:40:44.427152",
+    "id": "21c45eac-c350-47a5-887a-6b6287b12712"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "e7adad86-3b24-4b3e-b877-033ebdf1eec7",
+    "details": {
+      "lang": "Persian",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-05T04:41:52.640277",
+    "id": "b15b4b51-1c47-4f5b-b692-7527939c91c0"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "e7adad86-3b24-4b3e-b877-033ebdf1eec7",
+    "details": {
+      "lang": "Persian",
+      "theme": "theme_dark_forest"
+    },
+    "timestamp": "2026-11-05T04:42:04.489232",
+    "id": "54d3fda9-6132-4f21-8bda-da84d003e167"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "e7adad86-3b24-4b3e-b877-033ebdf1eec7",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_solarized_dark"
+    },
+    "timestamp": "2026-11-05T04:43:29.976692",
+    "id": "282a03fc-5231-4f82-9ded-ac64774034bb"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "e7adad86-3b24-4b3e-b877-033ebdf1eec7",
+    "details": {},
+    "timestamp": "2026-11-05T04:45:23.048075",
+    "id": "616c8351-bad3-4c29-b455-18fb4e382312"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T04:51:27.442268",
+    "id": "f4ecdfd9-0fa9-4b42-aed9-22bf1f2201db"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "test",
+    "session_id": "b95b8ad1-3584-42a9-9d1d-05f82882d7cc",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T04:54:28.631593",
+    "id": "bf64e315-eb25-4be0-99bc-1ac58001f058"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "test",
+    "session_id": "b95b8ad1-3584-42a9-9d1d-05f82882d7cc",
+    "details": {},
+    "timestamp": "2026-11-05T04:54:53.036006",
+    "id": "ddf0e89b-519e-477c-8d05-1bd8c35e4614"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T05:02:13.231232",
+    "id": "10517c77-0a3b-46fb-ae8e-444c290760c7"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "2abfd39b-e015-422a-a054-334ccfe0e44d",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T05:03:16.810177",
+    "id": "f25bb75a-83eb-4733-a62e-514ae8ec6831"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "2abfd39b-e015-422a-a054-334ccfe0e44d",
+    "details": {},
+    "timestamp": "2026-11-05T05:03:34.046505",
+    "id": "020510bf-ee5a-4197-bae1-a101ebb91b19"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T05:27:20.131677",
+    "id": "294d3bae-c812-4826-b9b0-36e62b1a4abc"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "8107c8eb-17d3-4c85-b48a-e97e00160edc",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T05:30:31.897477",
+    "id": "d3593c62-d6ef-4e59-8420-a89afb402742"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "8107c8eb-17d3-4c85-b48a-e97e00160edc",
+    "details": {},
+    "timestamp": "2026-11-05T05:32:46.502223",
+    "id": "236037a3-3d5d-444a-a3a9-b4594f3aa4c0"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T05:38:55.161980",
+    "id": "6853b661-a30f-4779-94f4-f60f9e521b86"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "9024ae36-9b60-4848-80df-961a4c0d6c3e",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T05:39:31.436802",
+    "id": "3938607b-0a21-4f7a-b6db-1ea2758aadc1"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "mobp",
+    "session_id": "9024ae36-9b60-4848-80df-961a4c0d6c3e",
+    "details": {},
+    "timestamp": "2026-11-05T05:41:31.443161",
+    "id": "69d63cbe-b951-4a00-a854-b0bbdfb48ba3"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "9024ae36-9b60-4848-80df-961a4c0d6c3e",
+    "details": {},
+    "timestamp": "2026-11-05T05:41:40.268885",
+    "id": "e1f17fa8-238c-4435-a06d-9bb32d722632"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T05:56:39.040549",
+    "id": "4f270fdb-f9b0-4eff-aee1-d7cc5eb3b4dc"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "ec748c0a-caf7-41fa-8043-e6fb1a88b9e1",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T05:57:13.129174",
+    "id": "ec46b765-6d3f-4933-ae69-bd2fa3fc7d6d"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "mobp",
+    "session_id": "ec748c0a-caf7-41fa-8043-e6fb1a88b9e1",
+    "details": {},
+    "timestamp": "2026-11-05T05:59:13.136879",
+    "id": "84f3d98c-7e46-4f90-a395-84957e934b17"
+  },
+  {
+    "action": "session_unlocked",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "ec748c0a-caf7-41fa-8043-e6fb1a88b9e1",
+    "details": {},
+    "timestamp": "2026-11-05T05:59:25.082448",
+    "id": "530a75e0-904e-44c5-b1c6-ce896ae577ab"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "mobp",
+    "session_id": "ec748c0a-caf7-41fa-8043-e6fb1a88b9e1",
+    "details": {},
+    "timestamp": "2026-11-05T05:59:34.267833",
+    "id": "43adee83-5dba-4142-8ef2-a3ad2a15f429"
+  },
+  {
+    "action": "session_unlocked",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "ec748c0a-caf7-41fa-8043-e6fb1a88b9e1",
+    "details": {},
+    "timestamp": "2026-11-05T05:59:43.907306",
+    "id": "b1aaf30d-adf4-4d47-8422-7970f0d4f2df"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "ec748c0a-caf7-41fa-8043-e6fb1a88b9e1",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_forest"
+    },
+    "timestamp": "2026-11-05T06:00:16.590577",
+    "id": "cb070c70-e99e-4cd8-ae49-ec614ff00d6a"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "ec748c0a-caf7-41fa-8043-e6fb1a88b9e1",
+    "details": {},
+    "timestamp": "2026-11-05T06:01:05.186366",
+    "id": "eadd0acd-94fb-4b13-af19-79708f598e8e"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T06:26:19.720702",
+    "id": "70511e3f-240d-4982-b7de-735367623505"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "1e1d7f1f-564a-4878-96b5-3743d73128f3",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T06:26:49.945232",
+    "id": "d95c5d9f-60d8-4314-ab70-dd4cd7c5393e"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "1e1d7f1f-564a-4878-96b5-3743d73128f3",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_solarized_dark"
+    },
+    "timestamp": "2026-11-05T06:28:20.639728",
+    "id": "803fbc44-eb1b-4bbf-baab-330e2af828d1"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "1e1d7f1f-564a-4878-96b5-3743d73128f3",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-05T06:29:13.131966",
+    "id": "2a29afed-9209-44d4-9c62-75c0feddc583"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "1e1d7f1f-564a-4878-96b5-3743d73128f3",
+    "details": {},
+    "timestamp": "2026-11-05T06:29:27.423760",
+    "id": "7fc57443-3a47-4bd5-8597-dbc3d180cd09"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T07:21:11.092542",
+    "id": "72c16e7a-f9fe-4b31-a82b-848b31490320"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "9dc293cf-5c9b-4552-94c8-8316e4a07d5d",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T07:23:37.933104",
+    "id": "6367a749-f787-48bc-8bc1-30fe637e818e"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "mobp",
+    "session_id": "9dc293cf-5c9b-4552-94c8-8316e4a07d5d",
+    "details": {},
+    "timestamp": "2026-11-05T07:24:15.619614",
+    "id": "fcb023b3-61da-4431-a0c0-736e27ac6d09"
+  },
+  {
+    "action": "session_unlocked",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "9dc293cf-5c9b-4552-94c8-8316e4a07d5d",
+    "details": {},
+    "timestamp": "2026-11-05T07:24:23.684172",
+    "id": "2d779845-2aa9-49e1-98ec-9f10822bdbf1"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "9dc293cf-5c9b-4552-94c8-8316e4a07d5d",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_forest"
+    },
+    "timestamp": "2026-11-05T07:25:12.983330",
+    "id": "d6b816bd-ce13-4f09-a14f-efac948604cf"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "9dc293cf-5c9b-4552-94c8-8316e4a07d5d",
+    "details": {},
+    "timestamp": "2026-11-05T07:25:22.757972",
+    "id": "b45f6bcd-ca5d-4b87-a735-16b7f237f36b"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T07:47:01.413610",
+    "id": "418ebf52-6c19-45c9-b7b8-e882f519935c"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "aea712a8-259b-42c9-97de-d695f77782a2",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T07:49:10.038061",
+    "id": "b70afcf4-e2c2-4e63-8a90-cd49f7f327e2"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "aea712a8-259b-42c9-97de-d695f77782a2",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_solarized_dark"
+    },
+    "timestamp": "2026-11-05T07:49:47.199421",
+    "id": "5f18c4e4-0e2f-4134-bbe6-b6f49d191dc7"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "aea712a8-259b-42c9-97de-d695f77782a2",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-05T07:50:48.333898",
+    "id": "b74b90ba-e8ed-49ff-8f59-585748702ca8"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "aea712a8-259b-42c9-97de-d695f77782a2",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9975,
+      "image": "Liver2143.png"
+    },
+    "timestamp": "2026-11-05T07:51:18.906527",
+    "id": "f0f35407-6824-42f5-b603-1578e6c19ccb"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobp",
+    "session_id": "aea712a8-259b-42c9-97de-d695f77782a2",
+    "details": {},
+    "timestamp": "2026-11-05T07:52:40.449467",
+    "id": "6991a878-752c-4d45-931a-66b6ea8616f8"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T09:11:04.428650",
+    "id": "9bb1714b-525f-4daa-a938-1235772c8da7"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "0289e6a2-682f-436f-bd40-963d49536d29",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T09:11:22.112133",
+    "id": "ea3284d8-67ee-4145-89da-8226a4cc5614"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "0289e6a2-682f-436f-bd40-963d49536d29",
+    "details": {},
+    "timestamp": "2026-11-05T09:13:47.075661",
+    "id": "404fa6db-085e-448b-af1d-1cee0fb57b37"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-05T09:17:17.027092",
+    "id": "c44007fb-e7e3-4c2c-9b9f-daa5ece98243"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "17a9e876-4cf5-4f60-be36-5436d7bea537",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-05T09:17:37.191891",
+    "id": "55b68fa0-ca45-488b-b3f7-679e6dff5eb8"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "17a9e876-4cf5-4f60-be36-5436d7bea537",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_forest"
+    },
+    "timestamp": "2026-11-05T09:18:31.251999",
+    "id": "8e0d514f-f86d-4b2e-9265-abcfe3307588"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "17a9e876-4cf5-4f60-be36-5436d7bea537",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9969,
+      "image": "Liver2607.png"
+    },
+    "timestamp": "2026-11-05T09:19:14.086668",
+    "id": "4b4cb7d0-a7c0-45e7-ac63-4d856fc9c916"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "17a9e876-4cf5-4f60-be36-5436d7bea537",
+    "details": {},
+    "timestamp": "2026-11-05T09:19:43.645104",
+    "id": "a1572cdc-8064-4b00-bff4-8ba90aab9403"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T05:14:48.766450",
+    "id": "ee5bc954-66c1-4b67-b843-8a42a9172582"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "8f02ddea-7ee7-4aeb-9206-e7b0b84a7d0e",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T05:15:16.073180",
+    "id": "b8918537-a122-4cdc-9386-88551700e68e"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "8f02ddea-7ee7-4aeb-9206-e7b0b84a7d0e",
+    "details": {
+      "grid": 0,
+      "confidence": 0.8125,
+      "image": "Liver091.png"
+    },
+    "timestamp": "2026-11-06T05:16:14.928426",
+    "id": "988bd128-9885-40d6-8e38-eb415794e3e5"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "8f02ddea-7ee7-4aeb-9206-e7b0b84a7d0e",
+    "details": {
+      "grid": 1,
+      "confidence": 0.5533,
+      "image": "Liver034.png"
+    },
+    "timestamp": "2026-11-06T05:16:38.833250",
+    "id": "cbd4a275-b90d-4bc8-a228-6800648518c6"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "fafar",
+    "session_id": "8f02ddea-7ee7-4aeb-9206-e7b0b84a7d0e",
+    "details": {},
+    "timestamp": "2026-11-06T05:16:44.762010",
+    "id": "d7d5b88b-6453-47fd-aa8b-5641166f7556"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T05:25:21.059794",
+    "id": "837320c1-f90f-44c3-91a7-c3617c5b4351"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T05:27:45.405893",
+    "id": "1ba59a4f-3cdd-44ce-a056-d92be41de5f1"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {
+      "grid": 3,
+      "confidence": 0.998,
+      "image": "Liver120.png"
+    },
+    "timestamp": "2026-11-06T05:28:31.753566",
+    "id": "2b43bb75-fff8-462a-850e-04c8c73a58f6"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9842,
+      "image": "Liver841.png"
+    },
+    "timestamp": "2026-11-06T05:29:21.546271",
+    "id": "670025cf-e33c-4966-bf80-736a9bdf3855"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {
+      "grid": 3,
+      "confidence": 0.846,
+      "image": "Liver1522.png"
+    },
+    "timestamp": "2026-11-06T05:30:00.342926",
+    "id": "b52f5876-3dbc-413c-97bb-423cce7c0e8a"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {
+      "lang": "Persian",
+      "theme": "theme_solarized_dark"
+    },
+    "timestamp": "2026-11-06T05:30:40.402419",
+    "id": "a2181b0e-a917-4cb4-88a9-007df4040c0c"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-06T05:33:19.882589",
+    "id": "8271f7cc-f98d-4754-bcb9-a6818629d198"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {},
+    "timestamp": "2026-11-06T05:35:20.742818",
+    "id": "ece07e0a-5a06-4eda-ab4e-806c3188c8ed"
+  },
+  {
+    "action": "session_unlocked",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {},
+    "timestamp": "2026-11-06T05:36:14.594391",
+    "id": "9c573c83-7d3c-4926-81fb-20cd8b38d2ba"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "d93457e1-d5f1-4d88-93fe-486b1b198b87",
+    "details": {},
+    "timestamp": "2026-11-06T05:36:20.413743",
+    "id": "b033e4ac-7901-4f73-b261-041158e0255f"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T05:58:34.501744",
+    "id": "0b24d4ce-1acd-43cb-8c05-4d61511f554b"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "6eedd751-3bd7-43bd-9b58-59b588d72a6b",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T05:59:03.685102",
+    "id": "01e091dc-5225-4909-a2b7-6c67c3c8ceaf"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "6eedd751-3bd7-43bd-9b58-59b588d72a6b",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9959,
+      "image": "Liver961.png"
+    },
+    "timestamp": "2026-11-06T05:59:43.527299",
+    "id": "8758518b-07d8-4d5b-9016-8f6398abb72a"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "mobidik",
+    "session_id": "6eedd751-3bd7-43bd-9b58-59b588d72a6b",
+    "details": {},
+    "timestamp": "2026-11-06T06:00:12.397890",
+    "id": "abe012d8-1c45-4f84-99b9-161c38ffc370"
+  },
+  {
+    "action": "session_unlocked",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "6eedd751-3bd7-43bd-9b58-59b588d72a6b",
+    "details": {},
+    "timestamp": "2026-11-06T06:00:19.298801",
+    "id": "953aa649-cdc1-4f7d-80a0-2148f02ec1e4"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "6eedd751-3bd7-43bd-9b58-59b588d72a6b",
+    "details": {
+      "grid": 3,
+      "confidence": 0.5275,
+      "image": "16.jpg"
+    },
+    "timestamp": "2026-11-06T06:00:46.110204",
+    "id": "e5302f2d-4d42-4042-ba08-bf6e77c67688"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "6eedd751-3bd7-43bd-9b58-59b588d72a6b",
+    "details": {},
+    "timestamp": "2026-11-06T06:01:07.598917",
+    "id": "1cd2d2cf-465d-49d1-b523-947d0298f167"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T06:20:42.980529",
+    "id": "ad001036-08e4-428b-bd3b-cd248e633ef0"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T06:21:04.728609",
+    "id": "c9237d66-2772-47bb-903d-e7a16ce48b93"
+  },
+  {
+    "action": "stats_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {},
+    "timestamp": "2026-11-06T06:21:12.337367",
+    "id": "880a5c64-b7fc-4f8d-b747-e09bd854c9e6"
+  },
+  {
+    "action": "history_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {},
+    "timestamp": "2026-11-06T06:21:19.506047",
+    "id": "c1fc92c3-f997-4481-ab1f-f3d1db855b8a"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 1,
+      "confidence": 0.8009,
+      "image": "Liver014.png"
+    },
+    "timestamp": "2026-11-06T06:21:33.403694",
+    "id": "2e5163ad-7b24-4235-bb08-16f2d135178e"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 1,
+      "confidence": 0.863,
+      "image": "Liver269.png"
+    },
+    "timestamp": "2026-11-06T06:21:43.085367",
+    "id": "5f016d14-2c39-40d8-bd89-1579fc82ed3b"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 1,
+      "confidence": 0.8354,
+      "image": "Liver403.png"
+    },
+    "timestamp": "2026-11-06T06:21:50.143973",
+    "id": "3b8a7601-913c-45c5-89ea-665ae8b380a1"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 1,
+      "confidence": 0.8731,
+      "image": "Liver496.png"
+    },
+    "timestamp": "2026-11-06T06:21:59.093453",
+    "id": "7735954e-688b-4bba-81a4-f830d06d4fed"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 1,
+      "confidence": 0.735,
+      "image": "Liver1683.png"
+    },
+    "timestamp": "2026-11-06T06:22:08.466609",
+    "id": "079015df-1da0-4f1e-9e2b-9ed11d62591f"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 2,
+      "confidence": 0.974,
+      "image": "Liver030.png"
+    },
+    "timestamp": "2026-11-06T06:22:18.030306",
+    "id": "a2fa9101-7333-4dfa-93ac-edd652d01e3b"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9106,
+      "image": "Liver976.png"
+    },
+    "timestamp": "2026-11-06T06:22:25.025737",
+    "id": "286abed4-5fb7-4d5a-b24b-819ed8413676"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 2,
+      "confidence": 0.792,
+      "image": "Liver736.png"
+    },
+    "timestamp": "2026-11-06T06:22:30.413152",
+    "id": "91db44b3-c474-4498-a258-2ccff40eeccf"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9106,
+      "image": "Liver976.png"
+    },
+    "timestamp": "2026-11-06T06:22:37.032266",
+    "id": "0fe4cf56-f2c0-4f0c-bf27-a6125e6e159d"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9127,
+      "image": "Liver2622.png"
+    },
+    "timestamp": "2026-11-06T06:22:45.816322",
+    "id": "92ea850b-5f05-4c9f-966c-4777b2f05d42"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 3,
+      "confidence": 0.998,
+      "image": "Liver120.png"
+    },
+    "timestamp": "2026-11-06T06:22:56.210353",
+    "id": "f122c4bb-2e43-4cb7-bc91-25edaaa9fd05"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9993,
+      "image": "Liver2537.png"
+    },
+    "timestamp": "2026-11-06T06:23:02.009468",
+    "id": "7343d0cd-45cc-4450-94bf-3b84b934b247"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9959,
+      "image": "Liver961.png"
+    },
+    "timestamp": "2026-11-06T06:23:06.359262",
+    "id": "34ed600d-9457-4991-a594-2990a164f7be"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9985,
+      "image": "Liver851.png"
+    },
+    "timestamp": "2026-11-06T06:23:10.997032",
+    "id": "b4beb8cd-af7c-490e-ae07-ef338a00ccd3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9956,
+      "image": "Liver2630.png"
+    },
+    "timestamp": "2026-11-06T06:23:16.029751",
+    "id": "1fcb761b-33f1-47ef-99cd-5dec7aade583"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 0,
+      "confidence": 0.805,
+      "image": "Liver031.png"
+    },
+    "timestamp": "2026-11-06T06:23:26.434318",
+    "id": "fe118b78-92ed-4b9a-8ce6-91aa1aae2a78"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 0,
+      "confidence": 0.6189,
+      "image": "Liver198.png"
+    },
+    "timestamp": "2026-11-06T06:23:32.208409",
+    "id": "b2c60bfb-076d-434a-a04a-265335f95df5"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5145,
+      "image": "Liver284.png"
+    },
+    "timestamp": "2026-11-06T06:23:40.639945",
+    "id": "b863bc2b-36e2-436e-a69a-fd1e86ccd4d8"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 0,
+      "confidence": 0.7279,
+      "image": "Liver864.png"
+    },
+    "timestamp": "2026-11-06T06:23:48.799054",
+    "id": "9221d337-edc1-4bf8-a617-badf2d4cdc63"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 0,
+      "confidence": 0.745,
+      "image": "Liver1415.png"
+    },
+    "timestamp": "2026-11-06T06:23:59.194529",
+    "id": "e4663496-b259-43d1-b986-6b9c2e0c1df2"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 3,
+      "confidence": 0.7841,
+      "image": "19.jpg"
+    },
+    "timestamp": "2026-11-06T06:24:14.273029",
+    "id": "c7466d81-2935-4585-9f46-739e4ab61db0"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {
+      "grid": 2,
+      "confidence": 1.0,
+      "image": "14.jpg"
+    },
+    "timestamp": "2026-11-06T06:24:22.635030",
+    "id": "018017b6-3b35-482e-a03e-a80553e56032"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "mobidik",
+    "session_id": "ad60a5a3-c8dd-4409-96dc-627310c882f0",
+    "details": {},
+    "timestamp": "2026-11-06T06:24:37.381856",
+    "id": "5e31a4df-4bf4-4680-9e91-dc49f202aa95"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T07:26:45.663246",
+    "id": "dbaf52dc-af8b-4f9b-bc6c-90287db6697a"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T07:28:00.773471",
+    "id": "c3e15f03-c5d4-4212-8afd-f69ce6cb62a4"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9961,
+      "image": "Liver2569.png"
+    },
+    "timestamp": "2026-11-06T07:28:41.970708",
+    "id": "62a3b524-429e-45a7-8779-a13b950e091e"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "score": 0.0,
+      "reason": "Image does not match liver ultrasound pattern. May be another organ or modality (MRI/CT/fetus/kidney).",
+      "file": "19.jpg"
+    },
+    "timestamp": "2026-11-06T07:29:14.753715",
+    "id": "2dec4a62-8cae-436d-bc6e-4b9a34b596ba"
+  },
+  {
+    "action": "session_locked",
+    "category": "AUTH",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {},
+    "timestamp": "2026-11-06T07:31:14.744153",
+    "id": "a2473d9b-ae2e-4865-ab78-dc5439a2b161"
+  },
+  {
+    "action": "session_unlocked",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {},
+    "timestamp": "2026-11-06T07:44:38.022943",
+    "id": "6a7dd307-c1b4-4655-a6c5-049b7a4b993f"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "score": 0.0,
+      "reason": "Image does not match liver ultrasound pattern. May be another organ or modality (MRI/CT/fetus/kidney).",
+      "file": "14.jpg"
+    },
+    "timestamp": "2026-11-06T07:45:00.117031",
+    "id": "60ac4118-6832-47b9-88c4-1d59b05476c2"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "lang": "Persian",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-06T07:45:10.490946",
+    "id": "68d6d1bb-7c38-4f97-a6f7-32850f1b21d4"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "lang": "Persian",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-06T07:45:31.639197",
+    "id": "3561a914-158d-40cf-bd20-25e2d4a4b1bd"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "score": 0.0,
+      "reason": "Image does not match liver ultrasound pattern. May be another organ or modality (MRI/CT/fetus/kidney).",
+      "file": "14.jpg"
+    },
+    "timestamp": "2026-11-06T07:46:01.694365",
+    "id": "266b6bae-ea24-40aa-84e8-3cdb0fc73603"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "score": 0.0,
+      "reason": "Image does not match liver ultrasound pattern. May be another organ or modality (MRI/CT/fetus/kidney).",
+      "file": "G1_00e8e388.png"
+    },
+    "timestamp": "2026-11-06T07:46:28.318454",
+    "id": "28326b0c-b8f3-4175-94de-d8a8cc3a3d3e"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {
+      "score": 0.0,
+      "reason": "Image does not match liver ultrasound pattern. May be another organ or modality (MRI/CT/fetus/kidney).",
+      "file": "G1_0b35ee16.png"
+    },
+    "timestamp": "2026-11-06T07:46:38.638251",
+    "id": "d1bc21cf-740d-4433-9a7d-d6b953378b71"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5ed35f94-f291-4e56-ba14-aaffc9a90eba",
+    "details": {},
+    "timestamp": "2026-11-06T07:46:41.337827",
+    "id": "9b4dfb98-a9e5-4132-96bb-94ffc3a7521b"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T08:01:13.816138",
+    "id": "dfc7de35-3ba3-4125-a8b5-33fbfb4413e2"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T08:01:41.352047",
+    "id": "6fed27d1-6df9-4a81-be53-406a21582071"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-06T08:01:53.679101",
+    "id": "41caa0cf-4643-49b2-ae72-a5ad3454622d"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_forest"
+    },
+    "timestamp": "2026-11-06T08:02:09.118980",
+    "id": "c9bbb2af-2ce3-4047-a7ed-cb389253e41f"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 2,
+      "confidence": 0.849,
+      "image": "Liver775.png"
+    },
+    "timestamp": "2026-11-06T08:02:25.311042",
+    "id": "d07ae8b5-a669-4464-bd14-629cc43956c9"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9985,
+      "image": "Liver851.png"
+    },
+    "timestamp": "2026-11-06T08:02:34.318172",
+    "id": "e6540613-9c11-4426-914f-e0e7f7fa58b8"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9786,
+      "image": "Liver006.png"
+    },
+    "timestamp": "2026-11-06T08:02:43.055896",
+    "id": "96f21d64-7383-4fc1-8c72-3b4b39649b2a"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 1,
+      "confidence": 0.8734,
+      "image": "Liver495.png"
+    },
+    "timestamp": "2026-11-06T08:02:53.649574",
+    "id": "ca659c05-4f90-4293-86bd-ebf5b8b2934e"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 0,
+      "confidence": 0.805,
+      "image": "Liver031.png"
+    },
+    "timestamp": "2026-11-06T08:03:01.030245",
+    "id": "ee1111d8-7102-4319-874c-912ae41e6f36"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "score": 0.837,
+      "reason": "More similar to non-liver references",
+      "file": "16.jpg"
+    },
+    "timestamp": "2026-11-06T08:03:17.456492",
+    "id": "82339f76-5366-46d6-a6e6-b9a0d550bb94"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "score": 0.056,
+      "reason": "Image does not match liver ultrasound pattern (liver_score=0.06 < 0.15)",
+      "file": "19.jpg"
+    },
+    "timestamp": "2026-11-06T08:03:22.350810",
+    "id": "ecf60653-e13d-4d67-8024-66b5e96292ce"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "score": 0.001,
+      "reason": "Image does not match liver ultrasound pattern (liver_score=0.00 < 0.15)",
+      "file": "14.jpg"
+    },
+    "timestamp": "2026-11-06T08:03:26.715202",
+    "id": "a83e3012-72ea-43a7-9102-2d0c815d5814"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 1,
+      "confidence": 0.7285,
+      "image": "G1_0b35ee16.png"
+    },
+    "timestamp": "2026-11-06T08:03:46.421917",
+    "id": "fc1c3fe7-0dfc-47eb-a3b8-568aa40e31a4"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 2,
+      "confidence": 0.6246,
+      "image": "G1_0a473e44.png"
+    },
+    "timestamp": "2026-11-06T08:03:52.211109",
+    "id": "274cff72-c2f1-4eaa-a798-aa7ee0b54821"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "score": 0.95,
+      "reason": "More similar to non-liver references",
+      "file": "G1_00e8e388.png"
+    },
+    "timestamp": "2026-11-06T08:03:57.429892",
+    "id": "bf8f1e47-6d9e-4bb7-8f7c-fdf6a7201eab"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 1,
+      "confidence": 0.6147,
+      "image": "G1_2eacf254.png"
+    },
+    "timestamp": "2026-11-06T08:04:05.254504",
+    "id": "5219ea4a-5bd8-43bc-afb5-a78ac840f882"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 1,
+      "confidence": 0.824,
+      "image": "G1_a75dc205.png"
+    },
+    "timestamp": "2026-11-06T08:04:21.833460",
+    "id": "0d61c93f-314e-43e9-a464-ee39d38bb856"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 1,
+      "confidence": 0.5679,
+      "image": "G1_0bd584da.png"
+    },
+    "timestamp": "2026-11-06T08:04:30.231012",
+    "id": "2cf7a4ae-7214-4ce1-a731-017458aa8c13"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "score": 0.955,
+      "reason": "More similar to non-liver references",
+      "file": "G1_0c77e0b8.png"
+    },
+    "timestamp": "2026-11-06T08:04:36.570984",
+    "id": "5466a5e2-cd27-404e-aa0a-571ae29bbd2e"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 1,
+      "confidence": 0.545,
+      "image": "G1_2f3508e2.png"
+    },
+    "timestamp": "2026-11-06T08:04:42.824711",
+    "id": "557f0633-698e-4047-8e23-5741512c6250"
+  },
+  {
+    "action": "result_rejected_low_confidence",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "confidence": 0.458,
+      "reason": "Model confidence too low (45.8%)",
+      "metrics": {
+        "saturation": 0.8,
+        "brightness": 1.0,
+        "grayscale": 0.5903131399279729,
+        "edges": 0.8,
+        "histogram": 0.7,
+        "heuristic_score": 0.7625782849819932,
+        "liver_score": 0.8840611552367033,
+        "non_liver_similarity": 0.7624900937080383,
+        "final_score": 0.8476162941602902,
+        "image_score": 0.8476162941602902
+      }
+    },
+    "timestamp": "2026-11-06T08:05:05.307436",
+    "id": "0a808685-55b9-48ef-bc64-48c77bb20f2e"
+  },
+  {
+    "action": "result_rejected_low_confidence",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "confidence": 0.458,
+      "reason": "Model confidence too low (45.8%)",
+      "metrics": {
+        "saturation": 0.8,
+        "brightness": 1.0,
+        "grayscale": 0.5903131399279729,
+        "edges": 0.8,
+        "histogram": 0.7,
+        "heuristic_score": 0.7625782849819932,
+        "liver_score": 0.8840611552367033,
+        "non_liver_similarity": 0.7624900937080383,
+        "final_score": 0.8476162941602902,
+        "image_score": 0.8476162941602902
+      }
+    },
+    "timestamp": "2026-11-06T08:05:25.302128",
+    "id": "c0cbc9dd-8485-4fb7-bb64-f46c612e2d10"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {
+      "grid": 1,
+      "confidence": 0.608,
+      "image": "Liver2175.png"
+    },
+    "timestamp": "2026-11-06T08:05:40.976667",
+    "id": "a0da61d3-e977-4dff-ae09-3609b3209451"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "9f5397ce-8f6c-4dc7-8983-66980b67eccc",
+    "details": {},
+    "timestamp": "2026-11-06T08:06:08.638758",
+    "id": "a11c5b0c-1d68-4772-abec-7764a0b2e3ef"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T11:19:15.573489",
+    "id": "2ffbd138-df6c-43c6-83c2-ef48b8aaac66"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5879e429-d7e4-48e8-a698-1e87b8421689",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T11:19:44.953240",
+    "id": "ae9696de-5ccc-4783-b072-b3ef6cf8b9c2"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5879e429-d7e4-48e8-a698-1e87b8421689",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9352,
+      "image": "liver_clean_19072_1793992802917.png"
+    },
+    "timestamp": "2026-11-06T11:20:20.223784",
+    "id": "e9287131-f552-4a80-b086-9a964859ab5e"
+  },
+  {
+    "action": "result_rejected_low_confidence",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "5879e429-d7e4-48e8-a698-1e87b8421689",
+    "details": {
+      "confidence": 0.466,
+      "reason": "Model confidence too low (46.6%)",
+      "metrics": {
+        "saturation": 1.0,
+        "brightness": 1.0,
+        "grayscale": 0.7415436522598511,
+        "edges": 1.0,
+        "histogram": 0.7,
+        "heuristic_score": 0.8903859130649627,
+        "liver_score": 0.9018341325620594,
+        "non_liver_similarity": 0.6897922158241272,
+        "final_score": 0.8983996667129304,
+        "image_score": 0.8983996667129304
+      }
+    },
+    "timestamp": "2026-11-06T11:20:54.508725",
+    "id": "ab4e8358-66a6-44c4-a929-c8b869f167f3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5879e429-d7e4-48e8-a698-1e87b8421689",
+    "details": {
+      "grid": 3,
+      "confidence": 0.5859,
+      "image": "liver_clean_19072_1793992865340.png"
+    },
+    "timestamp": "2026-11-06T11:21:08.654919",
+    "id": "ef48518c-bf15-4d1a-a8a3-0402772be086"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "5879e429-d7e4-48e8-a698-1e87b8421689",
+    "details": {},
+    "timestamp": "2026-11-06T11:21:22.139542",
+    "id": "805a2cf6-13cd-47e3-9118-382dd161a063"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T11:35:15.640309",
+    "id": "659eb031-24a9-492f-a18f-94b26cc0a7a7"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T11:35:36.547168",
+    "id": "96acbd38-4212-4573-a448-c9ea1c414a57"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9403,
+      "image": "liver_clean_11308_1793993752232.png"
+    },
+    "timestamp": "2026-11-06T11:36:02.140235",
+    "id": "1b6ff1b8-7ece-41db-864d-1d035c2dc8a9"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 3,
+      "confidence": 0.998,
+      "image": "liver_clean_11308_1793993771728.png"
+    },
+    "timestamp": "2026-11-06T11:36:15.386481",
+    "id": "29e1e6a7-c48b-4e43-972a-4cec0114f404"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9979,
+      "image": "liver_clean_11308_1793993780059.png"
+    },
+    "timestamp": "2026-11-06T11:36:22.138036",
+    "id": "e7c2d86d-cf10-46ed-8630-1e4c331a66cc"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9993,
+      "image": "liver_clean_11308_1793993785400.png"
+    },
+    "timestamp": "2026-11-06T11:36:27.366179",
+    "id": "a56e57f1-39a8-432a-880a-204061425ebd"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9978,
+      "image": "liver_clean_11308_1793993790891.png"
+    },
+    "timestamp": "2026-11-06T11:36:32.528654",
+    "id": "6bad9d5a-c6e0-4487-9658-23b0f9953b76"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9319,
+      "image": "liver_clean_11308_1793993799576.png"
+    },
+    "timestamp": "2026-11-06T11:36:43.612837",
+    "id": "9c9c8db3-cf72-4b67-9ae9-fb3b5b9a9fc9"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9315,
+      "image": "liver_clean_11308_1793993810169.png"
+    },
+    "timestamp": "2026-11-06T11:36:52.562453",
+    "id": "870b6174-f64a-4bb1-b4fb-bf605d3f81ec"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 3,
+      "confidence": 0.7723,
+      "image": "liver_clean_11308_1793993818255.png"
+    },
+    "timestamp": "2026-11-06T11:37:00.357547",
+    "id": "344fbac4-6ed5-46ef-8772-613c070272f9"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 0,
+      "confidence": 0.8189,
+      "image": "liver_clean_11308_1793993830529.png"
+    },
+    "timestamp": "2026-11-06T11:37:12.322606",
+    "id": "3951cdab-73f7-431f-8a10-13f467f04111"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 1,
+      "confidence": 0.7105,
+      "image": "liver_clean_11308_1793993835930.png"
+    },
+    "timestamp": "2026-11-06T11:37:17.529794",
+    "id": "3ed42a1e-214c-467d-8289-b3ae884b588c"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 0,
+      "confidence": 0.4433,
+      "image": "liver_clean_11308_1793993844996.png"
+    },
+    "timestamp": "2026-11-06T11:37:28.150934",
+    "id": "b1f98ac0-b4ba-412e-9fd2-66e3f3d4c57d"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 0,
+      "confidence": 0.7254,
+      "image": "liver_clean_11308_1793993854222.png"
+    },
+    "timestamp": "2026-11-06T11:37:36.398054",
+    "id": "d8901124-97d2-459e-9a70-11f2a1fd21ff"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "score": 0.002,
+      "reason": "Image does not match liver ultrasound pattern (liver_score=0.00 < 0.08)",
+      "file": "14.jpg",
+      "preprocessed": true
+    },
+    "timestamp": "2026-11-06T11:37:47.988725",
+    "id": "fe19471d-b78a-4fca-9a37-0da3c43c5c89"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {
+      "grid": 3,
+      "confidence": 0.5767,
+      "image": "liver_clean_11308_1793993874244.png"
+    },
+    "timestamp": "2026-11-06T11:37:58.183300",
+    "id": "0cc0e0b5-b403-49cf-957e-7071b014a3b5"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "dbe821c7-1ed9-47c0-918b-0ceb3af53d5c",
+    "details": {},
+    "timestamp": "2026-11-06T11:38:03.069287",
+    "id": "7c1b9e74-cd37-4dc6-80bc-c7b93d218f24"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T11:42:52.246182",
+    "id": "acb93da0-de19-43cb-9d5c-52fde5554c4a"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T11:43:46.715988",
+    "id": "55777642-0126-43d5-ab27-8247ff700587"
+  },
+  {
+    "action": "stats_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {},
+    "timestamp": "2026-11-06T11:43:53.353206",
+    "id": "0483f873-a3ce-49f4-aa25-4144544059ac"
+  },
+  {
+    "action": "history_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {},
+    "timestamp": "2026-11-06T11:43:57.994156",
+    "id": "be140efd-2144-4409-8520-f9218df9436a"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_aqua"
+    },
+    "timestamp": "2026-11-06T11:44:19.026530",
+    "id": "4db5451b-8b74-4206-b8ce-2eeaae46502f"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5052,
+      "image": "liver_clean_20504_1793994270951.png"
+    },
+    "timestamp": "2026-11-06T11:44:38.328945",
+    "id": "73d60f3f-d98b-44a0-9384-e7b3aeea7008"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 0,
+      "confidence": 0.857,
+      "image": "liver_clean_20504_1793994282614.png"
+    },
+    "timestamp": "2026-11-06T11:44:44.333999",
+    "id": "db846ffd-00b0-42d0-bbf9-847724693d73"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 1,
+      "confidence": 0.4312,
+      "image": "liver_clean_20504_1793994287858.png"
+    },
+    "timestamp": "2026-11-06T11:44:49.737003",
+    "id": "00389376-71f2-4f28-88ba-edcac386d423"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 3,
+      "confidence": 0.7305,
+      "image": "liver_clean_20504_1793994298600.png"
+    },
+    "timestamp": "2026-11-06T11:45:00.364467",
+    "id": "8c0e172c-7028-439c-bd84-aa4cf97ea80b"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9999,
+      "image": "liver_clean_20504_1793994305041.png"
+    },
+    "timestamp": "2026-11-06T11:45:06.778681",
+    "id": "637990d1-1154-4044-abf0-183a8ddbdeb4"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9611,
+      "image": "liver_clean_20504_1793994311630.png"
+    },
+    "timestamp": "2026-11-06T11:45:13.578843",
+    "id": "7580f570-6a81-4ef1-acee-b7d34323ac39"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 3,
+      "confidence": 0.7881,
+      "image": "liver_clean_20504_1793994317340.png"
+    },
+    "timestamp": "2026-11-06T11:45:19.158403",
+    "id": "cde9a5b5-ff7b-4e95-b4e0-efa8570856dd"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 2,
+      "confidence": 0.6696,
+      "image": "liver_clean_20504_1793994324784.png"
+    },
+    "timestamp": "2026-11-06T11:45:26.769750",
+    "id": "2bdea594-1366-4f75-b017-3693ab7b72b7"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 2,
+      "confidence": 0.81,
+      "image": "liver_clean_20504_1793994334139.png"
+    },
+    "timestamp": "2026-11-06T11:45:35.947879",
+    "id": "f3acdf19-586f-4d98-a52f-4d407f526f4a"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 1,
+      "confidence": 0.4779,
+      "image": "liver_clean_20504_1793994362625.png"
+    },
+    "timestamp": "2026-11-06T11:46:05.367110",
+    "id": "ed86f650-285b-4fc3-94a9-f2b759a045e3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 2,
+      "confidence": 0.5031,
+      "image": "liver_clean_20504_1793994370363.png"
+    },
+    "timestamp": "2026-11-06T11:46:12.164590",
+    "id": "ce5c0976-2838-461f-af3a-33615e30d4b8"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 1,
+      "confidence": 0.8676,
+      "image": "liver_clean_20504_1793994377052.png"
+    },
+    "timestamp": "2026-11-06T11:46:18.919470",
+    "id": "ca5ee47b-6825-489f-82b2-0cad8f949622"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "score": 0.982,
+      "reason": "More similar to non-liver references",
+      "file": "G1_3abed22f.png",
+      "preprocessed": true
+    },
+    "timestamp": "2026-11-06T11:46:34.337642",
+    "id": "0984f6cb-0389-48ad-ad90-87dd99d6db39"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "score": 0.955,
+      "reason": "More similar to non-liver references",
+      "file": "G1_0c77e0b8.png",
+      "preprocessed": true
+    },
+    "timestamp": "2026-11-06T11:46:38.689515",
+    "id": "fd2e5b62-c75c-475a-82fd-ea5ea8a768a2"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "score": 0.964,
+      "reason": "More similar to non-liver references",
+      "file": "G1_0b799b6e.png",
+      "preprocessed": true
+    },
+    "timestamp": "2026-11-06T11:46:46.430427",
+    "id": "25e5a546-e66b-4845-b11d-9fae14084743"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 3,
+      "confidence": 0.5949,
+      "image": "liver_clean_20504_1793994411159.png"
+    },
+    "timestamp": "2026-11-06T11:46:53.333872",
+    "id": "a99c824d-60f8-4928-80f9-cab6feb29d76"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 1,
+      "confidence": 0.6239,
+      "image": "liver_clean_20504_1793994421954.png"
+    },
+    "timestamp": "2026-11-06T11:47:06.725802",
+    "id": "4a7133ba-1282-4cd9-913d-b0dc240cb98f"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "grid": 1,
+      "confidence": 0.4659,
+      "image": "liver_clean_20504_1793994439800.png"
+    },
+    "timestamp": "2026-11-06T11:47:22.727420",
+    "id": "50be9374-f15c-451b-bb41-2e7306c54a63"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "score": 0.823,
+      "reason": "More similar to non-liver references",
+      "file": "16.jpg",
+      "preprocessed": true
+    },
+    "timestamp": "2026-11-06T11:47:33.241343",
+    "id": "20b80a69-a3c0-41e8-849c-71b41221f327"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "score": 0.002,
+      "reason": "Image does not match liver ultrasound pattern (liver_score=0.00 < 0.15)",
+      "file": "14.jpg",
+      "preprocessed": true
+    },
+    "timestamp": "2026-11-06T11:47:40.308243",
+    "id": "51e249af-c903-442a-b3c2-78189a00f632"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {
+      "score": 0.087,
+      "reason": "Image does not match liver ultrasound pattern (liver_score=0.09 < 0.15)",
+      "file": "19.jpg",
+      "preprocessed": true
+    },
+    "timestamp": "2026-11-06T11:47:46.217905",
+    "id": "e99f83d0-08e2-4bd1-8bcd-dd970af4ce16"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "fe4bc0f4-a07d-4e87-8e1f-224da6f53af4",
+    "details": {},
+    "timestamp": "2026-11-06T11:47:57.812608",
+    "id": "9124f326-8241-4a94-b89a-7424eb063006"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T12:29:19.215028",
+    "id": "954582f6-89d1-4479-bf47-ac4469ce5f29"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-06T12:29:27.007199",
+    "id": "1584bc13-3854-48c4-8195-f8d41cb5e5b0"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T12:32:32.269039",
+    "id": "5062141a-5187-4a1c-8c8b-2c801318d818"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T12:32:52.344941",
+    "id": "3124640a-4630-426a-b525-0545894abeb3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9998,
+      "image": "liver_clean_17088_1793997192208.png"
+    },
+    "timestamp": "2026-11-06T12:33:26.622002",
+    "id": "fb2def20-6a27-4212-ab46-b88e05278fe3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9998,
+      "image": "liver_clean_17088_1793997222994.png"
+    },
+    "timestamp": "2026-11-06T12:33:46.894808",
+    "id": "b34dfb55-f7e2-4a73-83c3-21a1ab5277b5"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9232,
+      "image": "liver_clean_17088_1793997243832.png"
+    },
+    "timestamp": "2026-11-06T12:34:05.867406",
+    "id": "e6a5e1d6-1e10-4608-8adc-63d55530f756"
+  },
+  {
+    "action": "stats_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {},
+    "timestamp": "2026-11-06T12:34:24.709211",
+    "id": "8fb3b4e3-54dc-4817-b9c1-0dbb7de06f94"
+  },
+  {
+    "action": "history_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {},
+    "timestamp": "2026-11-06T12:34:31.188699",
+    "id": "f6a3b8a5-cf6b-4fcd-9fd0-8957b886f8e5"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9999,
+      "image": "liver_clean_17088_1793997284871.png"
+    },
+    "timestamp": "2026-11-06T12:34:46.628191",
+    "id": "48c3cbf8-2c27-4a43-bf8d-3546c27d4a58"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {
+      "grid": 1,
+      "confidence": 0.4485,
+      "image": "liver_clean_17088_1793997293845.png"
+    },
+    "timestamp": "2026-11-06T12:34:55.650306",
+    "id": "d50bd81c-69d9-447a-a4bd-2d14eeb89e36"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "2ad07ef1-34b2-47c4-a15f-01fe00437d26",
+    "details": {},
+    "timestamp": "2026-11-06T12:35:00.135731",
+    "id": "52594842-73c5-4461-8552-8a9ef225f554"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T13:08:07.128690",
+    "id": "867e2526-63c9-40ab-b7a1-498bb3adb521"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T13:08:29.564300",
+    "id": "10bd357f-2472-4e46-92e7-ebd018176a10"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.696,
+      "image": "Liver690.png"
+    },
+    "timestamp": "2026-11-06T13:09:18.051810",
+    "id": "1ad47887-653c-4949-bd29-c2a829569cd5"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9393,
+      "image": "Liver1071.png"
+    },
+    "timestamp": "2026-11-06T13:09:27.371922",
+    "id": "6d3d61ae-b83c-4aaf-ba79-370154695d82"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9988,
+      "image": "Liver2325.png"
+    },
+    "timestamp": "2026-11-06T13:09:35.771998",
+    "id": "6635e37c-5b98-47da-8b8a-ca7a79fae0c9"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5302,
+      "image": "Liver1057.png"
+    },
+    "timestamp": "2026-11-06T13:09:45.361829",
+    "id": "25709762-c348-463e-9162-83e4aca8b782"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5761,
+      "image": "Liver022.png"
+    },
+    "timestamp": "2026-11-06T13:09:56.968103",
+    "id": "6bfaece9-4bbb-4fbf-882e-66dfa735f337"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.5715,
+      "image": "G1_0b00f100.png"
+    },
+    "timestamp": "2026-11-06T13:10:08.144423",
+    "id": "5d6d1545-425c-4ef7-87f5-2460c008ad41"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.5616,
+      "image": "G1_0c759405.png"
+    },
+    "timestamp": "2026-11-06T13:10:13.348851",
+    "id": "5d3ac5db-49a0-4eeb-8e9f-87d3c539d095"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "score": 0.947,
+      "reason": "More similar to non-liver references",
+      "file": "G1_7d80c6c8.png"
+    },
+    "timestamp": "2026-11-06T13:10:21.465680",
+    "id": "e5358445-a433-4855-ba2d-df0585adfc8c"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.7409,
+      "image": "G1_2f89c28a.png"
+    },
+    "timestamp": "2026-11-06T13:10:29.938610",
+    "id": "eaa575f1-ce92-47e8-9bfc-c4c367b3ca90"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.7577,
+      "image": "G1_8e4d72b1.png"
+    },
+    "timestamp": "2026-11-06T13:10:39.168802",
+    "id": "003abc42-1e8d-4919-88ba-a3fe19510ee0"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.9282,
+      "image": "Liver225.png"
+    },
+    "timestamp": "2026-11-06T13:11:04.749203",
+    "id": "2fdee08f-86d9-4e26-9ec8-081dc95ef00b"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.9171,
+      "image": "Liver225_no_label.png"
+    },
+    "timestamp": "2026-11-06T13:11:14.137314",
+    "id": "fb894e69-31af-4768-869f-97a2381b6b0a"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 1,
+      "confidence": 0.6443,
+      "image": "Liver1899.png"
+    },
+    "timestamp": "2026-11-06T13:11:30.326331",
+    "id": "1ae572cb-b27a-4a86-9295-7d42ce4abe67"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "grid": 0,
+      "confidence": 0.4584,
+      "image": "Liver018.png"
+    },
+    "timestamp": "2026-11-06T13:11:46.524761",
+    "id": "63d704c0-b49f-49b3-a4e8-ed38b8c6459b"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "score": 0.001,
+      "reason": "Image does not match liver ultrasound pattern (liver_score=0.00 < 0.05)",
+      "file": "14.jpg"
+    },
+    "timestamp": "2026-11-06T13:12:00.660362",
+    "id": "457c2fa4-d7a9-4aa3-99ce-38640f7abcfd"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "score": 0.91,
+      "reason": "Image has too many sharp edges",
+      "file": "19.jpg"
+    },
+    "timestamp": "2026-11-06T13:12:05.385649",
+    "id": "68796a73-bd8c-4ecd-98e0-7c0cfa4e72a5"
+  },
+  {
+    "action": "image_rejected_not_liver",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {
+      "score": 0.837,
+      "reason": "More similar to non-liver references",
+      "file": "16.jpg"
+    },
+    "timestamp": "2026-11-06T13:12:10.082551",
+    "id": "b2a6a579-2b01-4884-9b05-db9d99b5aedc"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eb8286c5-5f50-4b86-bacb-776b7bbc7614",
+    "details": {},
+    "timestamp": "2026-11-06T13:12:14.646397",
+    "id": "8422bc24-2a67-4b70-a0f8-7278c571b18d"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T13:18:10.918174",
+    "id": "5a92c585-5613-4d12-b5ff-30908dae3905"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "28519e21-5618-464d-a8df-557cfd8289ee",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T13:18:33.313155",
+    "id": "e6f4eed0-d965-4d8e-8cf6-5bbd0cdc7628"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "28519e21-5618-464d-a8df-557cfd8289ee",
+    "details": {
+      "grid": 1,
+      "confidence": 0.9282,
+      "image": "Liver225.png"
+    },
+    "timestamp": "2026-11-06T13:19:01.448239",
+    "id": "b14a6ca5-0b05-4a0a-94ca-4a6ad6a00cad"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "28519e21-5618-464d-a8df-557cfd8289ee",
+    "details": {
+      "grid": 1,
+      "confidence": 0.9171,
+      "image": "Liver225_no_label.png"
+    },
+    "timestamp": "2026-11-06T13:19:11.751232",
+    "id": "e9476a15-93bc-4ffd-b151-0c4f1b25cf81"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "28519e21-5618-464d-a8df-557cfd8289ee",
+    "details": {
+      "grid": 2,
+      "confidence": 0.6359,
+      "image": "Liver167.png"
+    },
+    "timestamp": "2026-11-06T13:19:24.124275",
+    "id": "f392e602-21e2-44fd-9502-b3af97d81372"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "28519e21-5618-464d-a8df-557cfd8289ee",
+    "details": {
+      "grid": 1,
+      "confidence": 0.7343,
+      "image": "Liver374.png"
+    },
+    "timestamp": "2026-11-06T13:19:46.129399",
+    "id": "f6ea9a48-3895-4c83-adb7-40e39a1586ac"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "28519e21-5618-464d-a8df-557cfd8289ee",
+    "details": {},
+    "timestamp": "2026-11-06T13:19:53.598121",
+    "id": "b7ea4d14-5007-451b-92f1-5fbb446e6d67"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T13:24:03.056510",
+    "id": "8d346b03-73a8-49ff-8132-4f8799c8d43e"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "7a4c8322-f0ce-49f3-9cd4-7e0e6cbf3434",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T13:24:21.105264",
+    "id": "1db1623e-6973-4f4e-9ff9-71fe4bbd380f"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "7a4c8322-f0ce-49f3-9cd4-7e0e6cbf3434",
+    "details": {
+      "grid": 1,
+      "confidence": 0.9282,
+      "image": "Liver225.png"
+    },
+    "timestamp": "2026-11-06T13:24:51.980376",
+    "id": "1baed7e6-a15b-4dbd-8594-62b1ec089b5d"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "7a4c8322-f0ce-49f3-9cd4-7e0e6cbf3434",
+    "details": {},
+    "timestamp": "2026-11-06T13:24:54.646705",
+    "id": "1bc8fd47-3fa6-4b6f-b4dd-c7f9b7b02e21"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T13:28:04.869289",
+    "id": "df0e01df-7b15-4077-9605-c4f57f6547a4"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-06T13:28:32.425880",
+    "id": "b2cac1b9-d14a-4fe3-a69f-e0f151c15d76"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T13:34:02.616246",
+    "id": "0495acb4-3e9f-483a-badb-2746293809a4"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-06T13:35:05.325311",
+    "id": "5c82a8b4-056a-4dc5-a13f-b130ef920db8"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T13:39:06.112429",
+    "id": "b3862349-e374-4956-bf7e-a3f6f77e16bf"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-06T13:39:22.302890",
+    "id": "a324ac5a-90b3-4088-a0d3-999fdd8a8819"
+  },
+  {
+    "action": "stats_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {},
+    "timestamp": "2026-11-06T13:39:34.819007",
+    "id": "20efc85f-0d32-4bcb-9379-f9efcd020634"
+  },
+  {
+    "action": "history_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {},
+    "timestamp": "2026-11-06T13:39:41.485088",
+    "id": "898be529-ce56-423b-a845-f4fcf225578b"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {
+      "grid": 2,
+      "confidence": 0.8876,
+      "image": "liver_clean_15868_1794001199052.png"
+    },
+    "timestamp": "2026-11-06T13:40:15.239485",
+    "id": "a005748d-a398-4883-ba7a-421e272e68c2"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9958,
+      "image": "liver_clean_15868_1794001235516.png"
+    },
+    "timestamp": "2026-11-06T13:40:39.443502",
+    "id": "32158e68-5680-4082-8b8a-a3a5d75240c4"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5308,
+      "image": "liver_clean_15868_1794001258244.png"
+    },
+    "timestamp": "2026-11-06T13:41:02.408916",
+    "id": "83be09ae-d456-44ee-8f8b-db0f5238b254"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {
+      "grid": 0,
+      "confidence": 0.6401,
+      "image": "liver_clean_15868_1794001291772.png"
+    },
+    "timestamp": "2026-11-06T13:41:35.258928",
+    "id": "09b3fe78-e764-41cf-b62d-75e4168df2a2"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "31f5b756-30ee-4ed2-b16c-8fd04f0d8d96",
+    "details": {},
+    "timestamp": "2026-11-06T13:42:01.581688",
+    "id": "9792a981-f9e3-4564-b566-46dae2e66f34"
+  }
+]

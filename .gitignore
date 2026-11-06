@@ -113,3 +113,10 @@ desktop.ini
 ^
 *.bak
 *~
+
+
+# اضافه کن اگر نیست:
+Add-Content .gitignore "`n# Image Guard - don't ship raw references"
+Add-Content .gitignore "core/security/liver_reference/"
+Add-Content .gitignore "core/security/non_liver_reference/"
+Add-Content .gitignore "core/security/.cache/"
