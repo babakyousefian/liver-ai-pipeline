@@ -3556,5 +3556,163 @@
     "details": {},
     "timestamp": "2026-11-06T13:42:01.581688",
     "id": "9792a981-f9e3-4564-b566-46dae2e66f34"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-06T13:58:40.581632",
+    "id": "9aad66b2-713d-4525-92a4-f0df710dd676"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-06T14:00:57.918104",
+    "id": "642c865c-0a42-433c-9c1e-183bb8eefabb"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T05:36:06.201997",
+    "id": "504aeb62-0a58-46c2-9f55-1c353d24ad63"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-07T05:38:00.003595",
+    "id": "a8b92842-8370-4a23-819a-b39f3a453e08"
+  },
+  {
+    "action": "stats_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {},
+    "timestamp": "2026-11-07T05:38:09.438486",
+    "id": "2846e161-f682-41fc-8123-788a4f96045a"
+  },
+  {
+    "action": "history_cleared",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {},
+    "timestamp": "2026-11-07T05:38:16.037879",
+    "id": "4be03b43-279c-49da-8a6a-415cbbdf389a"
+  },
+  {
+    "action": "settings_changed",
+    "category": "SETTINGS",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {
+      "lang": "USA",
+      "theme": "theme_dark_forest"
+    },
+    "timestamp": "2026-11-07T05:38:50.386326",
+    "id": "0c618db3-d1a9-48a4-b312-dea3bc54da3f"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {
+      "grid": 1,
+      "confidence": 0.8732,
+      "image": "liver_clean_1256_1794058750120.png"
+    },
+    "timestamp": "2026-11-07T05:39:27.654727",
+    "id": "e6af5fac-0d89-4f29-8e78-f9fd6c24b2bc"
+  },
+  {
+    "action": "result_rejected_low_confidence",
+    "category": "DATA",
+    "level": "WARNING",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {
+      "confidence": 0.395,
+      "reason": "Model confidence too low (39.5%)",
+      "metrics": {
+        "saturation": 1.0,
+        "brightness": 1.0,
+        "grayscale": 0.7440564942858733,
+        "edges": 1.0,
+        "histogram": 1.0,
+        "heuristic_score": 0.9360141235714683,
+        "liver_score": 0.8870318350777139,
+        "non_liver_similarity": 0.7215567827224731,
+        "final_score": 0.9017265216258401,
+        "image_score": 0.9017265216258401
+      }
+    },
+    "timestamp": "2026-11-07T05:39:48.700941",
+    "id": "c7fa401c-8374-4a44-8814-d908c8f0054e"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {
+      "grid": 1,
+      "confidence": 0.671,
+      "image": "liver_clean_1256_1794058794837.png"
+    },
+    "timestamp": "2026-11-07T05:39:56.739420",
+    "id": "ef37ca5c-b237-489f-bb2d-96daa8e37ff8"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5606,
+      "image": "liver_clean_1256_1794058801551.png"
+    },
+    "timestamp": "2026-11-07T05:40:02.946416",
+    "id": "3d3fc5ec-c2ed-4f8c-9add-63d9cf1b1208"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "bobby",
+    "session_id": "eac270c6-fc49-4592-b198-7c8dd5f09141",
+    "details": {},
+    "timestamp": "2026-11-07T05:40:08.285685",
+    "id": "e60b90ea-259c-4474-bc8b-523e8977fab8"
   }
 ]

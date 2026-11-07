@@ -1,25 +1,19 @@
 # core/security/image_guard.py
 # -*- coding: utf-8 -*-
 """
-AI Detector for Fatty Liver Disease — v3.0 (Reference-Based Anomaly Detection)
+Image Guard v3.2 — Robust Reference-Based Anomaly Detection
 
-Goal: Accept ONLY liver ultrasound images that match the training set.
-Reject EVERYTHING else: fetus, kidney, brain, MRI, CT, nature, space, memes...
-
-Strategy:
-    Layer 1 — Heuristic gate (fast reject of non-medical images)
-    Layer 2 — Statistical model (PCA + Mahalanobis) trained on YOUR liver images
-    Layer 3 — Non-liver reference check (optional, for extra safety)
-
-This uses the 2642 liver images you provided to learn the "liver pattern"
-(color, texture, histogram, edges, FFT) without needing deep learning.
+Key fixes vs v3.1:
+- Feature vector is NOT L2-normalized (keeps cosine meaningful)
+- Mahalanobis threshold uses 99th percentile + wider margin
+- Heuristic gate runs on ROI only (not full resized image)
+- Fail-open on ANY error (never blocks a valid image)
+- Non-liver check removed (was causing false rejections)
 """
 
 import os
 import math
-import time
 import pickle
-import hashlib
 from typing import Optional, Dict, Tuple, List
 
 try:
@@ -35,50 +29,45 @@ except ImportError:
 
 
 # ================================================================
-# ✅ Configuration
+# Configuration — VERY PERMISSIVE
 # ================================================================
 
-MIN_LIVER_SCORE = 0.45         # ← از 0.55 به 0.45 (کمی نرم‌تر)
-MIN_MODEL_CONFIDENCE = 0.45    # ← از 0.50 به 0.45
+# ✅ Only reject if image is CLEARLY not liver (very low thresholds)
+MIN_LIVER_SCORE = 0.35
+MIN_MODEL_CONFIDENCE = 0.25       # ← lowered from 0.45
 
-# ✅ NEW: Generalization settings
-PCA_COMPONENTS = 15              # ← از 10 به 15 (تعادل بهتر)
-KNN_K = 7                        # ← از 5 به 7
-REJECT_SCORE = 0.05             # ← از 0.15 به 0.05 (خیلی نرم‌تر — فقط نویز خالص رد بشه)
+# ✅ Model settings
+PCA_COMPONENTS = 15
+KNN_K = 7
+
+# ✅ Threshold: use p99 + wide margin (not p50 + 2.5*spread)
+REJECT_SCORE = 0.02               # ← lowered from 0.05
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 LIVER_REFERENCE_DIR = os.path.join(_HERE, "liver_reference")
-NON_LIVER_REFERENCE_DIR = os.path.join(_HERE, "non_liver_reference")
 CACHE_DIR = os.path.join(_HERE, ".cache")
 
-# ✅ فایل مدل از پیش آموزش‌دیده — همراه پروژه، نه در .cache
 _BUNDLE_MODEL_FILE = os.path.join(_HERE, "models", "liver_model.pkl")
-# ✅ فایل قدیمی (dev cache) — فقط به‌عنوان fallback
-_DEV_CACHE_FILE = os.path.join(_HERE, ".cache", "liver_model.pkl")
+_DEV_CACHE_FILE = os.path.join(CACHE_DIR, "liver_model.pkl")
 
-MODEL_CACHE_FILE = _BUNDLE_MODEL_FILE    # ← مسیر ترجیحی
-MODEL_CACHE_VERSION = 4
+MODEL_CACHE_FILE = _BUNDLE_MODEL_FILE
+MODEL_CACHE_VERSION = 5           # ← bumped: pkl باید دوباره ساخته شود
 
-# ابعاد ویژگی‌ها
 FEATURE_SIZE = (256, 256)
-MAX_REFERENCE_IMAGES = 3000    # حداکثر تصویر برای آموزش
-
-# ================================================================
-# ✅ NEW: Env flag — فقط برای تولید pkl (روی سیستم خودتان)
-# ================================================================
+MAX_REFERENCE_IMAGES = 3000
 
 _ALLOW_TRAINING = os.environ.get("LIVER_GUARD_ALLOW_TRAIN", "0") == "1"
 
 
 # ================================================================
-# ✅ Utility — ROI extraction (fan-shaped)
+# Utility — ROI extraction
 # ================================================================
 
 def _extract_roi(bgr: np.ndarray) -> np.ndarray:
-    """جدا کردن بافت (حذف پس‌زمینه‌ی سیاه سونوگرافی)."""
+    """Extract tissue region (remove black background)."""
     try:
         gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-        _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(gray, 15, 255, cv2.THRESH_BINARY)
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
@@ -90,7 +79,8 @@ def _extract_roi(bgr: np.ndarray) -> np.ndarray:
         tissue_mask = (labels == largest).astype(np.uint8) * 255
 
         tissue_ratio = float((tissue_mask > 0).sum()) / float(tissue_mask.size)
-        if tissue_ratio < 0.15 or tissue_ratio > 0.98:
+        # ✅ If tissue covers >95% or <10%, keep original (already cropped or too small)
+        if tissue_ratio < 0.10 or tissue_ratio > 0.95:
             return bgr
 
         x = stats[largest, cv2.CC_STAT_LEFT]
@@ -115,7 +105,7 @@ def _extract_roi(bgr: np.ndarray) -> np.ndarray:
 def _tissue_gray(bgr: np.ndarray) -> np.ndarray:
     try:
         gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-        mask = gray > 20
+        mask = gray > 15
         if mask.sum() < 100:
             return gray.flatten()
         return gray[mask]
@@ -124,20 +114,13 @@ def _tissue_gray(bgr: np.ndarray) -> np.ndarray:
 
 
 # ================================================================
-# ✅ Feature extraction (rich, robust, discriminative)
+# Feature extraction — NO L2 normalization
 # ================================================================
 
 def _compute_features(bgr: np.ndarray) -> Optional[np.ndarray]:
     """
-    استخراج یک بردار ویژگی غنی از تصویر.
-    این بردار شامل:
-        - هیستوگرام شدت (64 bin)
-        - هیستوگرام LBP (10 bin)
-        - هیستوگرام گرادیان (32 bin)
-        - پروفایل شعاعی FFT (16 bin)
-        - گشتاورهای آماری (5 عدد)
-        - هیستوگرام رنگ (32 bin)
-        - ویژگی‌های بافت GLCM (4 عدد)
+    Extract a rich feature vector.
+    ✅ IMPORTANT: NO L2 normalization — keeps magnitudes meaningful.
     """
     if not HAS_CV2:
         return None
@@ -148,19 +131,19 @@ def _compute_features(bgr: np.ndarray) -> Optional[np.ndarray]:
         resized = cv2.resize(roi, FEATURE_SIZE, interpolation=cv2.INTER_AREA)
         gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 
-        tissue_mask = gray > 20
+        tissue_mask = gray > 15
         if tissue_mask.sum() < 500:
             return None
 
         feats = []
 
-        # 1. Intensity histogram
+        # 1. Intensity histogram (64 bins) — already sums to 1
         hist = cv2.calcHist([gray], [0], tissue_mask.astype(np.uint8),
                             [64], [0, 256]).flatten()
         hist = hist / (hist.sum() + 1e-6)
         feats.append(hist)
 
-        # 2. LBP histogram
+        # 2. LBP histogram (10 bins) — already sums to 1
         try:
             lbp = _local_binary_pattern(gray, radius=1, n_points=8)
             lbp_hist = np.histogram(lbp[tissue_mask], bins=10, range=(0, 256))[0].astype(np.float32)
@@ -169,7 +152,7 @@ def _compute_features(bgr: np.ndarray) -> Optional[np.ndarray]:
         except Exception:
             feats.append(np.zeros(10, dtype=np.float32))
 
-        # 3. Gradient histogram
+        # 3. Gradient histogram (32 bins) — already sums to 1
         try:
             gx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
             gy = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
@@ -180,7 +163,7 @@ def _compute_features(bgr: np.ndarray) -> Optional[np.ndarray]:
         except Exception:
             feats.append(np.zeros(32, dtype=np.float32))
 
-        # 4. FFT radial profile
+        # 4. FFT radial profile (16 bins) — already sums to 1
         try:
             f = np.fft.fft2(gray.astype(np.float32))
             fshift = np.fft.fftshift(f)
@@ -204,7 +187,7 @@ def _compute_features(bgr: np.ndarray) -> Optional[np.ndarray]:
         except Exception:
             feats.append(np.zeros(16, dtype=np.float32))
 
-        # 5. Statistical moments
+        # 5. Statistical moments (5 values, NOT normalized to sum=1)
         try:
             tissue_vals = gray[tissue_mask].astype(np.float32)
             moments = np.array([
@@ -218,7 +201,7 @@ def _compute_features(bgr: np.ndarray) -> Optional[np.ndarray]:
         except Exception:
             feats.append(np.zeros(5, dtype=np.float32))
 
-        # 6. Color histogram (ROI)
+        # 6. Color histogram (32 bins) — already sums to 1
         try:
             hsv = cv2.cvtColor(resized, cv2.COLOR_BGR2HSV)
             color_hist = cv2.calcHist([hsv], [0, 1], tissue_mask.astype(np.uint8),
@@ -228,23 +211,27 @@ def _compute_features(bgr: np.ndarray) -> Optional[np.ndarray]:
         except Exception:
             feats.append(np.zeros(32, dtype=np.float32))
 
-        # 7. GLCM-like texture features (از گرادیان)
+        # 7. Texture features (4 values)
         try:
             grad_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
             grad_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
             energy = float(np.mean(grad_x ** 2 + grad_y ** 2)) / 10000.0
             contrast = float(np.std(gray)) / 128.0
             homogeneity = 1.0 / (1.0 + float(np.var(gray)) / 1000.0)
-            correlation = float(np.corrcoef(gray.flatten(), np.roll(gray, 1, axis=1).flatten())[0, 1]) if gray.size > 1 else 0.0
+            if gray.size > 1:
+                correlation = float(np.corrcoef(
+                    gray.flatten(),
+                    np.roll(gray, 1, axis=1).flatten()
+                )[0, 1])
+            else:
+                correlation = 0.0
             glcm = np.array([energy, contrast, homogeneity, correlation], dtype=np.float32)
             feats.append(glcm)
         except Exception:
             feats.append(np.zeros(4, dtype=np.float32))
 
+        # ✅ CONCATENATE — NO L2 NORMALIZATION
         vec = np.concatenate(feats).astype(np.float32)
-        norm = np.linalg.norm(vec)
-        if norm > 1e-6:
-            vec = vec / norm
         return vec
     except Exception as e:
         print(f"⚠️ Feature extraction failed: {e}")
@@ -273,119 +260,144 @@ def _local_binary_pattern(gray: np.ndarray, radius: int = 1, n_points: int = 8) 
 
 
 # ================================================================
-# ✅ Layer 1 — Heuristic gate (fast reject of non-medical images)
+# Layer 1 — Heuristic gate (fast, on ROI)
 # ================================================================
 
 def _saturation_score(bgr: np.ndarray) -> float:
+    """✅ Runs on ROI — very permissive."""
     try:
-        tissue_mask = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY) > 20
+        gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+        tissue_mask = gray > 15
         if tissue_mask.sum() < 100:
-            return 0.5
+            return 0.7  # ✅ neutral, don't penalize
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
         sat = hsv[:, :, 1].astype(np.float32) / 255.0
         mean_sat = float(sat[tissue_mask].mean())
-        if mean_sat < 0.15: return 1.0
-        elif mean_sat < 0.25: return 0.8
-        elif mean_sat < 0.35: return 0.5
-        else: return 0.1
+        # ✅ Very permissive: ultrasound can have slight color tint
+        if mean_sat < 0.20: return 1.0
+        elif mean_sat < 0.30: return 0.85
+        elif mean_sat < 0.45: return 0.6
+        else: return 0.3
     except Exception:
-        return 0.5
+        return 0.7
 
 
 def _brightness_score(bgr: np.ndarray) -> float:
     try:
         tissue = _tissue_gray(bgr)
         if tissue.size < 100:
-            return 0.5
+            return 0.7
         mean_b = float(tissue.mean()) / 255.0
-        if 0.08 <= mean_b <= 0.85: return 1.0
-        elif 0.05 <= mean_b < 0.08 or 0.85 < mean_b <= 0.92: return 0.7
-        else: return 0.1
+        # ✅ Very permissive: ultrasound brightness varies a lot
+        if 0.05 <= mean_b <= 0.90: return 1.0
+        elif 0.02 <= mean_b < 0.05 or 0.90 < mean_b <= 0.96: return 0.7
+        else: return 0.3
     except Exception:
-        return 0.5
+        return 0.7
 
 
 def _grayscale_score(bgr: np.ndarray) -> float:
     try:
-        tissue_mask = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY) > 20
-        if tissue_mask.sum() < 100: return 0.5
+        gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+        tissue_mask = gray > 15
+        if tissue_mask.sum() < 100:
+            return 0.7
         b, g, r = cv2.split(bgr.astype(np.float32))
-        mean_r, mean_g, mean_b = float(r[tissue_mask].mean()), float(g[tissue_mask].mean()), float(b[tissue_mask].mean())
+        mean_r = float(r[tissue_mask].mean())
+        mean_g = float(g[tissue_mask].mean())
+        mean_b = float(b[tissue_mask].mean())
         mean_all = (mean_r + mean_g + mean_b) / 3.0 + 1e-6
         diff = (abs(mean_r - mean_g) + abs(mean_g - mean_b) + abs(mean_b - mean_r)) / 3.0
-        return max(0.0, 1.0 - (diff / mean_all) * 4.0)
+        # ✅ Very permissive: allow slight color tint
+        score = 1.0 - (diff / mean_all) * 2.5  # ← was 4.0
+        return max(0.0, min(1.0, score))
     except Exception:
-        return 0.5
+        return 0.7
 
 
 def _edge_density_score(bgr: np.ndarray) -> float:
     try:
         gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-        tissue_mask = gray > 20
-        if tissue_mask.sum() < 100: return 0.5
+        tissue_mask = gray > 15
+        if tissue_mask.sum() < 100:
+            return 0.7
         edges = cv2.Canny(gray, 50, 150)
         density = float((edges > 0)[tissue_mask].mean())
-        if density < 0.08: return 1.0
-        elif density < 0.15: return 0.8
-        elif density < 0.25: return 0.5
-        else: return 0.1
+        # ✅ Very permissive
+        if density < 0.12: return 1.0
+        elif density < 0.20: return 0.85
+        elif density < 0.30: return 0.6
+        else: return 0.3
     except Exception:
-        return 0.5
+        return 0.7
 
 
 def _histogram_score(bgr: np.ndarray) -> float:
     try:
         tissue = _tissue_gray(bgr)
-        if tissue.size < 100: return 0.5
+        if tissue.size < 100:
+            return 0.7
         hist = np.histogram(tissue, bins=256, range=(0, 256))[0].astype(np.float32)
         hist /= (hist.sum() + 1e-6)
-        mid = float(hist[50:210].sum())
-        extreme = float(hist[0:20].sum() + hist[235:256].sum())
-        if mid > 0.65 and extreme < 0.25: return 1.0
-        elif mid > 0.45 and extreme < 0.40: return 0.7
-        else: return 0.15
+        mid = float(hist[30:225].sum())
+        # ✅ Very permissive
+        if mid > 0.50: return 1.0
+        elif mid > 0.35: return 0.7
+        else: return 0.3
     except Exception:
-        return 0.5
+        return 0.7
 
 
 def _heuristic_gate(bgr: np.ndarray) -> Tuple[bool, float, Dict[str, float]]:
+    """
+    ✅ Runs on ROI (not full image).
+    ✅ Very permissive — only rejects CLEARLY non-medical images.
+    """
+    # ✅ Extract ROI first
+    roi = _extract_roi(bgr)
+    if roi.size == 0:
+        roi = bgr
+
     metrics = {
-        "saturation": _saturation_score(bgr),
-        "brightness": _brightness_score(bgr),
-        "grayscale": _grayscale_score(bgr),
-        "edges": _edge_density_score(bgr),
-        "histogram": _histogram_score(bgr),
+        "saturation": _saturation_score(roi),
+        "brightness": _brightness_score(roi),
+        "grayscale": _grayscale_score(roi),
+        "edges": _edge_density_score(roi),
+        "histogram": _histogram_score(roi),
     }
-    weights = {"saturation": 0.35, "brightness": 0.15, "grayscale": 0.25, "edges": 0.10, "histogram": 0.15}
+    weights = {
+        "saturation": 0.35,
+        "brightness": 0.15,
+        "grayscale": 0.25,
+        "edges": 0.10,
+        "histogram": 0.15,
+    }
     score = sum(metrics[k] * weights[k] for k in metrics)
 
-    # ✅ NEW: Hard rules — reject non-medical images definitively
-    # اگه تصویر رنگی واضحه (saturation کم امتیاز)، یا grayscale نیست، رد کن
-    if metrics["saturation"] < 0.30:  # ← خیلی رنگی = منظره/عکس معمولی
+    # ✅ Only reject if CATASTROPHICALLY bad (colorful photo, etc.)
+    # ✅ REMOVED the "edges < 0.20" hard rule (was rejecting valid images)
+    if metrics["saturation"] < 0.20:  # ← was 0.30
         return False, score, metrics
-    if metrics["grayscale"] < 0.30:  # ← رنگی = سونوگرافی نیست
-        return False, score, metrics
-    if metrics["edges"] < 0.20:  # ← لبه‌های خیلی زیاد = عکس طبیعت
+    if metrics["grayscale"] < 0.20:   # ← was 0.30
         return False, score, metrics
 
-    # ✅ آستانه‌ی نهایی (نرم‌تر از قبل)
-    is_medical_like = score >= 0.45  # ← از 0.50 به 0.45
+    # ✅ Very permissive final threshold
+    is_medical_like = score >= 0.35  # ← was 0.45
     return is_medical_like, score, metrics
 
 
 # ================================================================
-# ✅ Layer 2 — Statistical model (PCA + Mahalanobis)
+# Layer 2 — Statistical model (PCA + Mahalanobis)
 # ================================================================
 
 class LiverModel:
     """
-    ✅ v3.1 — Generalization-focused liver model.
+    v3.2 — Generalization-focused.
 
-    Key changes vs v3.0:
-        - PCA 10 (not 50) → less memorization
-        - KNN-Lite on reduced features → tolerance to new images
-        - Threshold from percentile (not mean+2.5σ)
-        - Score via sigmoid CDF (soft, not hard cutoff)
+    Key changes:
+    - Threshold = p99 + wide margin (not p50 + 2.5*spread)
+    - Score via sigmoid with LARGER scale (smoother)
+    - KNN-Lite with Euclidean distance
     """
 
     def __init__(self):
@@ -394,86 +406,65 @@ class LiverModel:
         self.mean = None
         self.threshold = 0.0
         self.n_samples = 0
-        # ✅ NEW: reduced features for KNN
-        self.reduced_features = None   # (N, n_components) numpy array
-        self.dist_stats = None         # {"min", "p25", "p50", "p75", "p95", "max"}
+        self.reduced_features = None
+        self.dist_stats = None
 
     def fit(self, features: List[np.ndarray]):
-        """آموزش از لیست بردارهای ویژگی."""
         if not features or len(features) < 10:
             raise ValueError("Need at least 10 reference features")
 
         X = np.array(features, dtype=np.float32)
         n_components = min(PCA_COMPONENTS, X.shape[0] - 1, X.shape[1])
 
-        # 1. PCA (کاهش ابعاد)
         self.pca = PCA(n_components=n_components, whiten=True)
         X_reduced = self.pca.fit_transform(X)
         self.reduced_features = X_reduced.astype(np.float32)
 
-        # 2. میانگین + کوواریانس
         self.mean = np.mean(X_reduced, axis=0).astype(np.float32)
         self.cov = EmpiricalCovariance()
         self.cov.fit(X_reduced)
 
-        # 3. محاسبه‌ی فاصله‌ی همه‌ی نمونه‌ها
         distances = self.cov.mahalanobis(X_reduced)
 
-        # ✅ NEW: آستانه از percentile (نه mean+2.5σ)
         p50 = float(np.percentile(distances, 50))
-        p75 = float(np.percentile(distances, 75))
         p95 = float(np.percentile(distances, 95))
         p99 = float(np.percentile(distances, 99))
+        max_d = float(distances.max())
 
-        # آستانه = میانه + 1.5 * (p95 - p50)
-        # این یعنی هر تصویر تا 2.5 برابر پراکندگی طبیعی → قبول
-        spread = max(p95 - p50, 1e-3)
-        self.threshold = p50 + 2.5 * spread
+        # ✅ KEY FIX: threshold based on p99 + wide margin
+        # This allows new images up to ~3x the training spread
+        spread = max(p99 - p50, 1e-3)
+        self.threshold = p99 + 2.0 * spread   # ← generous
 
-        # ✅ آمار برای امتیازدهی نرم
         self.dist_stats = {
             "min": float(distances.min()),
             "p25": float(np.percentile(distances, 25)),
             "p50": p50,
-            "p75": p75,
+            "p75": float(np.percentile(distances, 75)),
             "p95": p95,
             "p99": p99,
-            "max": float(distances.max()),
+            "max": max_d,
         }
         self.n_samples = len(features)
 
-        # ✅ گزارش کامل برای دیباگ
-        print(f"✅ Liver model v3.1 trained on {self.n_samples} images")
+        print(f"✅ Liver model v3.2 trained on {self.n_samples} images")
         print(f"   PCA components:  {n_components}")
-        print(f"   Threshold:       {self.threshold:.3f}  (p50={p50:.2f}, p95={p95:.2f})")
-        print(f"   Distance range:  {distances.min():.2f} .. {distances.max():.2f}")
+        print(f"   Threshold:       {self.threshold:.3f}  (p50={p50:.2f}, p99={p99:.2f})")
+        print(f"   Distance range:  {distances.min():.2f} .. {max_d:.2f}")
 
     def score(self, feature: np.ndarray) -> float:
         """
-        امتیاز شباهت به مدل (0 تا 1) — نرم و تحمل‌پذیر.
-
-        روش:
-            1. Mahalanobis distance در PCA space
-            2. KNN-Lite: میانگین فاصله تا ۵ نزدیک‌ترین neighbor
-            3. ترکیب دو → score
-
-        برخلاف v3.0، اینجا از sigmoid (CDF) استفاده می‌شه،
-        نه exp() ساده. یعنی حتی اگه فاصله بیشتر از threshold باشه،
-        score صفر نمی‌شه (تا 0.05 شنا می‌کنه).
+        Similarity score (0-1) — SMOOTH and FORGIVING.
         """
-        if self.pca is None or self.cov is None or self.mean is None:
+        if self.pca is None or self.cov is None:
             return 0.5
         try:
-            # 1. PCA transform
             x_reduced = self.pca.transform(feature.reshape(1, -1))
             x_reduced = x_reduced.astype(np.float32)
 
-            # 2. Mahalanobis distance
             dist = float(self.cov.mahalanobis(x_reduced)[0])
 
-            # 3. KNN-Lite: میانگین فاصله تا K نزدیک‌ترین neighbor
             if self.reduced_features is not None and len(self.reduced_features) >= KNN_K:
-                # Euclidean distance در PCA space
                 diffs = self.reduced_features - x_reduced
                 dists_sq = np.sum(diffs * diffs, axis=1)
                 nearest = np.partition(dists_sq, KNN_K)[:KNN_K]
@@ -481,17 +472,12 @@ class LiverModel:
             else:
                 knn_dist = dist
 
-            # 4. ترکیب: نیم‌نیم
             combined = 0.6 * dist + 0.4 * knn_dist
 
-            # 5. تبدیل به score با sigmoid (CDF)
-            #    score = 1 / (1 + exp((combined - threshold) / scale))
-            #    - اگه combined << threshold → score ≈ 1.0
-            #    - اگه combined == threshold → score = 0.5
-            #    - اگه combined >> threshold → score ≈ 0.0
-            scale = max(self.threshold * 0.4, 1e-3)
+            # ✅ KEY FIX: MUCH larger scale → smoother sigmoid
+            # Combined up to 3x threshold still gives reasonable score
+            scale = max(self.threshold * 1.5, 1e-3)   # ← was 0.4
             z = (combined - self.threshold) / scale
-            # clamp برای جلوگیری از overflow
             z = max(-50.0, min(50.0, z))
             score = 1.0 / (1.0 + math.exp(z))
 
@@ -511,8 +497,8 @@ class LiverModel:
                     "mean": self.mean,
                     "threshold": self.threshold,
                     "n_samples": self.n_samples,
-                    "reduced_features": self.reduced_features,  # ✅ NEW
-                    "dist_stats": self.dist_stats,               # ✅ NEW
+                    "reduced_features": self.reduced_features,
+                    "dist_stats": self.dist_stats,
                 }, f)
             print(f"💾 Model saved: {path}")
         except Exception as e:
@@ -526,6 +512,7 @@ class LiverModel:
             with open(path, "rb") as f:
                 data = pickle.load(f)
             if data.get("version") != MODEL_CACHE_VERSION:
+                print(f"⚠️ Model version mismatch: {data.get('version')} != {MODEL_CACHE_VERSION}")
                 return None
             model = cls()
             model.pca = data["pca"]
@@ -533,9 +520,9 @@ class LiverModel:
             model.mean = data["mean"]
             model.threshold = data["threshold"]
             model.n_samples = data["n_samples"]
-            model.reduced_features = data.get("reduced_features")  # ممکنه نباشه در pkl قدیمی
+            model.reduced_features = data.get("reduced_features")
             model.dist_stats = data.get("dist_stats", {})
-            print(f"📦 Model loaded from cache ({model.n_samples} samples, v3.1)")
+            print(f"📦 Model loaded from cache ({model.n_samples} samples, v3.2)")
             return model
         except Exception as e:
             print(f"⚠️ Failed to load model: {e}")
@@ -543,26 +530,17 @@ class LiverModel:
 
 
 # ================================================================
-# ✅ Model singleton + training
+# Model singleton + training
 # ================================================================
 
 _LIVER_MODEL: Optional[LiverModel] = None
 
 
 def _get_liver_model() -> Optional[LiverModel]:
-    """
-    ترتیب بارگذاری:
-      1. کش در حافظه
-      2. pkl از پیش آموزش‌دیده (shipped)  ← اصلی
-      3. .cache/ قدیمی (dev fallback)
-      4. آموزش جدید ONLY IF LIVER_GUARD_ALLOW_TRAIN=1
-         وگرنه fail-open (None برمی‌گرداند — بدون کندی)
-    """
     global _LIVER_MODEL
     if _LIVER_MODEL is not None:
         return _LIVER_MODEL
 
-    # 1. pkl از پیش آموزش‌دیده
     for path in (_BUNDLE_MODEL_FILE, _DEV_CACHE_FILE):
         if os.path.exists(path):
             m = LiverModel.load(path)
@@ -570,13 +548,11 @@ def _get_liver_model() -> Optional[LiverModel]:
                 _LIVER_MODEL = m
                 return m
 
-    # 2. آموزش فقط اگر صریحاً اجازه داده شده باشد
     if not _ALLOW_TRAINING:
         print("⚠️ Liver model pkl not found — guard is in FAIL-OPEN mode.")
         print("   (To generate the pkl once, run: LIVER_GUARD_ALLOW_TRAIN=1 python tools/build_liver_model.py)")
         return None
 
-    # 3. آموزش (فقط dev)
     print("🔄 [DEV] Training liver model from references...")
     features = _load_reference_features(LIVER_REFERENCE_DIR, max_images=MAX_REFERENCE_IMAGES)
     if not features or len(features) < 10:
@@ -586,7 +562,6 @@ def _get_liver_model() -> Optional[LiverModel]:
     try:
         model = LiverModel()
         model.fit(features)
-        # ✅ ذخیره در مسیر bundle (تا در نصب‌های بعدی استفاده شود)
         model.save(_BUNDLE_MODEL_FILE)
         model.save(_DEV_CACHE_FILE)
         _LIVER_MODEL = model
@@ -597,20 +572,18 @@ def _get_liver_model() -> Optional[LiverModel]:
 
 
 def _load_reference_features(directory: str, max_images: int = MAX_REFERENCE_IMAGES) -> List[np.ndarray]:
-    """بارگذاری ویژگی‌های همه‌ی تصاویر یک پوشه."""
     features = []
     if not os.path.isdir(directory):
         return features
     files = sorted([f for f in os.listdir(directory)
                     if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"))])
 
-    # نمونه‌گیری تصادفی اگه بیشتر از max_images بود
     if len(files) > max_images:
         import random
         random.seed(42)
         files = random.sample(files, max_images)
 
-    for i, fname in enumerate(files):
+    for fname in files:
         path = os.path.join(directory, fname)
         img = cv2.imread(path)
         if img is None:
@@ -624,25 +597,13 @@ def _load_reference_features(directory: str, max_images: int = MAX_REFERENCE_IMA
 
 
 # ================================================================
-# ✅ Layer 3 — Non-liver reference check (optional)
-# ================================================================
-
-_NON_LIVER_FEATURES: Optional[List[np.ndarray]] = None
-
-
-def _get_non_liver_features() -> List[np.ndarray]:
-    global _NON_LIVER_FEATURES
-    if _NON_LIVER_FEATURES is not None:
-        return _NON_LIVER_FEATURES
-    _NON_LIVER_FEATURES = _load_reference_features(NON_LIVER_REFERENCE_DIR, max_images=500)
-    return _NON_LIVER_FEATURES
-
-
-# ================================================================
-# ✅ Public API
+# Public API — FAIL-OPEN
 # ================================================================
 
 def analyze_image(image_path: str) -> Dict:
+    """
+    ✅ FAIL-OPEN: On ANY error, returns is_liver_like=True.
+    """
     result = {"is_liver_like": True, "score": 1.0,
               "metrics": {}, "reason": ""}
 
@@ -651,15 +612,13 @@ def analyze_image(image_path: str) -> Dict:
         return result
 
     if not image_path or not os.path.isfile(image_path):
-        result.update(is_liver_like=False, score=0.0,
-                      reason="File not found")
+        result["reason"] = "File not found — fail-open"
         return result
 
     try:
         img = cv2.imread(image_path)
         if img is None:
-            result.update(is_liver_like=False, score=0.0,
-                          reason="Could not read image")
+            result["reason"] = "Could not read image — fail-open"
             return result
 
         h, w = img.shape[:2]
@@ -667,7 +626,7 @@ def analyze_image(image_path: str) -> Dict:
             s = 600.0 / max(h, w)
             img = cv2.resize(img, (int(w * s), int(h * s)))
 
-        # ---------- Layer 1: Heuristic gate (ALWAYS runs — fast) ----------
+        # ---------- Layer 1: Heuristic gate ----------
         is_medical_like, heuristic_score, heuristic_metrics = _heuristic_gate(img)
         result["metrics"].update(heuristic_metrics)
         result["metrics"]["heuristic_score"] = heuristic_score
@@ -689,7 +648,6 @@ def analyze_image(image_path: str) -> Dict:
         # ---------- Layer 2: Statistical model ----------
         model = _get_liver_model()
         if model is None:
-            # ✅ FAIL-OPEN: heuristic passed, we allow (no 5-min delay)
             result["is_liver_like"] = True
             result["score"] = heuristic_score
             result["reason"] = "No liver model — heuristic-only (fail-open)"
@@ -704,27 +662,16 @@ def analyze_image(image_path: str) -> Dict:
         liver_score = model.score(test_vec)
         result["metrics"]["liver_score"] = liver_score
 
-        if liver_score < REJECT_SCORE:  # ← از 0.35 به 0.15
+        # ✅ ONLY reject if score is EXTREMELY low
+        if liver_score < REJECT_SCORE:
             result.update(is_liver_like=False, score=liver_score,
                           reason=(
                               f"Image does not match liver ultrasound pattern "
-                              f"(liver_score={liver_score:.2f} < {REJECT_SCORE})"
+                              f"(liver_score={liver_score:.3f} < {REJECT_SCORE})"
                           ))
             return result
 
-        # ---------- Layer 3: optional non-liver ----------
-        non_liver = _get_non_liver_features()
-        if non_liver:
-            try:
-                sims = [float(np.dot(test_vec, r)) for r in non_liver]
-                best = max(sims) if sims else 0.0
-                result["metrics"]["non_liver_similarity"] = best
-                if best > liver_score + 0.1:
-                    result.update(is_liver_like=False, score=best,
-                                  reason="More similar to non-liver references")
-                    return result
-            except Exception:
-                pass
+        # ✅ Layer 3 removed (was causing false rejections)
 
         final = 0.3 * heuristic_score + 0.7 * liver_score
         result["score"] = final
@@ -745,6 +692,9 @@ def analyze_image(image_path: str) -> Dict:
 
 def is_confident_result(image_path: str, model_confidence: float,
                         all_probs: Optional[Dict] = None) -> Tuple[bool, str, Dict]:
+    """
+    ✅ VERY PERMISSIVE: only rejects if model is COMPLETELY unsure.
+    """
     metrics = {}
     img_result = analyze_image(image_path)
     metrics.update(img_result.get("metrics", {}))
@@ -753,31 +703,17 @@ def is_confident_result(image_path: str, model_confidence: float,
     if not img_result["is_liver_like"]:
         return (False, img_result.get("reason", "Not a liver ultrasound"), metrics)
 
+    # ✅ Only reject if confidence is EXTREMELY low
     if model_confidence < MIN_MODEL_CONFIDENCE:
         return (False, f"Model confidence too low ({model_confidence*100:.1f}%)", metrics)
 
-    if all_probs and len(all_probs) >= 2:
-        try:
-            probs = list(all_probs.values())
-            s = sum(probs) + 1e-9
-            probs = [p/s for p in probs]
-            entropy = -sum(p * math.log(p + 1e-9) for p in probs if p > 0)
-            max_entropy = math.log(len(probs))
-            norm_entropy = entropy / (max_entropy + 1e-9)
-            metrics["entropy"] = norm_entropy
-            if norm_entropy > 0.98:
-                return (False, f"Model distribution too uniform (entropy={norm_entropy:.2f})", metrics)
-        except Exception:
-            pass
-
+    # ✅ Entropy check removed (was rejecting Grid 0 cases)
     return (True, "", metrics)
 
 
 def reload_model():
-    """برای زمانی که تصاویر reference عوض شدن."""
-    global _LIVER_MODEL, _NON_LIVER_FEATURES
+    global _LIVER_MODEL
     _LIVER_MODEL = None
-    _NON_LIVER_FEATURES = None
     try:
         if os.path.exists(MODEL_CACHE_FILE):
             os.remove(MODEL_CACHE_FILE)

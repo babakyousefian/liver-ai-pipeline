@@ -130,7 +130,7 @@ try:
         MIN_MODEL_CONFIDENCE,
     )
     HAS_IMAGE_GUARD = True
-    print("✅ Image Guard available")
+    print(f"✅ Image Guard available (MIN_LIVER={MIN_LIVER_SCORE}, MIN_CONF={MIN_MODEL_CONFIDENCE})")
 except Exception as e:
     print(f"⚠️ Image Guard not available: {e}")
     HAS_IMAGE_GUARD = False
@@ -20962,61 +20962,59 @@ class MainWindow(QMainWindow):
             self.close()
 
     def _load_image_from_path(self, path: str):
-        """
-        بارگذاری تصویر، کراپ دقیق بادبزن، حذف لیبل، و نمایش تصویر تمیز.
-        """
+        """بارگذاری تصویر، کراپ هوشمند، حذف لیبل، و نمایش تصویر تمیز."""
         if not path or not os.path.isfile(path):
-            show_message(self, "warning", tr(self.current_lang, "warning"), tr(self.current_lang, "drop_invalid"))
+            show_message(self, "warning", tr(self.current_lang, "warning"),
+                         tr(self.current_lang, "drop_invalid"))
             return
 
         if not self._is_valid_image_file(path):
-            show_message(self, "warning", tr(self.current_lang, "warning"), tr(self.current_lang, "drop_invalid"))
+            show_message(self, "warning", tr(self.current_lang, "warning"),
+                         tr(self.current_lang, "drop_invalid"))
             return
 
         # ============================================================
-        # STEP 1: تشخیص عکس‌های خام دستگاه سونوگرافی
-        # ============================================================
-        is_already_cropped = False
-        try:
-            _pm = QPixmap(path)
-            if not _pm.isNull():
-                w, h = _pm.width(), _pm.height()
-                # اگه عکس خیلی کوچیک یا مربع بود، کراپ شده است
-                if (w / max(1, h)) < 1.1 and w < 600:
-                    is_already_cropped = True
-        except Exception:
-            pass
-
-        # ============================================================
-        # STEP 2: Preprocess (Crop + Inpaint)
+        # ✅ STEP 1: Preprocess with AUTO-DETECT
+        # (preprocessor خودش تشخیص می‌دهد header دارد یا نه)
         # ============================================================
         cleaned_path = path
         preprocess_info = None
 
         if HAS_PREPROCESSOR:
             try:
-                result = preprocess_medical_image(path, already_cropped=is_already_cropped)
+                # ✅ already_cropped=None → auto-detect header/panels
+                result = preprocess_medical_image(
+                    path,
+                    already_cropped=None,
+                )
                 if result.success and result.image is not None:
                     preprocess_info = result
                     import tempfile
                     tmp_dir = tempfile.gettempdir()
-                    cleaned_path = os.path.join(tmp_dir,
-                                                f"liver_clean_{os.getpid()}_{int(datetime.now().timestamp() * 1000)}.png")
+                    cleaned_path = os.path.join(
+                        tmp_dir,
+                        f"liver_clean_{os.getpid()}_{int(datetime.now().timestamp() * 1000)}.png"
+                    )
 
                     if result.save(cleaned_path):
                         print(f"🧹 Preprocessed: {result.original_shape} → {result.final_shape}")
-                        print(f"   Cropped: {result.cropped}, Labels removed: {result.labels_removed}")
+                        print(f"   Decision: {result.crop_decision}")
+                        print(f"   Cropped: {result.cropped}, "
+                              f"Labels removed: {result.labels_removed}, "
+                              f"Has header: {result.has_header}, "
+                              f"Has panels: {result.has_side_panels}")
                     else:
                         cleaned_path = path
                         preprocess_info = None
             except Exception as e:
                 print(f"⚠️ Preprocessing exception: {e}")
+                import traceback
+                traceback.print_exc()
 
         # ============================================================
-        # STEP 3: Load pixmap (از تصویر تمیز شده)
+        # ✅ STEP 2: Load pixmap (ONCE)
         # ============================================================
         pixmap = QPixmap(cleaned_path)
-
         if pixmap.isNull() and HAS_CV2:
             try:
                 img = cv2.imread(cleaned_path)
@@ -21031,11 +21029,12 @@ class MainWindow(QMainWindow):
 
         if pixmap.isNull():
             SoundManager.get().play("ErrorSound")
-            show_message(self, "critical", tr(self.current_lang, "error"), f"Could not load image:\n{path}")
+            show_message(self, "critical", tr(self.current_lang, "error"),
+                         f"Could not load image:\n{path}")
             return
 
         # ============================================================
-        # STEP 4: Guard check (بررسی با pkl روی تصویر تمیز)
+        # ✅ STEP 3: Guard check (ONCE)
         # ============================================================
         if HAS_IMAGE_GUARD:
             try:
@@ -21043,27 +21042,28 @@ class MainWindow(QMainWindow):
                 is_liver = guard.get("is_liver_like", True)
                 score = guard.get("score", 0.0)
 
-                print(f"🛡️ Guard: is_liver={is_liver}, score={score:.3f}")
+                print(f"🛡️ Guard: is_liver={is_liver}, score={score:.3f}, "
+                      f"reason={guard.get('reason', '')}")
 
                 if not is_liver:
                     SoundManager.get().play("warningSound")
                     msg = tr(self.current_lang, "image_not_liver_warning")
                     if msg == "image_not_liver_warning":
-                        msg = "This image does not look like a liver ultrasound.\n\nPlease insert a proper liver ultrasound image."
-
+                        msg = ("This image does not look like a liver ultrasound.\n\n"
+                               "Please insert a proper liver ultrasound image.")
                     show_message(self, "warning", tr(self.current_lang, "warning"),
                                  f"{msg}\n\nSimilarity: {score * 100:.1f}%")
                     self._speak("voice_image_rejected")
                     return
             except Exception as e:
-                print(f"⚠️ Image guard failed: {e}")
+                print(f"⚠️ Image guard failed (fail-open): {e}")
 
         # ============================================================
-        # STEP 5: نمایش در UI و ذخیره مسیر برای پردازش
+        # ✅ STEP 4: UI
         # ============================================================
-        self.current_image_path = cleaned_path  # مدل این مسیر (عکس تمیز) رو می‌خونه
+        self.current_image_path = cleaned_path
         self._image_loaded_at = datetime.now().timestamp()
-        self.image_view.set_image(pixmap)  # کاربر این (عکس تمیز) رو می‌بینه
+        self.image_view.set_image(pixmap)
 
         self.result_label.setVisible(False)
         self._last_result_grid = None
@@ -21080,16 +21080,19 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
 
+        # ============================================================
+        # ✅ STEP 5: Notify (ONCE)
+        # ============================================================
         success_title = tr(self.current_lang, "image_loaded")
         success_detail = os.path.basename(path)
         extras = []
-        if is_already_cropped:
-            extras.append("already-cropped")
         if preprocess_info:
             if preprocess_info.cropped:
                 extras.append("cropped")
-            if preprocess_info.inpainted and preprocess_info.labels_removed > 0:
+            if preprocess_info.labels_removed > 0:
                 extras.append(f"{preprocess_info.labels_removed} label(s) removed")
+            if not preprocess_info.cropped and preprocess_info.labels_removed == 0:
+                extras.append("no change")
         if extras:
             success_detail += f" ({', '.join(extras)})"
 
