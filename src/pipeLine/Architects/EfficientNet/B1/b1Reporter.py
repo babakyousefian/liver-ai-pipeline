@@ -24,7 +24,7 @@ Page 14: Captum Reporter (Grad-CAM + IG)
 Page 15: LIME Reporter
 Page 16: Netron Reporter
 Page 17: CV Results (5-Fold)
-Page 18: CI Results (95% Bootstrap)
+Page ResNet18: CI Results (95% Bootstrap)
 Page 19: Train/Test/Val AUC
 Page 20: Grad-CAM Reporter
 Page 21: Loss History
@@ -1188,9 +1188,9 @@ def generate_23page_pdf(
     story.append(PageBreak())
 
     # ================================================================
-    # PAGE 18: CI 95%
+    # PAGE ResNet18: CI 95%
     # ================================================================
-    story.append(Paragraph("18. 95% Confidence Intervals (Bootstrap)", h1_style))
+    story.append(Paragraph("ResNet18. 95% Confidence Intervals (Bootstrap)", h1_style))
     story.append(Spacer(1, 0.2 * inch))
 
     ci_data = [["Metric", "Mean", "95% CI Lower", "95% CI Upper", "Std"]]
@@ -1219,13 +1219,13 @@ def generate_23page_pdf(
     story.append(t)
 
     # ================================================================
-    # PAGE 18.5: Ensemble Information (v8.0) — فقط اگه ensemble داریم
+    # PAGE ResNet18.5: Ensemble Information (v8.0) — فقط اگه ensemble داریم
     # ================================================================
     ensemble_seeds = metrics.get("ensemble_seeds", None) if isinstance(metrics, dict) else None
     per_seed_metrics = metrics.get("per_seed_metrics", None) if isinstance(metrics, dict) else None
 
     if ensemble_seeds and per_seed_metrics:
-        story.append(Paragraph("18.5 Ensemble Configuration", h1_style))
+        story.append(Paragraph("ResNet18.5 Ensemble Configuration", h1_style))
         story.append(Spacer(1, 0.2 * inch))
 
         story.append(Paragraph(

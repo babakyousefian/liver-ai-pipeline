@@ -147,7 +147,7 @@ class PasswordStrengthMeter(QWidget):
         # ✅ Colors
         track_bg = t.get("glass_highlight", "rgba(0, 229, 255, 0.10)")
         if "theme_solarized_white" == t.get("name", "").lower().replace(" ", "_"):
-            track_bg = "rgba(38, 139, 210, 0.18)"
+            track_bg = "rgba(38, 139, 210, 0.ResNet18)"
 
         self._track.setStyleSheet(f"""
             QFrame#psm_track {{

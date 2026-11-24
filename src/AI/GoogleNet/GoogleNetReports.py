@@ -440,12 +440,36 @@ class GoogleNetReporter:
                                  alpha=0.2, color="#f39c12",
                                  label="Gap (Val - Train)")
 
+            # ✅ اول best_epoch_num رو تعریف کن
+            val_acc_history = history.get("val_acc", [])
+            best_epoch_num = n
+            if val_acc_history and len(val_acc_history) == n:
+                best_epoch_idx = int(np.argmax(val_acc_history))
+                best_epoch_num = best_epoch_idx + 1
+            else:
+                best_epoch_idx = int(np.argmin(val_loss))
+                best_epoch_num = best_epoch_idx + 1
+
+            # ✅ بعد عنوان رو با best_epoch_num تنظیم کن
             axes[0].set_xlabel("Epoch", fontsize=12, fontweight="bold")
             axes[0].set_ylabel("Loss", fontsize=12, fontweight="bold")
-            axes[0].set_title("Train vs Validation Loss — Gap Analysis",
-                              fontsize=14, fontweight="bold", pad=12)
+            title_str = (
+                "Train vs Validation Loss — Gap Analysis "
+                "({} epochs, best @ epoch {})".format(n, best_epoch_num)
+            )
+            axes[0].set_title(
+                title_str,
+                fontsize=14, fontweight="bold", pad=12,
+            )
             axes[0].legend(loc="upper right", fontsize=11)
             axes[0].grid(alpha=0.3, linestyle="--")
+
+            # ✅ حالا خط عمودی best epoch رو بکش
+            axes[0].axvline(x=best_epoch_num, color="#2ecc71",
+                            linestyle="--", linewidth=2, alpha=0.7)
+            axes[0].text(best_epoch_num, axes[0].get_ylim()[1] * 0.95,
+                         "  Best Epoch: {}".format(best_epoch_num),
+                         color="#2ecc71", fontsize=9, fontweight="bold")
 
             # ✅ آمار Gap
             max_gap = max(gap)
@@ -464,14 +488,21 @@ class GoogleNetReporter:
                                    facecolor="#fff9e6", edgecolor="#f39c12",
                                    alpha=0.95, linewidth=1.5))
 
-            # ✅ بهترین epoch
-            if val_loss:
+            # ✅ بهترین epoch بر اساس val_acc (نه val_loss)
+            val_acc_history = history.get("val_acc", [])
+            best_epoch_num = n
+            if val_acc_history and len(val_acc_history) == n:
+                best_epoch_idx = int(np.argmax(val_acc_history))
+                best_epoch_num = best_epoch_idx + 1
+            else:
                 best_epoch_idx = int(np.argmin(val_loss))
-                axes[0].axvline(x=epochs[best_epoch_idx], color="#2ecc71",
-                                linestyle="--", linewidth=2, alpha=0.7)
-                axes[0].text(epochs[best_epoch_idx], axes[0].get_ylim()[1] * 0.95,
-                             f"  Best Epoch: {epochs[best_epoch_idx]}",
-                             color="#2ecc71", fontsize=9, fontweight="bold")
+                best_epoch_num = best_epoch_idx + 1
+
+            axes[0].axvline(x=best_epoch_num, color="#2ecc71",
+                            linestyle="--", linewidth=2, alpha=0.7)
+            axes[0].text(best_epoch_num, axes[0].get_ylim()[1] * 0.95,
+                         f"  Best Epoch: {best_epoch_num}",
+                         color="#2ecc71", fontsize=9, fontweight="bold")
 
             # =====================================================
             #  نمودار پایین

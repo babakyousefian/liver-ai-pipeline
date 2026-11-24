@@ -158,7 +158,7 @@ MIN_DELTA = 1e-4          # improvement threshold
 #   - "v2.2": MobileNetV2 only — lower LR, stronger WD, gap monitor
 #
 # Goal of v2.2:
-#   - Reduce gap between train_loss and val_loss (target: <18%)
+#   - Reduce gap between train_loss and val_loss (target: <ResNet18%)
 #   - Increase test accuracy without heavy F1 drop
 # ================================================================
 
@@ -474,7 +474,7 @@ class TTADataset(Dataset):
         if 15 <= k <= 17:
             g = [0.9, 1.1, 1.15][k - 15]
             return np.clip((img.astype(np.float32) / 255.0) ** g * 255, 0, 255).astype(np.uint8)
-        # 18-20: zoom
+        # ResNet18-20: zoom
         if 18 <= k <= 20:
             zoom = [0.9, 0.85, 1.15][k - 18]
             h, w = img.shape[:2]
@@ -2394,7 +2394,7 @@ def generate_pdf(
         story.append(PageBreak())
 
     # =========================================================
-    # PAGE 18 — Ensemble Analysis
+    # PAGE ResNet18 — Ensemble Analysis
     # =========================================================
     story.append(Paragraph("Ensemble Analysis", h1))
     story.append(Paragraph(

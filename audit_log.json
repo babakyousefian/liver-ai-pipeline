@@ -3714,5 +3714,689 @@
     "details": {},
     "timestamp": "2026-11-07T05:40:08.285685",
     "id": "e60b90ea-259c-4474-bc8b-523e8977fab8"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T07:07:59.967140",
+    "id": "16748b76-13a3-4b62-9ad3-7167e5d10403"
+  },
+  {
+    "action": "login_success",
+    "category": "AUTH",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "method": "password"
+    },
+    "timestamp": "2026-11-07T07:10:02.930983",
+    "id": "de2fc70e-7ab5-4078-be00-b28124ba2640"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 1,
+      "confidence": 0.6161,
+      "image": "liver_clean_11368_1794064257492.png"
+    },
+    "timestamp": "2026-11-07T07:11:01.795352",
+    "id": "d4c86d6d-3a7e-4ec1-9326-a90dd75ccde3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 1,
+      "confidence": 0.5522,
+      "image": "liver_clean_11368_1794064271324.png"
+    },
+    "timestamp": "2026-11-07T07:11:15.318229",
+    "id": "5787f464-a986-4a1e-950e-98d64ef031d4"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 1,
+      "confidence": 0.5075,
+      "image": "liver_clean_11368_1794064280386.png"
+    },
+    "timestamp": "2026-11-07T07:11:22.143432",
+    "id": "982f069d-85e7-4e66-ac30-0c1814eeeff7"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.811,
+      "image": "liver_clean_11368_1794064288750.png"
+    },
+    "timestamp": "2026-11-07T07:11:32.918897",
+    "id": "0871397e-66f0-45be-b37f-973e056bc10f"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9567,
+      "image": "liver_clean_11368_1794064314630.png"
+    },
+    "timestamp": "2026-11-07T07:11:56.764689",
+    "id": "d3d7e302-5b73-4a85-a857-5a81d0a060a3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.8945,
+      "image": "liver_clean_11368_1794064325018.png"
+    },
+    "timestamp": "2026-11-07T07:12:07.367782",
+    "id": "0b1aa16e-d43e-443a-9ce8-771d4770dab9"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.7565,
+      "image": "liver_clean_11368_1794064333412.png"
+    },
+    "timestamp": "2026-11-07T07:12:17.174686",
+    "id": "d8222e25-92af-40f6-abeb-246b73c4fa8b"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9227,
+      "image": "liver_clean_11368_1794064345345.png"
+    },
+    "timestamp": "2026-11-07T07:12:27.272603",
+    "id": "f47f08aa-bad3-4fdd-bb03-45464264c8a3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 3,
+      "confidence": 0.7936,
+      "image": "liver_clean_11368_1794064354578.png"
+    },
+    "timestamp": "2026-11-07T07:12:36.726156",
+    "id": "d656eef7-0088-4897-93ed-0c4065a35041"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 3,
+      "confidence": 0.8493,
+      "image": "liver_clean_11368_1794064360841.png"
+    },
+    "timestamp": "2026-11-07T07:12:43.154844",
+    "id": "546c9749-3a8d-4405-99ff-a3d38a996298"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9999,
+      "image": "liver_clean_11368_1794064367456.png"
+    },
+    "timestamp": "2026-11-07T07:12:50.126083",
+    "id": "1fdf8392-1b62-4361-b510-17f4cc8dc6fc"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9991,
+      "image": "liver_clean_11368_1794064377672.png"
+    },
+    "timestamp": "2026-11-07T07:12:59.494415",
+    "id": "cf2700d9-e0e8-4fbc-992b-2a26ae21d088"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 3,
+      "confidence": 0.9132,
+      "image": "liver_clean_11368_1794064382973.png"
+    },
+    "timestamp": "2026-11-07T07:13:05.010084",
+    "id": "7824fc82-51d8-4527-9be2-a374a7a26bfc"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 0,
+      "confidence": 0.7905,
+      "image": "liver_clean_11368_1794064391610.png"
+    },
+    "timestamp": "2026-11-07T07:13:13.516754",
+    "id": "789147d1-02b4-4e53-bbe5-c341ccdb3998"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5989,
+      "image": "liver_clean_11368_1794064398029.png"
+    },
+    "timestamp": "2026-11-07T07:13:19.932701",
+    "id": "aa93ff7d-68b0-46d2-9f03-cd5ae2cedea3"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 0,
+      "confidence": 0.551,
+      "image": "liver_clean_11368_1794064407124.png"
+    },
+    "timestamp": "2026-11-07T07:13:29.729509",
+    "id": "68daaf99-5fab-4753-bc08-eec17514f688"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 0,
+      "confidence": 0.5378,
+      "image": "liver_clean_11368_1794064415727.png"
+    },
+    "timestamp": "2026-11-07T07:13:37.947726",
+    "id": "b5a88e38-fa4f-4bc2-b2bb-8f48237b8e79"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 1,
+      "confidence": 0.3517,
+      "image": "liver_clean_11368_1794064423752.png"
+    },
+    "timestamp": "2026-11-07T07:13:45.735304",
+    "id": "4158a708-8593-47f4-9e42-2c5f66be164b"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 1,
+      "confidence": 0.6465,
+      "image": "liver_clean_11368_1794064446980.png"
+    },
+    "timestamp": "2026-11-07T07:14:16.859181",
+    "id": "da678b70-1faf-45db-9fda-ecf957921f73"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 0,
+      "confidence": 0.6396,
+      "image": "liver_clean_11368_1794064464046.png"
+    },
+    "timestamp": "2026-11-07T07:14:27.846836",
+    "id": "7e4794ec-667a-47b4-ad9c-08f2a8402753"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.8283,
+      "image": "liver_clean_11368_1794064534008.png"
+    },
+    "timestamp": "2026-11-07T07:15:36.581991",
+    "id": "91daf27e-55d5-467f-b9dc-c29c380bcb2a"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 1,
+      "confidence": 0.5128,
+      "image": "liver_clean_11368_1794064541584.png"
+    },
+    "timestamp": "2026-11-07T07:15:43.659275",
+    "id": "bdcf1577-3b84-4a31-ab9e-93945afbf0ed"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.9375,
+      "image": "liver_clean_11368_1794064550797.png"
+    },
+    "timestamp": "2026-11-07T07:15:52.840841",
+    "id": "dcdeb491-c4ef-48f1-91c2-0eb9ca3bf5db"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 2,
+      "confidence": 0.995,
+      "image": "liver_clean_11368_1794064565398.png"
+    },
+    "timestamp": "2026-11-07T07:16:10.462712",
+    "id": "67940c0a-7be0-4798-977e-297e8c368c70"
+  },
+  {
+    "action": "inference_completed",
+    "category": "DATA",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {
+      "grid": 3,
+      "confidence": 0.6041,
+      "image": "liver_clean_11368_1794064599108.png"
+    },
+    "timestamp": "2026-11-07T07:16:43.097665",
+    "id": "5638ad91-eb1c-4cc2-8aa2-5c66a57c17e4"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "username",
+    "session_id": "195d10d2-5ef8-4627-ba72-047f86058abd",
+    "details": {},
+    "timestamp": "2026-11-07T07:17:07.366917",
+    "id": "985b5597-cf11-434a-918d-1ff6c69b728d"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T07:34:46.011496",
+    "id": "755ca8d0-df86-4e6b-a112-879f46069abf"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T07:35:28.699019",
+    "id": "181b54e1-5c95-4c94-b998-cf3df747c63f"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T08:46:28.165613",
+    "id": "630f4401-de29-4454-a810-fd82ad821ba9"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T08:47:26.887502",
+    "id": "39221151-7af9-4e81-9953-cbc4d123210f"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T08:55:30.696720",
+    "id": "f969ef0f-7d56-4cbf-b0e4-b4ce25f3e4cc"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T08:56:29.843436",
+    "id": "6708cf68-e60d-4b7b-9286-8882e048c930"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T09:00:24.096652",
+    "id": "d888a8ea-eac7-4aa7-ad7d-5c272c91233f"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T09:01:38.909927",
+    "id": "451d93fe-1855-42f0-ab16-09742ca387f7"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T09:11:03.140094",
+    "id": "3925f8a0-610b-4aad-b301-b8fe3f8c6f05"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T09:13:44.955198",
+    "id": "2e6aeef6-23b1-429f-86d8-48daf108eb13"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T09:16:58.684696",
+    "id": "d5399ecb-be83-4e34-901a-2f95ee68e109"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T09:17:38.614379",
+    "id": "4587cf55-262d-4e5e-b326-5b2d568f5cbe"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T09:21:24.275704",
+    "id": "595a1541-a96b-472e-854d-81e8eaab4f50"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T09:22:32.860431",
+    "id": "916c6bdc-8cf9-463a-950f-a84520b0f2a7"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T09:41:54.461679",
+    "id": "874a459d-002e-42cb-81f3-6b0830b0d4cd"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T09:46:23.243307",
+    "id": "a5b432af-7a23-45d0-b796-3f4615195c81"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T10:08:34.343199",
+    "id": "3ac9b305-42ff-4f50-b6a4-1e64b12f596d"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T10:10:16.140078",
+    "id": "968b7382-5042-4c68-8ac3-233828228d7c"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T10:39:21.443049",
+    "id": "89618593-a094-4aab-ac77-552eeeaa2621"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T10:42:16.898997",
+    "id": "321efe9a-4420-475f-9330-236d56edbacc"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T11:07:20.344343",
+    "id": "e28add76-225d-4cb3-8938-c9cd5e008de6"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T11:09:34.415878",
+    "id": "a5c4ec5b-56f9-4a77-826c-4b3bafab4377"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T11:27:05.245094",
+    "id": "7d140961-f6b3-4b88-ae9c-57c084233a54"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T11:28:40.146374",
+    "id": "cac5c068-7e2e-42a7-86d6-1abb8d6c0eb4"
+  },
+  {
+    "action": "app_start",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {
+      "os": "Windows-11-10.0.22631-SP0",
+      "python": "3.13.2"
+    },
+    "timestamp": "2026-11-07T11:30:55.192058",
+    "id": "3840a617-5398-4d1e-9e7e-763065c75d65"
+  },
+  {
+    "action": "app_close",
+    "category": "SYSTEM",
+    "level": "INFO",
+    "user": "",
+    "session_id": "",
+    "details": {},
+    "timestamp": "2026-11-07T11:31:36.905623",
+    "id": "4c0b79e3-0e54-41cf-8619-19a82eabd2fc"
   }
 ]

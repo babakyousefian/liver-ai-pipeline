@@ -8,7 +8,7 @@ without any pre-trained weights, following the original paper:
 "Deep Residual Learning for Image Recognition" by Kaiming He et al.
 
 The implementation includes:
-- Complete ResNet50 architecture (50 layers with Bottleneck blocks)
+- Complete ResNet50 architecture (ResNet50 layers with Bottleneck blocks)
 - Basic building blocks (Bottleneck with expansion=4)
 - Advanced profiling and analysis tools
 - Model registry and management

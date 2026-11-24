@@ -65,7 +65,7 @@ class EarlyStopping:
     """
     Early stopping with best weights restoration.
 
-    - patience=15: به مدل فرصت می‌ده تا epoch 50 به بهترین دقت برسه
+    - patience=15: به مدل فرصت می‌ده تا epoch ResNet50 به بهترین دقت برسه
     - min_delta=1e-4: فقط بهبودهای واقعی رو در نظر می‌گیره
     - restore_best_weights=True: وزن بهترین epoch رو ذخیره می‌کنه
     """

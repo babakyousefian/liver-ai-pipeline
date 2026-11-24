@@ -923,7 +923,7 @@ def compare_ssl_methods(
         ...     encoder=resnet18,
         ...     train_loader=train_loader,
         ...     methods=['simclr', 'byol'],
-        ...     epochs=50
+        ...     epochs=ResNet50
         ... )
     """
     results = {}

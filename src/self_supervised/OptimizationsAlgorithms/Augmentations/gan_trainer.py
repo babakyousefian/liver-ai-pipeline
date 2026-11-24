@@ -51,7 +51,7 @@ class UltimateGANTrainer:
 
     1. Feature Matching Loss (Salimans et al., 2016)
        - Generator matches discriminator's feature statistics
-       - 30-50% quality improvement
+       - 30-ResNet50% quality improvement
 
     2. R1 Regularization (Mescheder et al., 2018)
        - Penalizes discriminator gradient norm

@@ -69,7 +69,7 @@ def get_search_space(
     """
     Return the 22 parameters for the given model.
 
-    ResNet18/50   → input_size = 224 only
+    ResNet18/ResNet50   → input_size = 224 only
     EfficientNet  → input_size ∈ {224, 240}
     """
     # input_size depends on model family

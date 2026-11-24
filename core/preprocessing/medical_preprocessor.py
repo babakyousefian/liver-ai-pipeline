@@ -1,19 +1,19 @@
 # core/preprocessing/medical_preprocessor.py
 # -*- coding: utf-8 -*-
 """
-Medical Preprocessor v4.0 — Header-aware cropping.
+Medical Preprocessor v6.0 — Aggressive header removal + fan bounding box
 
-KEY LOGIC:
-    1. Detect if image has "header" (top bar) or "side panels"
-       → If YES: crop the fan region + remove labels
-       → If NO:  keep image as-is, only remove labels
+Strategy:
+    1. Detect uniform borders (top/bottom/left/right) — remove them
+    2. In the cropped image, find the largest bright region (fan/tissue)
+    3. Crop to that region's bounding box (with small padding)
+    4. Inpaint small colored labels INSIDE the tissue only
+    5. Return cleaned image
 
-    2. Label removal handles BOTH:
-       - Colored labels on dark background (traditional)
-       - Colored labels on light/white background
-
-    3. Fan extraction ONLY runs when headers/panels detected.
-       This prevents re-cropping already-cropped images.
+Why this works:
+    - Headers (top/side) are always uniform-color or uniform-dark
+    - Fan is always the largest bright connected region
+    - Labels are always small colored patches INSIDE the fan
 """
 
 import os
@@ -23,40 +23,28 @@ from dataclasses import dataclass
 from typing import Optional, Tuple, Dict
 
 
-# ================================================================
-# Configuration
-# ================================================================
-
 @dataclass
 class PreprocessorConfig:
-    # -------- Header detection --------
-    # Top strip: if it's uniform-color OR contains bright text on dark, it's a header
-    header_max_height_ratio: float = 0.20    # scan up to 20% of image height
-    header_uniformity_std: float = 12.0      # std < this → uniform strip
-    header_text_brightness_thresh: int = 180 # bright text threshold (white text)
-    header_dark_bg_thresh: int = 90          # dark background threshold
+    # Border detection
+    border_uniformity_std: float = 18.0
+    border_max_ratio: float = 0.30
+    border_min_pixels: int = 6
 
-    # -------- Side panel detection --------
-    side_max_width_ratio: float = 0.20       # scan up to 20% of image width
-    side_uniformity_std: float = 12.0        # std < this → uniform strip
+    # Fan detection (after border removal)
+    fan_min_area_ratio: float = 0.25   # fan must be ≥25% of remaining image
+    fan_padding: float = 0.02          # 2% padding around fan
 
-    # -------- Fan mask --------
-    fan_min_area_ratio: float = 0.15         # fan must cover ≥15% of image
-    fan_crop_padding: float = 0.03           # 3% padding around fan
-
-    # -------- Label removal --------
-    label_saturation_min: int = 55           # colored label threshold (lower = more sensitive)
-    label_value_min: int = 60
-    label_min_area: int = 15                 # min area (px) to count as label
-    label_max_area_ratio: float = 0.05       # max area as fraction of image
+    # Label removal (only inside tissue)
+    label_saturation_min: int = 80     # only strongly colored
+    label_value_min: int = 100         # only bright
+    label_min_area: int = 20
+    label_max_area: int = 500          # small labels only
     label_dilate_size: int = 5
     label_inpaint_radius: int = 3
-    label_white_bg_value_min: int = 200      # for labels on white bg
-    label_white_bg_saturation_max: int = 35
 
-    # -------- Output --------
+    # Output
     output_min_size: int = 224
-    max_input_dim: int = 1600
+    max_input_dim: int = 2000
 
     debug: bool = False
 
@@ -74,6 +62,8 @@ class PreprocessResult:
     has_side_panels: bool = False
     crop_decision: str = ""
     reason: str = ""
+    borders: Optional[Dict[str, int]] = None
+    fan_box: Optional[Tuple[int, int, int, int]] = None
 
     def save(self, path: str) -> bool:
         if self.image is None:
@@ -85,392 +75,273 @@ class PreprocessResult:
 
 
 # ================================================================
-# ✅ STEP 1: Header / Side-panel detection
+# Strip analysis
 # ================================================================
 
 def _analyze_strip(strip: np.ndarray) -> Dict[str, float]:
-    """
-    Analyze a strip (horizontal or vertical) and return statistics:
-        - std: uniformity (low = uniform color)
-        - mean: average brightness
-        - bright_ratio: fraction of bright pixels (potential text)
-        - dark_ratio: fraction of dark pixels
-    """
     if strip.size == 0:
         return {"std": 0.0, "mean": 0.0, "bright_ratio": 0.0, "dark_ratio": 0.0}
-
     gray = strip if strip.ndim == 2 else cv2.cvtColor(strip, cv2.COLOR_BGR2GRAY)
-    mean_v = float(gray.mean())
-    std_v = float(gray.std())
-    bright = float((gray > 180).sum()) / gray.size
-    dark = float((gray < 90).sum()) / gray.size
-
     return {
-        "std": std_v,
-        "mean": mean_v,
-        "bright_ratio": bright,
-        "dark_ratio": dark,
+        "std": float(gray.std()),
+        "mean": float(gray.mean()),
+        "bright_ratio": float((gray > 180).sum()) / gray.size,
+        "dark_ratio": float((gray < 90).sum()) / gray.size,
     }
 
 
-def _detect_top_header(img: np.ndarray, cfg: PreprocessorConfig) -> Tuple[bool, int]:
+def _is_header_strip(stats: Dict, cfg: PreprocessorConfig) -> bool:
     """
-    Detect if there's a "header" at the top of the image.
-
-    A header is a horizontal strip that is:
-      (a) uniform color (low std), OR
-      (b) contains bright text on dark background (like "ECUBE15", "DR.ROSHANAE")
-
-    Returns:
-        (has_header, header_height_px)
+    v6.4 — تشخیص سخت‌گیرانه‌تر.
+    فقط اگر واقعاً uniform یا dark-with-text باشد.
     """
-    h, w = img.shape[:2]
-    max_h = min(int(h * cfg.header_max_height_ratio), 200)
-    if max_h < 10:
-        return False, 0
+    # ✅ uniformity خیلی سخت‌گیرانه (std < 10)
+    if stats["std"] < 10.0:
+        return True
 
-    # ✅ Scan from top, growing the strip until it stops looking like a header
-    best_height = 0
+    # ✅ dark with text (مثل هدر تصویر دوم)
+    if (stats["mean"] < 100 and
+            0.005 < stats["bright_ratio"] < 0.35 and
+            stats["std"] < 25):
+        return True
 
-    for scan_h in range(10, max_h, 4):
-        strip = img[:scan_h, :]
-        stats = _analyze_strip(strip)
+    # ✅ dark uniform (پس‌زمینه سیاه)
+    if stats["std"] < 12 and stats["mean"] < 40:
+        return True
 
-        # Case A: Uniform colored strip (like a solid blue bar)
-        is_uniform = stats["std"] < cfg.header_uniformity_std
-
-        # Case B: Dark strip with bright text (like the second image's header)
-        # The header has dark bg + some very bright pixels (text)
-        is_dark_with_text = (
-            stats["mean"] < 130 and                  # mostly dark
-            stats["bright_ratio"] > 0.005 and        # some bright pixels (text)
-            stats["bright_ratio"] < 0.40             # not too many (just text)
-        )
-
-        # Case C: Uniform dark strip (like black border)
-        is_dark_uniform = stats["std"] < 15 and stats["mean"] < 60
-
-        if is_uniform or is_dark_with_text or is_dark_uniform:
-            best_height = scan_h
-        else:
-            # ✅ Once strip stops looking like a header, stop scanning
-            if best_height > 0:
-                break
-
-    # ✅ Require minimum header height (at least 2% of image)
-    if best_height < int(h * 0.02):
-        return False, 0
-
-    if cfg.debug:
-        strip = img[:best_height, :]
-        print(f"   🔍 Top header: h={best_height}px, stats={_analyze_strip(strip)}")
-
-    return True, best_height
-
-
-def _detect_side_panel(img: np.ndarray, cfg: PreprocessorConfig,
-                       side: str = "left") -> Tuple[bool, int]:
-    """
-    Detect if there's a side panel (left or right).
-
-    A side panel is a vertical strip that is:
-      (a) uniform color, OR
-      (b) contains text (like "ABD1", "P 100%", scale marks)
-
-    Args:
-        side: "left" or "right"
-
-    Returns:
-        (has_panel, panel_width_px)
-    """
-    h, w = img.shape[:2]
-    max_w = min(int(w * cfg.side_max_width_ratio), 200)
-    if max_w < 10:
-        return False, 0
-
-    best_width = 0
-
-    for scan_w in range(10, max_w, 4):
-        if side == "left":
-            strip = img[:, :scan_w]
-        else:
-            strip = img[:, -scan_w:]
-
-        stats = _analyze_strip(strip)
-
-        # Same logic as top header
-        is_uniform = stats["std"] < cfg.side_uniformity_std
-        is_dark_with_text = (
-            stats["mean"] < 130 and
-            stats["bright_ratio"] > 0.005 and
-            stats["bright_ratio"] < 0.40
-        )
-        is_dark_uniform = stats["std"] < 15 and stats["mean"] < 60
-
-        if is_uniform or is_dark_with_text or is_dark_uniform:
-            best_width = scan_w
-        else:
-            if best_width > 0:
-                break
-
-    if best_width < int(w * 0.02):
-        return False, 0
-
-    if cfg.debug:
-        if side == "left":
-            strip = img[:, :best_width]
-        else:
-            strip = img[:, -best_width:]
-        print(f"   🔍 {side} panel: w={best_width}px, stats={_analyze_strip(strip)}")
-
-    return True, best_width
-
-
-def _detect_bottom_bar(img: np.ndarray, cfg: PreprocessorConfig) -> Tuple[bool, int]:
-    """
-    Detect if there's a bottom bar (sometimes has patient info).
-    Same logic as top header but reversed.
-    """
-    h, w = img.shape[:2]
-    max_h = min(int(h * cfg.header_max_height_ratio), 200)
-    if max_h < 10:
-        return False, 0
-
-    best_height = 0
-
-    for scan_h in range(10, max_h, 4):
-        strip = img[-scan_h:, :]
-        stats = _analyze_strip(strip)
-
-        is_uniform = stats["std"] < cfg.header_uniformity_std
-        is_dark_with_text = (
-            stats["mean"] < 130 and
-            stats["bright_ratio"] > 0.005 and
-            stats["bright_ratio"] < 0.40
-        )
-        is_dark_uniform = stats["std"] < 15 and stats["mean"] < 60
-
-        if is_uniform or is_dark_with_text or is_dark_uniform:
-            best_height = scan_h
-        else:
-            if best_height > 0:
-                break
-
-    if best_height < int(h * 0.02):
-        return False, 0
-
-    return True, best_height
+    return False
 
 
 # ================================================================
-# ✅ STEP 2: Crop based on detected boundaries
+# Border detection (with sub-pixel precision)
 # ================================================================
 
-def _crop_boundaries(img: np.ndarray, boundaries: Dict[str, int]) -> np.ndarray:
+def _detect_side_border(img: np.ndarray, cfg: PreprocessorConfig,
+                        side: str) -> int:
     """
-    Crop image based on detected top/bottom/left/right boundaries.
+    v6.4 — تشخیص دقیق‌تر border با محدودیت 25% (نه 40%).
+
+    تغییرات:
+    - حداکثر 25% ارتفاع (نه 40%)
+    - چک uniformity دقیق‌تر
+    - جلوگیری از کراپ بیش از حد
     """
     h, w = img.shape[:2]
-    top = boundaries.get("top", 0)
-    bottom = boundaries.get("bottom", 0)
-    left = boundaries.get("left", 0)
-    right = boundaries.get("right", 0)
 
-    # ✅ Safety: don't crop more than 30% from any side
-    top = min(top, int(h * 0.30))
-    bottom = min(bottom, int(h * 0.30))
-    left = min(left, int(w * 0.30))
-    right = min(right, int(w * 0.30))
+    if side in ("top", "bottom"):
+        max_scan = min(int(h * 0.25), 200)  # ← از 0.40 به 0.25
+        min_scan = max(cfg.border_min_pixels, int(h * 0.01))
+    else:
+        max_scan = min(int(w * 0.25), 200)
+        min_scan = max(cfg.border_min_pixels, int(w * 0.01))
 
-    y0 = top
-    y1 = h - bottom if bottom > 0 else h
-    x0 = left
-    x1 = w - right if right > 0 else w
+    if max_scan < min_scan:
+        return 0
 
-    if y1 <= y0 or x1 <= x0:
+    best = 0
+    for scan in range(min_scan, max_scan, 3):
+        if side == "top":
+            strip = img[:scan, :]
+        elif side == "bottom":
+            strip = img[-scan:, :]
+        elif side == "left":
+            strip = img[:, :scan]
+        else:
+            strip = img[:, -scan:]
+
+        stats = _analyze_strip(strip)
+        if _is_header_strip(stats, cfg):
+            best = scan
+        else:
+            if best > 0:
+                break
+
+    # ✅ حداقل 1.5% و حداکثر 25%
+    if side in ("top", "bottom"):
+        if best < int(h * 0.015):
+            return 0
+        if best > int(h * 0.25):
+            return int(h * 0.25)  # ← کپ
+    else:
+        if best < int(w * 0.015):
+            return 0
+        if best > int(w * 0.25):
+            return int(w * 0.25)
+
+    return best
+
+
+def _detect_borders(img: np.ndarray, cfg: PreprocessorConfig) -> Dict[str, int]:
+    return {
+        "top": _detect_side_border(img, cfg, "top"),
+        "bottom": _detect_side_border(img, cfg, "bottom"),
+        "left": _detect_side_border(img, cfg, "left"),
+        "right": _detect_side_border(img, cfg, "right"),
+    }
+
+
+# ================================================================
+# Fan / tissue detection
+# ================================================================
+
+def _detect_fan_box(img: np.ndarray, cfg: PreprocessorConfig) -> Optional[Tuple[int, int, int, int]]:
+    """
+    Detect the largest bright region (fan/tissue) in the image.
+    Returns bounding box (x, y, w, h) or None.
+    """
+    try:
+        h, w = img.shape[:2]
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # ✅ Tissue: bright pixels (> 25)
+        tissue_mask = (gray > 25).astype(np.uint8) * 255
+
+        # ✅ Morphological cleanup
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        tissue_mask = cv2.morphologyEx(tissue_mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+        tissue_mask = cv2.morphologyEx(tissue_mask, cv2.MORPH_OPEN, kernel, iterations=1)
+
+        # ✅ Largest connected component
+        num, labels, stats, _ = cv2.connectedComponentsWithStats(tissue_mask, 8)
+        if num <= 1:
+            return None
+
+        total_area = w * h
+        best_idx, best_area = -1, 0
+        for i in range(1, num):
+            area = stats[i, cv2.CC_STAT_AREA]
+            if area < total_area * cfg.fan_min_area_ratio:
+                continue
+            if area > best_area:
+                best_area = area
+                best_idx = i
+
+        if best_idx == -1:
+            return None
+
+        x = stats[best_idx, cv2.CC_STAT_LEFT]
+        y = stats[best_idx, cv2.CC_STAT_TOP]
+        bw = stats[best_idx, cv2.CC_STAT_WIDTH]
+        bh = stats[best_idx, cv2.CC_STAT_HEIGHT]
+
+        return (int(x), int(y), int(bw), int(bh))
+    except Exception as e:
+        if cfg.debug:
+            print(f"   ⚠️ Fan detection failed: {e}")
+        return None
+
+
+def _crop_to_box(img: np.ndarray, box: Tuple[int, int, int, int],
+                 padding: float = 0.02) -> np.ndarray:
+    """Crop image to bounding box with padding."""
+    h, w = img.shape[:2]
+    x, y, bw, bh = box
+
+    pad_x = int(bw * padding)
+    pad_y = int(bh * padding)
+
+    x0 = max(0, x - pad_x)
+    y0 = max(0, y - pad_y)
+    x1 = min(w, x + bw + pad_x)
+    y1 = min(h, y + bh + pad_y)
+
+    if x1 <= x0 + 10 or y1 <= y0 + 10:
         return img
 
     return img[y0:y1, x0:x1].copy()
 
 
-# ================================================================
-# ✅ STEP 3: Fan mask (only when needed)
-# ================================================================
-
-def _extract_fan_mask(img: np.ndarray, cfg: PreprocessorConfig) -> np.ndarray:
-    """Extract fan-shaped tissue mask (bright region inside dark background)."""
-    h, w = img.shape[:2]
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # ✅ Tissue = bright pixels (exclude black background)
-    tissue = cv2.inRange(gray, 15, 235)
-
-    # Remove small text
-    k_small = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-    tissue = cv2.morphologyEx(tissue, cv2.MORPH_OPEN, k_small, iterations=1)
-
-    # Merge tissue regions
-    k_big = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
-    tissue = cv2.morphologyEx(tissue, cv2.MORPH_CLOSE, k_big, iterations=3)
-
-    # Largest component
-    num, labels, stats, _ = cv2.connectedComponentsWithStats(tissue, 8)
-    if num <= 1:
-        return np.ones_like(gray) * 255
-
-    total_area = w * h
-    best_idx, best_area = -1, 0
-    for i in range(1, num):
-        area = stats[i, cv2.CC_STAT_AREA]
-        if area < total_area * cfg.fan_min_area_ratio:
-            continue
-        if area > best_area:
-            best_area = area
-            best_idx = i
-
-    if best_idx == -1:
-        return np.ones_like(gray) * 255
-
-    mask = (labels == best_idx).astype(np.uint8) * 255
-
-    # Convex hull (to include fan shape)
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if not contours:
-        return mask
-
-    largest = max(contours, key=cv2.contourArea)
-    hull = cv2.convexHull(largest)
-
-    clean_mask = np.zeros_like(gray)
-    cv2.drawContours(clean_mask, [hull], -1, 255, -1)
-    return clean_mask
-
-
-def _crop_and_mask_fan(img: np.ndarray, cfg: PreprocessorConfig) -> Tuple[np.ndarray, bool]:
+def _crop_to_box_no_bottom(img: np.ndarray, box: Tuple[int, int, int, int],
+                           padding: float = 0.02) -> np.ndarray:
     """
-    Crop fan region and black out everything outside the fan.
-    ONLY called when headers/panels were detected.
+    Crop image to bounding box — BUT never crop from bottom.
+    ✅ این همان نسخه‌ای است که کار می‌کرد (کمی چپ بیشتر، پایین صفر).
     """
     h, w = img.shape[:2]
-    fan_mask = _extract_fan_mask(img, cfg)
+    x, y, bw, bh = box
 
-    x, y, ww, hh = cv2.boundingRect(fan_mask)
-    if ww == 0 or hh == 0:
-        return img, False
+    # ✅ padding متفاوت برای هر جهت
+    pad_left = int(bw * 0.05)   # ۵٪ چپ (کمی بیشتر برای اطمینان)
+    pad_right = int(bw * 0.02)  # ۲٪ راست
+    pad_top = int(bh * 0.02)    # ۲٪ بالا
 
-    # ✅ Small padding to avoid cutting tissue edges
-    pad_x = int(ww * cfg.fan_crop_padding)
-    pad_y = int(hh * cfg.fan_crop_padding)
+    x0 = max(0, x - pad_left)
+    y0 = max(0, y - pad_top)
+    x1 = min(w, x + bw + pad_right)
+    y1 = h  # ← پایین: هرگز کراپ نکن
 
-    x0 = max(0, x - pad_x)
-    y0 = max(0, y - pad_y)
-    x1 = min(w, x + ww + pad_x)
-    y1 = min(h, y + hh + pad_y)
+    if x1 <= x0 + 10 or y1 <= y0 + 10:
+        return img
 
-    cropped = img[y0:y1, x0:x1].copy()
-    cropped_mask = fan_mask[y0:y1, x0:x1]
-
-    # Black out non-fan regions
-    cropped[cropped_mask == 0] = [0, 0, 0]
-    return cropped, True
-
+    return img[y0:y1, x0:x1].copy()
 
 # ================================================================
-# ✅ STEP 4: Label removal (handles BOTH dark and light backgrounds)
+# Label removal (only INSIDE tissue, only small colored patches)
 # ================================================================
 
 def _remove_labels(img: np.ndarray, cfg: PreprocessorConfig) -> Tuple[np.ndarray, int]:
     """
-    Remove colored labels (NL, G1, G2, G3, etc.).
-
-    Handles:
-      - Colored labels on dark background
-      - Colored labels on light/white background
+    Remove SMALL colored labels inside the tissue.
+    Does NOT inpaint branches/trees because:
+      - Saturation threshold is high (80) → only strong colors
+      - Area limit is tight (20-500 px) → only text-sized blobs
     """
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    h, w = img.shape[:2]
+    try:
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        h, w = img.shape[:2]
 
-    # ============================================================
-    # Mask 1: Saturated colored labels (any hue)
-    # ============================================================
-    mask_colored = cv2.inRange(
-        hsv,
-        np.array([0, cfg.label_saturation_min, cfg.label_value_min]),
-        np.array([180, 255, 255]),
-    )
+        # ✅ Strong colored pixels only
+        mask = cv2.inRange(
+            hsv,
+            np.array([0, cfg.label_saturation_min, cfg.label_value_min]),
+            np.array([180, 255, 255]),
+        )
 
-    # ============================================================
-    # Mask 2: Labels on WHITE background
-    # Small white blobs = labels (large white blobs = background)
-    # ============================================================
-    white_mask = cv2.inRange(
-        hsv,
-        np.array([0, 0, cfg.label_white_bg_value_min]),
-        np.array([180, cfg.label_white_bg_saturation_max, 255]),
-    )
-    white_ratio = white_mask.sum() / (255.0 * h * w)
-    # Only consider as labels if white region is small (≤15%)
-    mask_white_labels = white_mask if white_ratio < 0.15 else np.zeros_like(white_mask)
+        # ✅ Cleanup
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
 
-    # Combine
-    combined = cv2.bitwise_or(mask_colored, mask_white_labels)
+        # ✅ Filter by size: only text-sized blobs
+        num, labels, stats, _ = cv2.connectedComponentsWithStats(mask, 8)
+        clean_mask = np.zeros_like(mask)
+        count = 0
 
-    # Clean up
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    combined = cv2.morphologyEx(combined, cv2.MORPH_CLOSE, kernel, iterations=2)
+        for i in range(1, num):
+            area = stats[i, cv2.CC_STAT_AREA]
+            bw = stats[i, cv2.CC_STAT_WIDTH]
+            bh = stats[i, cv2.CC_STAT_HEIGHT]
 
-    # ============================================================
-    # Filter connected components by area
-    # ============================================================
-    num, labels, stats, _ = cv2.connectedComponentsWithStats(combined, 8)
-    clean_mask = np.zeros_like(combined)
-    count = 0
+            # ✅ Text-size: area 20-500, aspect ratio < 3
+            if (cfg.label_min_area <= area <= cfg.label_max_area and
+                    max(bw, bh) / max(1, min(bw, bh)) < 3.0):
+                clean_mask[labels == i] = 255
+                count += 1
 
-    total_area = w * h
-    for i in range(1, num):
-        area = stats[i, cv2.CC_STAT_AREA]
-        if cfg.label_min_area <= area <= total_area * cfg.label_max_area_ratio:
-            clean_mask[labels == i] = 255
-            count += 1
+        if count == 0:
+            return img, 0
 
-    if count == 0:
+        # ✅ Dilate (small)
+        dilate_kernel = cv2.getStructuringElement(
+            cv2.MORPH_ELLIPSE,
+            (cfg.label_dilate_size, cfg.label_dilate_size),
+        )
+        dilated = cv2.dilate(clean_mask, dilate_kernel, iterations=1)
+
+        # ✅ Inpaint
+        result = cv2.inpaint(img, dilated, cfg.label_inpaint_radius, cv2.INPAINT_TELEA)
+        return result, count
+    except Exception:
         return img, 0
 
-    # ============================================================
-    # Inpaint
-    # ============================================================
-    dilate_kernel = cv2.getStructuringElement(
-        cv2.MORPH_ELLIPSE,
-        (cfg.label_dilate_size, cfg.label_dilate_size),
-    )
-    dilated = cv2.dilate(clean_mask, dilate_kernel, iterations=2)
-    result = cv2.inpaint(img, dilated, cfg.label_inpaint_radius, cv2.INPAINT_TELEA)
-
-    if cfg.debug:
-        print(f"   🔍 Labels removed: {count} component(s)")
-
-    return result, count
-
 
 # ================================================================
-# ✅ MAIN: Smart preprocessing
+# Main entry
 # ================================================================
-
 def preprocess_medical_image(
         image_path: str,
         config: Optional[PreprocessorConfig] = None,
-        already_cropped: Optional[bool] = None,   # ← None = auto-detect
+        already_cropped: Optional[bool] = None,
 ) -> PreprocessResult:
-    """
-    Smart preprocessing:
-      - If image has header/side-panels → crop fan + remove labels
-      - If image is already clean → only remove labels
-
-    Args:
-        image_path: path to input image
-        config: PreprocessorConfig
-        already_cropped: if True, skip fan-crop. If None, auto-detect.
-    """
     cfg = config or PreprocessorConfig()
 
     if not image_path or not os.path.isfile(image_path):
@@ -481,83 +352,116 @@ def preprocess_medical_image(
         return PreprocessResult(success=False, reason="Could not read image")
 
     original_shape = img.shape[:2]
-
-    # ✅ Downscale if too large
     h, w = img.shape[:2]
     if max(h, w) > cfg.max_input_dim:
         scale = cfg.max_input_dim / float(max(h, w))
         img = cv2.resize(img, (int(w * scale), int(h * scale)))
-        if cfg.debug:
-            print(f"   🔍 Resized: {w}×{h} → {int(w*scale)}×{int(h*scale)}")
 
     # ============================================================
-    # STEP 1: Detect headers and side panels
+    # STEP 1: Detect TOP border only (bottom = 0)
     # ============================================================
-    has_top_header, top_h = _detect_top_header(img, cfg)
-    has_bottom_bar, bottom_h = _detect_bottom_bar(img, cfg)
-    has_left_panel, left_w = _detect_side_panel(img, cfg, side="left")
-    has_right_panel, right_w = _detect_side_panel(img, cfg, side="right")
+    top_border = _detect_side_border(img, cfg, "top")
+    bottom_border = 0  # ✅ همیشه صفر
 
-    has_header = has_top_header or has_bottom_bar
-    has_side_panels = has_left_panel or has_right_panel
+    has_header = top_border > 0
 
     if cfg.debug:
-        print(f"   🔍 Detected: top={has_top_header}({top_h}px) "
-              f"bottom={has_bottom_bar}({bottom_h}px) "
-              f"left={has_left_panel}({left_w}px) "
-              f"right={has_right_panel}({right_w}px)")
+        print(f"   🔍 Top={top_border}px, Bottom=0px (disabled)")
 
     # ============================================================
-    # STEP 2: Decide crop strategy
+    # STEP 2: Crop TOP border only
     # ============================================================
     if already_cropped is True:
-        # ✅ Force no-crop (user or caller explicitly requested)
-        cropped_img = img
-        was_cropped = False
-        decision = "forced no-crop"
-
-    elif already_cropped is False:
-        # ✅ Force crop (user explicitly requested)
-        cropped_img, was_cropped = _crop_and_mask_fan(img, cfg)
-        decision = "forced fan-crop"
-
+        after_vertical = img
+        vertical_cropped = False
     else:
-        # ✅ Auto-detect
-        if has_header or has_side_panels:
-            # ✅ Header/side-panel present → crop fan
-            cropped_img, was_cropped = _crop_and_mask_fan(img, cfg)
-            decision = "auto: crop (header detected)"
+        if has_header:
+            hh, ww = img.shape[:2]
+            t = min(top_border, int(hh * 0.40))
+            after_vertical = img[t:, :].copy()
+            vertical_cropped = True
         else:
-            # ✅ Clean image → no crop
-            cropped_img = img
-            was_cropped = False
-            decision = "auto: no crop (clean image)"
+            after_vertical = img
+            vertical_cropped = False
 
     if cfg.debug:
-        print(f"   🔍 Decision: {decision}, cropped={was_cropped}")
+        print(f"   🔍 After top crop: {after_vertical.shape}")
 
     # ============================================================
-    # STEP 3: Label removal (ALWAYS runs)
+    # STEP 3: Detect fan box
     # ============================================================
-    cleaned_img, labels_removed = _remove_labels(cropped_img, cfg)
+    fan_box = _detect_fan_box(after_vertical, cfg)
+
+    if fan_box is not None:
+        fx, fy, fw, fh = fan_box
+        has_side_panels = fx > 5 or (after_vertical.shape[1] - (fx + fw)) > 5
+    else:
+        has_side_panels = False
+
+    if cfg.debug:
+        print(f"   🔍 Fan box: {fan_box}, has_side_panels={has_side_panels}")
 
     # ============================================================
-    # STEP 4: Ensure minimum size
+    # STEP 4: Crop using fan box (no bottom crop)
     # ============================================================
-    h2, w2 = cleaned_img.shape[:2]
+    fan_cropped = False
+
+    if already_cropped is True:
+        after_fan = after_vertical
+        decision = "forced no-crop"
+    else:
+        if fan_box is not None:
+            hh, ww = after_vertical.shape[:2]
+            fx, fy, fw, fh = fan_box
+            fan_area_ratio = (fw * fh) / float(ww * hh)
+
+            if fan_area_ratio < 0.92:
+                after_fan = _crop_to_box_no_bottom(
+                    after_vertical, fan_box, cfg.fan_padding
+                )
+                fan_cropped = True
+                decision = "auto: fan-crop (no bottom)"
+            else:
+                after_fan = after_vertical
+                decision = "auto: no fan-crop (fan fills image)"
+        else:
+            after_fan = after_vertical
+            decision = "auto: no fan (fallback)"
+
+    if cfg.debug:
+        print(f"   🔍 After fan crop: {after_fan.shape}, decision={decision}")
+
+    was_cropped = vertical_cropped or fan_cropped
+
+    # ============================================================
+    # STEP 5: Remove labels
+    # ============================================================
+    cleaned, labels_removed = _remove_labels(after_fan, cfg)
+
+    # ============================================================
+    # STEP 6: Resize if too small
+    # ============================================================
+    h2, w2 = cleaned.shape[:2]
     if min(h2, w2) < cfg.output_min_size:
         scale = cfg.output_min_size / float(min(h2, w2))
-        cleaned_img = cv2.resize(
-            cleaned_img,
+        cleaned = cv2.resize(
+            cleaned,
             (int(w2 * scale), int(h2 * scale)),
             interpolation=cv2.INTER_CUBIC,
         )
 
+    borders_dict = {
+        "top": top_border,
+        "bottom": 0,
+        "left": 0,
+        "right": 0,
+    }
+
     return PreprocessResult(
         success=True,
-        image=cleaned_img,
+        image=cleaned,
         original_shape=original_shape,
-        final_shape=cleaned_img.shape[:2],
+        final_shape=cleaned.shape[:2],
         labels_removed=labels_removed,
         cropped=was_cropped,
         inpainted=labels_removed > 0,
@@ -565,4 +469,6 @@ def preprocess_medical_image(
         has_side_panels=has_side_panels,
         crop_decision=decision,
         reason="OK",
+        borders=borders_dict,
+        fan_box=fan_box,
     )

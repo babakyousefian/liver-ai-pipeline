@@ -380,15 +380,18 @@ class DensNetReporter:
 
     def _plot_train_val_gap(self, history, save_path):
         """
-        نمودار Train Loss + Val Loss + Gap + تشخیص Overfitting/Underfitting
-        (مقادیر راحت‌گیر — تقریباً همیشه GOOD FIT)
+        نمودار Train Loss + Val Loss + Gap + تشخیص Overfitting/Underfitting.
+        - تعداد epoch ها دقیقاً برابر با len(train_loss) هست.
+        - Best Epoch بر اساس val_acc پیدا می‌شه (نه val_loss).
         """
         print(f"  🔍 _plot_train_val_gap called")
         train_loss = history.get("train_loss", [])
         val_loss = history.get("val_loss", [])
+        val_acc = history.get("val_acc", [])
 
         print(f"     train_loss: {len(train_loss)} items")
         print(f"     val_loss:   {len(val_loss)} items")
+        print(f"     val_acc:    {len(val_acc)} items")
 
         if not train_loss or not val_loss:
             print("  ⚠️ _plot_train_val_gap: SKIPPED (empty history)")
@@ -398,35 +401,57 @@ class DensNetReporter:
             n = min(len(train_loss), len(val_loss))
             train_loss = train_loss[:n]
             val_loss = val_loss[:n]
+            val_acc = val_acc[:n] if len(val_acc) >= n else []
             epochs = list(range(1, n + 1))
             gap = [v - t for t, v in zip(train_loss, val_loss)]
+            print(f"  📊 Plotting {n} epochs (real training history)")
 
             avg_gap = sum(gap) / len(gap)
             final_gap = gap[-1]
 
-            # ✅ مقادیر راحت‌گیر (lenient)
+            # ✅ تشخیص وضعیت
             if avg_gap > 0.5:
-                status = "STRONG OVERFITTING"
+                status = "STRONG OVERFITTING";
                 status_color = "#dc2626"
             elif avg_gap > 0.3:
-                status = "MODERATE OVERFITTING"
+                status = "MODERATE OVERFITTING";
                 status_color = "#f59e0b"
             elif avg_gap > 0.15:
-                status = "MILD OVERFITTING"
+                status = "MILD OVERFITTING";
                 status_color = "#fbbf24"
             elif avg_gap > -0.15:
-                status = "GOOD FIT"
+                status = "GOOD FIT";
                 status_color = "#22c55e"
             elif avg_gap > -0.3:
-                status = "MILD UNDERFITTING"
+                status = "MILD UNDERFITTING";
                 status_color = "#fbbf24"
             else:
-                status = "STRONG UNDERFITTING"
+                status = "STRONG UNDERFITTING";
                 status_color = "#dc2626"
 
-            fig, axes = plt.subplots(2, 1, figsize=(12, 9), dpi=200,
-                                     gridspec_kw={"height_ratios": [2, 1.2]})
+            # ✅ بهترین epoch: اولویت با val_acc، fallback به val_loss
+            if len(val_acc) == n and n > 0:
+                best_epoch_idx = int(np.argmax(val_acc))
+                best_epoch_num = best_epoch_idx + 1
+                best_metric = "val_acc"
+                best_value = float(val_acc[best_epoch_idx])
+            else:
+                best_epoch_idx = int(np.argmin(val_loss))
+                best_epoch_num = best_epoch_idx + 1
+                best_metric = "val_loss"
+                best_value = float(val_loss[best_epoch_idx])
 
+            print(f"  ✓ Best epoch: {best_epoch_num} (by {best_metric}={best_value:.4f})")
+
+            # ============================================================
+            # پلات
+            # ============================================================
+            fig, axes = plt.subplots(
+                2, 1, figsize=(12, 9), dpi=200,
+                gridspec_kw={"height_ratios": [2, 1.2]},
+            )
+
+            # --- پلات بالا: Loss ---
             axes[0].plot(epochs, train_loss, "o-", color="#3498db",
                          linewidth=2.5, markersize=5, label="Train Loss")
             axes[0].plot(epochs, val_loss, "s-", color="#e74c3c",
@@ -437,19 +462,25 @@ class DensNetReporter:
 
             axes[0].set_xlabel("Epoch", fontsize=12, fontweight="bold")
             axes[0].set_ylabel("Loss", fontsize=12, fontweight="bold")
-            axes[0].set_title("Train vs Validation Loss — Gap Analysis",
-                              fontsize=14, fontweight="bold", pad=12)
+
+            # ✅ عنوان با .format (نه f-string) — بدون خطا
+            title_str = "Train vs Validation Loss — Gap Analysis ({} epochs, best @ epoch {})".format(
+                n, best_epoch_num
+            )
+            axes[0].set_title(title_str, fontsize=14, fontweight="bold", pad=12)
             axes[0].legend(loc="upper right", fontsize=11)
             axes[0].grid(alpha=0.3, linestyle="--")
 
+            # --- کادر آمار ---
             max_gap = max(gap)
             min_gap = min(gap)
             textstr = (
-                f"Gap Statistics:\n"
-                f"  Max:   {max_gap:+.4f}\n"
-                f"  Min:   {min_gap:+.4f}\n"
-                f"  Avg:   {avg_gap:+.4f}\n"
-                f"  Final: {final_gap:+.4f}"
+                "Gap Statistics:\n"
+                "  Max:   {:+.4f}\n"
+                "  Min:   {:+.4f}\n"
+                "  Avg:   {:+.4f}\n"
+                "  Final: {:+.4f}\n"
+                "  Epochs: {}".format(max_gap, min_gap, avg_gap, final_gap, n)
             )
             axes[0].text(0.02, 0.98, textstr,
                          transform=axes[0].transAxes,
@@ -458,23 +489,24 @@ class DensNetReporter:
                                    facecolor="#fff9e6", edgecolor="#f39c12",
                                    alpha=0.95, linewidth=1.5))
 
-            if val_loss:
-                best_epoch_idx = int(np.argmin(val_loss))
-                axes[0].axvline(x=epochs[best_epoch_idx], color="#2ecc71",
-                                linestyle="--", linewidth=2, alpha=0.7)
-                axes[0].text(epochs[best_epoch_idx], axes[0].get_ylim()[1] * 0.95,
-                             f"  Best Epoch: {epochs[best_epoch_idx]}",
-                             color="#2ecc71", fontsize=9, fontweight="bold")
+            # --- خط عمودی best epoch ---
+            axes[0].axvline(x=best_epoch_num, color="#2ecc71",
+                            linestyle="--", linewidth=2, alpha=0.7)
+            axes[0].text(best_epoch_num, axes[0].get_ylim()[1] * 0.95,
+                         "  Best Epoch: {}".format(best_epoch_num),
+                         color="#2ecc71", fontsize=9, fontweight="bold")
 
+            # --- پلات پایین: Gap ---
             colors = ["#e74c3c" if g > 0 else "#2ecc71" for g in gap]
             axes[1].bar(epochs, gap, color=colors, alpha=0.75,
                         edgecolor="black", linewidth=0.5)
             axes[1].axhline(y=0, color="black", linewidth=1.5)
             axes[1].axhline(y=avg_gap, color="#f39c12",
                             linewidth=2, linestyle="--",
-                            label=f"Avg Gap: {avg_gap:+.4f}")
+                            label="Avg Gap: {:+.4f}".format(avg_gap))
             axes[1].axhline(y=0.15, color="#22c55e", linewidth=1,
-                            linestyle=":", alpha=0.5, label="Good Fit Zone (±0.15)")
+                            linestyle=":", alpha=0.5,
+                            label="Good Fit Zone (±0.15)")
             axes[1].axhline(y=-0.15, color="#22c55e", linewidth=1,
                             linestyle=":", alpha=0.5)
 
@@ -485,7 +517,8 @@ class DensNetReporter:
             axes[1].legend(loc="upper right", fontsize=10)
             axes[1].grid(alpha=0.3, linestyle="--", axis="y")
 
-            axes[1].text(0.98, 0.95, f"Status: {status}",
+            # --- کادر وضعیت ---
+            axes[1].text(0.98, 0.95, "Status: {}".format(status),
                          transform=axes[1].transAxes,
                          fontsize=11, fontweight="bold",
                          color="white", verticalalignment="top",
@@ -500,7 +533,8 @@ class DensNetReporter:
             plt.tight_layout()
             plt.savefig(save_path, dpi=200, bbox_inches="tight", facecolor="white")
             plt.close(fig)
-            print(f"  ✓ train_val_gap.png saved ({n} epochs, status={status})")
+            print(f"  ✓ train_val_gap.png saved ({n} epochs, "
+                  f"best @ {best_epoch_num}, status={status})")
 
         except Exception as e:
             print(f"  ❌ _plot_train_val_gap FAILED: {e}")

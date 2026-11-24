@@ -1,0 +1,1 @@
+iscc.exe windows_installer_update.iss

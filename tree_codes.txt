@@ -1,0 +1,74 @@
+
+$exclude = @(
+    ".cache", ".git", ".idea", ".pytest_cache", ".venv",
+    "_backup_20261104_045919",
+    "build", "dist",
+    "finalReports/BU.selfSupervisedLearning",
+    "finalReports/cropped",
+    "finalReports/cropped_raw",
+    "finalReports/croppedBackups",
+    "finalReports/newLiver_v3(Augmentations)",
+    "finalReports/pngs",
+    "finalReports/pngs_from_dcm",
+    "GitHubRelease", "history", "htmlcov",
+    "installers", "packages", "settings", "tests",
+    "update_v3.2.0",
+
+    "core/security/liver_reference",
+    "finalReports/selfSupervisedLearning/GAN/G1/synthetic",
+    "finalReports/selfSupervisedLearning/GAN/G2/synthetic",
+    "finalReports/selfSupervisedLearning/GAN/G3/synthetic"
+)
+
+$root = (Get-Location).Path
+
+function Get-FilteredTree {
+    param(
+        [string]$Path,
+        [string]$RelativePath = "",
+        [string]$Prefix = ""
+    )
+
+    $items = @(Get-ChildItem -LiteralPath $Path -Force -ErrorAction SilentlyContinue |
+        Where-Object {
+            $relative = if ($RelativePath) {
+                "$RelativePath/$($_.Name)"
+            } else {
+                $_.Name
+            }
+
+            $normalized = $relative.Replace('\', '/')
+            $normalized -notin $exclude
+        } | Sort-Object @{Expression={$_.PSIsContainer}; Descending=$true}, Name)
+
+    for ($i = 0; $i -lt $items.Count; $i++) {
+        $item = $items[$i]
+        $last = $i -eq ($items.Count - 1)
+
+        $branch = if ($last) { "└── " } else { "├── " }
+        Write-Output "$Prefix$branch$($item.Name)"
+
+        if ($item.PSIsContainer) {
+            $nextPrefix = $Prefix + $(if ($last) { "    " } else { "│   " })
+            $nextRelative = if ($RelativePath) {
+                "$RelativePath/$($item.Name)"
+            } else {
+                $item.Name
+            }
+
+            Get-FilteredTree -Path $item.FullName `
+                -RelativePath $nextRelative `
+                -Prefix $nextPrefix
+        }
+    }
+}
+
+$tree = @(
+    (Split-Path $root -Leaf)
+    Get-FilteredTree -Path $root
+)
+
+$tree | Out-File -FilePath "$root\project-tree.txt" -Encoding utf8
+
+Write-Host "`nTree generated successfully!" -ForegroundColor Green
+Write-Host "Saved to: $root\project-tree.txt" -ForegroundColor Cyan

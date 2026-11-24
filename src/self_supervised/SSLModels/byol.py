@@ -109,7 +109,7 @@ class BYOLMonitor:
         # بقیه موارد warning هستن، نه unhealthy
         self.collapse_thresholds = {
             "std_min": 0.01,  # ← از 0.05 به 0.02 (سختگیرانه‌تر نیست)
-            "std_max": 100.0,  # ← از 50 به 100
+            "std_max": 100.0,  # ← از ResNet50 به 100
             "variance_min": 0.0001,  # ← از 0.0025 به 0.0004
             "variance_max": 10000.0,  # ← از 2500 به 10000
             "covariance_max": 100.0,  # ← از 20 به 100 (خیلی راحت‌گیرتر)
@@ -2198,7 +2198,7 @@ class BYOLTrainer:
             # ============================================================
             # ✅ FIX: clamp + normalize + float32 برای جلوگیری از overflow
             z1_for_dist = z1.detach().float()
-            # clamp مقادیر بزرگ — وقتی Std=15، مقادیر به ±50 می‌رسند و cdist overflow می‌کند
+            # clamp مقادیر بزرگ — وقتی Std=15، مقادیر به ±ResNet50 می‌رسند و cdist overflow می‌کند
             z1_for_dist = torch.clamp(z1_for_dist, min=-100.0, max=100.0)
             # نرمال‌سازی برای اطمینان از اینکه در واحد sphere هستند
             z1_for_dist = z1_for_dist / (z1_for_dist.norm(dim=1, keepdim=True) + 1e-8)

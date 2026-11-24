@@ -217,7 +217,7 @@ class VoiceManager:
         self._volume = max(0.0, min(1.0, float(volume)))
 
     def set_rate(self, rate: int):
-        """تنظیم سرعت (کلمات در دقیقه، 50-300)."""
+        """تنظیم سرعت (کلمات در دقیقه، ResNet50-300)."""
         self._rate = max(50, min(300, int(rate)))
 
     def set_language(self, lang: str):

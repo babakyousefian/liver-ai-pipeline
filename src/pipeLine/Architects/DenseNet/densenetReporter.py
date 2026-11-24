@@ -24,7 +24,7 @@ Pages:
   15. 5-Fold CV — Best Fold
   16. Bootstrap 95% CI
   17. TTA Analysis
-  18. SSL Methods Comparison (BYOL / SimCLR / MAE)
+  ResNet18. SSL Methods Comparison (BYOL / SimCLR / MAE)
   19. Captum Interpretability
   20. LIME Explanations
   21. SHAP Summary
@@ -867,7 +867,7 @@ def _build_pdf(
     safe_img(interp_paths.get("shap"), "16.1 SHAP Summary", w=6 * inch, h=4 * inch)
     story.append(PageBreak())
 
-    # PAGE 18: ARCHITECTURE
+    # PAGE ResNet18: ARCHITECTURE
     story.append(Paragraph("17. Model Architecture (Netron)", S["h1"]))
     if arch_paths:
         arch_data = [["File", "Path", "Purpose"]]
@@ -902,7 +902,7 @@ def _build_pdf(
     story.append(PageBreak())
 
     # PAGE 19: PIPELINE SUMMARY
-    story.append(Paragraph("18. Pipeline Summary", S["h1"]))
+    story.append(Paragraph("ResNet18. Pipeline Summary", S["h1"]))
     pipeline_data = [
         ["Stage", "Status", "Details"],
         ["SSL Pretraining", "✅",

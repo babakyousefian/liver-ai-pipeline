@@ -23,6 +23,14 @@ Author: Babak Yousefian
 Version: 2.2.0
 """
 
+# GUI_update.py
+# -*- coding: utf-8 -*-
+
+"""
+Liver AI Pipeline - GUI (ULTIMATE EDITION v2.2)
+...
+"""
+
 import os
 import sys
 import json
@@ -14360,7 +14368,7 @@ class ProcessingProgressBar(QWidget):
         # اگه تم روشنه، track روشن‌تر؛ اگه تیره، track تیره‌تر
         is_light_theme = (self._theme.get("name") == "Solarized White")
         if is_light_theme:
-            track_bg = "rgba(38, 139, 210, 0.18)"
+            track_bg = "rgba(38, 139, 210, 0.ResNet18)"
             track_border = "rgba(38, 139, 210, 0.55)"
         else:
             track_bg = "rgba(0, 0, 0, 0.35)"
@@ -20962,7 +20970,7 @@ class MainWindow(QMainWindow):
             self.close()
 
     def _load_image_from_path(self, path: str):
-        """بارگذاری تصویر، کراپ هوشمند، حذف لیبل، و نمایش تصویر تمیز."""
+        """بارگذاری تصویر، اعتبارسنجی، کراپ هوشمند."""
         if not path or not os.path.isfile(path):
             show_message(self, "warning", tr(self.current_lang, "warning"),
                          tr(self.current_lang, "drop_invalid"))
@@ -20974,19 +20982,39 @@ class MainWindow(QMainWindow):
             return
 
         # ============================================================
-        # ✅ STEP 1: Preprocess with AUTO-DETECT
-        # (preprocessor خودش تشخیص می‌دهد header دارد یا نه)
+        # ✅ STEP 1: GUARD CHECK FIRST (on raw image, before preprocess)
+        # ============================================================
+        if HAS_IMAGE_GUARD:
+            try:
+                guard = guard_analyze_image(path)  # ← raw image!
+                is_liver = guard.get("is_liver_like", True)
+                score = guard.get("score", 0.0)
+
+                print(f"🛡️ Guard (raw): is_liver={is_liver}, score={score:.3f}, "
+                      f"reason={guard.get('reason', '')}")
+
+                if not is_liver:
+                    SoundManager.get().play("warningSound")
+                    msg = tr(self.current_lang, "image_not_liver_warning")
+                    if msg == "image_not_liver_warning":
+                        msg = ("This image does not look like a liver ultrasound.\n\n"
+                               "Please insert a proper liver ultrasound image.")
+                    show_message(self, "warning", tr(self.current_lang, "warning"),
+                                 f"{msg}\n\nSimilarity: {score * 100:.1f}%")
+                    self._speak("voice_image_rejected")
+                    return  # ← reject EARLY
+            except Exception as e:
+                print(f"⚠️ Guard failed (fail-open): {e}")
+
+        # ============================================================
+        # ✅ STEP 2: Preprocess (only if guard passed)
         # ============================================================
         cleaned_path = path
         preprocess_info = None
 
         if HAS_PREPROCESSOR:
             try:
-                # ✅ already_cropped=None → auto-detect header/panels
-                result = preprocess_medical_image(
-                    path,
-                    already_cropped=None,
-                )
+                result = preprocess_medical_image(path, already_cropped=None)
                 if result.success and result.image is not None:
                     preprocess_info = result
                     import tempfile
@@ -20999,10 +21027,8 @@ class MainWindow(QMainWindow):
                     if result.save(cleaned_path):
                         print(f"🧹 Preprocessed: {result.original_shape} → {result.final_shape}")
                         print(f"   Decision: {result.crop_decision}")
-                        print(f"   Cropped: {result.cropped}, "
-                              f"Labels removed: {result.labels_removed}, "
-                              f"Has header: {result.has_header}, "
-                              f"Has panels: {result.has_side_panels}")
+                        print(f"   Borders: {result.borders}")
+                        print(f"   Cropped: {result.cropped}")
                     else:
                         cleaned_path = path
                         preprocess_info = None
@@ -21012,7 +21038,7 @@ class MainWindow(QMainWindow):
                 traceback.print_exc()
 
         # ============================================================
-        # ✅ STEP 2: Load pixmap (ONCE)
+        # ✅ STEP 3: Load pixmap
         # ============================================================
         pixmap = QPixmap(cleaned_path)
         if pixmap.isNull() and HAS_CV2:
@@ -21034,32 +21060,24 @@ class MainWindow(QMainWindow):
             return
 
         # ============================================================
-        # ✅ STEP 3: Guard check (ONCE)
+        # ✅ STEP 4: Double guard check on cleaned image (defense in depth)
         # ============================================================
-        if HAS_IMAGE_GUARD:
+        if HAS_IMAGE_GUARD and cleaned_path != path:
             try:
                 guard = guard_analyze_image(cleaned_path)
-                is_liver = guard.get("is_liver_like", True)
-                score = guard.get("score", 0.0)
-
-                print(f"🛡️ Guard: is_liver={is_liver}, score={score:.3f}, "
-                      f"reason={guard.get('reason', '')}")
-
-                if not is_liver:
+                if not guard.get("is_liver_like", True):
                     SoundManager.get().play("warningSound")
                     msg = tr(self.current_lang, "image_not_liver_warning")
                     if msg == "image_not_liver_warning":
-                        msg = ("This image does not look like a liver ultrasound.\n\n"
-                               "Please insert a proper liver ultrasound image.")
-                    show_message(self, "warning", tr(self.current_lang, "warning"),
-                                 f"{msg}\n\nSimilarity: {score * 100:.1f}%")
+                        msg = ("This image does not look like a liver ultrasound.")
+                    show_message(self, "warning", tr(self.current_lang, "warning"), msg)
                     self._speak("voice_image_rejected")
                     return
-            except Exception as e:
-                print(f"⚠️ Image guard failed (fail-open): {e}")
+            except Exception:
+                pass  # fail-open
 
         # ============================================================
-        # ✅ STEP 4: UI
+        # ✅ STEP 5: UI
         # ============================================================
         self.current_image_path = cleaned_path
         self._image_loaded_at = datetime.now().timestamp()
@@ -21080,19 +21098,11 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
 
-        # ============================================================
-        # ✅ STEP 5: Notify (ONCE)
-        # ============================================================
         success_title = tr(self.current_lang, "image_loaded")
         success_detail = os.path.basename(path)
         extras = []
-        if preprocess_info:
-            if preprocess_info.cropped:
-                extras.append("cropped")
-            if preprocess_info.labels_removed > 0:
-                extras.append(f"{preprocess_info.labels_removed} label(s) removed")
-            if not preprocess_info.cropped and preprocess_info.labels_removed == 0:
-                extras.append("no change")
+        if preprocess_info and preprocess_info.cropped:
+            extras.append("cropped")
         if extras:
             success_detail += f" ({', '.join(extras)})"
 

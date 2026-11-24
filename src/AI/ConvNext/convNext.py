@@ -20,6 +20,7 @@ For RTX 2050 (4GB VRAM):
 Author: Babak Yousefian
 """
 
+import pandas as pd
 import json
 import os
 import time
@@ -67,9 +68,210 @@ torch.set_num_threads(4)
 set_seed(42)
 
 # ✅ ConvNeXt output dir
-CONVNEXT_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "..", "ConvNext")
-CONVNEXT_OUTPUT_DIR = os.path.abspath(CONVNEXT_OUTPUT_DIR)
+# ✅ مسیر قطعی — همیشه توی finalReports/AI_Comparisons/ConvNext
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))
+)))
+CONVNEXT_OUTPUT_DIR = os.path.join(
+    _PROJECT_ROOT, "finalReports", "AI_Comparisons", "ConvNext"
+)
+os.makedirs(CONVNEXT_OUTPUT_DIR, exist_ok=True)
 
+
+def regenerate_convnext_reports() -> Optional[str]:
+    """
+    Regenerate ConvNeXt reports from existing artifacts.
+
+    مسیرهای واقعی:
+      INPUT:  finalReports/AI_Comparisons/ConvNext/convnext/
+                - ConvNext_best.pth
+                - history_ConvNext.json
+                - training_meta_ConvNext.json
+                - config_ConvNext.json
+
+      OUTPUT: finalReports/AI_Comparisons/ConvNext/reports/
+                - CONVNEXT_Report.pdf
+                - metrics.json, summary.txt, classification_report.txt, predictions.csv
+                - confusion_matrix.png, confusion_matrix_raw.png, roc_curves.png
+                - metrics_bar.png, per_class_metrics.png, performance_pie.png
+                - training_history.png, train_val_gap.png, learning_rate.png
+    """
+    import json
+    from datetime import datetime
+
+    print("\n" + "=" * 70)
+    print("📄 REGENERATE CONVNEXT REPORTS (no retraining)")
+    print("=" * 70)
+
+    # ----- 1. Resolve paths (دقیقاً مطابق خروجی‌های واقعی) -----
+    base_dir = CONVNEXT_OUTPUT_DIR  # .../ConvNext
+    model_dir = os.path.join(base_dir, "convnext")  # .../ConvNext/convnext
+    reports_dir = os.path.join(base_dir, "reports")  # .../ConvNext/reports
+
+    if not os.path.exists(model_dir):
+        print(f"❌ Model dir not found: {model_dir}")
+        print("👉 Run the full ConvNeXt training first (option in menu).")
+        return None
+
+    os.makedirs(reports_dir, exist_ok=True)
+
+    # ----- 2. Check required files -----
+    history_path = os.path.join(model_dir, "history_ConvNext.json")
+    meta_path = os.path.join(model_dir, "training_meta_ConvNext.json")
+    config_path = os.path.join(model_dir, "config_ConvNext.json")
+    best_model_path = os.path.join(model_dir, "ConvNext_best.pth")
+
+    missing = []
+    for p in [history_path, meta_path, config_path, best_model_path]:
+        if not os.path.exists(p):
+            missing.append(p)
+    if missing:
+        print("❌ Missing files:")
+        for p in missing:
+            print(f"   - {p}")
+        return None
+
+    print(f"✅ All required files found")
+    print(f"   Model dir:    {model_dir}")
+    print(f"   Reports dir:  {reports_dir}")
+
+    # ----- 3. Load history + meta + config -----
+    with open(history_path, "r", encoding="utf-8") as f:
+        history = json.load(f)
+    with open(meta_path, "r", encoding="utf-8") as f:
+        meta = json.load(f)
+    with open(config_path, "r", encoding="utf-8") as f:
+        config_raw = json.load(f)
+
+    print(f"   History: {len(history.get('train_loss', []))} epochs")
+    print(f"   Meta best_val_acc: {meta.get('best_val_acc', 'N/A')}")
+    print(f"   Meta test_accuracy: {meta.get('test_accuracy', 'N/A')}")
+
+    # ----- 4. Load the best model + build test loader -----
+    print("\n📥 Loading best model...")
+    from src.AI.ConvNext.convNext import ConvNextTrainer
+
+    try:
+        trainer = ConvNextTrainer.__new__(ConvNextTrainer)
+
+        # --- Minimal attributes ---
+        trainer.csv_path = config_raw.get("csv_path")
+        trainer.img_dir = config_raw.get("img_dir")
+        trainer.target_size = config_raw.get("target_size", 224)
+        trainer.batch_size = config_raw.get("batch_size", 16)
+        trainer.num_workers = config_raw.get("num_workers", 0)
+        trainer.use_mixed_precision = config_raw.get("use_mixed_precision", True)
+        trainer.use_sampler = config_raw.get("use_sampler", True)
+        trainer.dropout_rate = config_raw.get("dropout_rate", 0.3)
+        trainer.lr = config_raw.get("lr", 1e-4)
+        trainer.weight_decay = config_raw.get("weight_decay", 0.05)
+        trainer.label_smoothing = config_raw.get("label_smoothing", 0.15)
+        trainer.accumulation_steps = config_raw.get("accumulation_steps", 2)
+        trainer.warmup_epochs = config_raw.get("warmup_epochs", 8)
+        trainer.epochs_per_phase = config_raw.get("epochs_per_phase", [5, 30])
+        trainer.phase_lrs = None
+
+        # --- Paths (مطابق خروجی واقعی) ---
+        trainer.base_dir = base_dir
+        trainer.model_dir = model_dir
+        trainer.save_path = best_model_path
+        trainer.checkpoint_path = os.path.join(model_dir, "ConvNext_checkpoint.pth")
+        trainer.last_path = os.path.join(model_dir, "ConvNext_last.pth")
+        trainer.config_path = config_path
+
+        # --- History & meta ---
+        trainer.history = history
+        trainer.best_acc = float(meta.get("best_val_acc", 0.0))
+        trainer.best_epoch = int(meta.get("best_epoch", 0))
+        trainer.test_accuracy = float(meta.get("test_accuracy", 0.0))
+        trainer.test_loss = float(meta.get("test_loss", 0.0))
+        trainer.test_auc = float(meta.get("test_auc", 0.0))
+
+        # --- Build model ---
+        from torchvision import models
+        from src.AI.ResNet.utils import CLASS_NAMES
+
+        print("   Building ConvNeXt-Tiny...")
+        model = models.convnext_tiny(weights=None)
+        num_features = model.classifier[2].in_features
+        model.classifier[2] = nn.Sequential(
+            nn.Dropout(trainer.dropout_rate),
+            nn.Linear(num_features, 256),
+            nn.LayerNorm(256),
+            nn.GELU(),
+            nn.Dropout(trainer.dropout_rate * 0.5),
+            nn.Linear(256, len(CLASS_NAMES)),
+        )
+        model = model.to(DEVICE)
+
+        # --- Load weights ---
+        checkpoint = torch.load(best_model_path, map_location=DEVICE)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        model.eval()
+        trainer.model = model
+        print(f"   ✅ Model loaded: {best_model_path}")
+
+        # --- Criterion ---
+        from src.AI.ResNet.utils import LabelSmoothingCrossEntropy
+        trainer.criterion = LabelSmoothingCrossEntropy(
+            smoothing=trainer.label_smoothing
+        )
+        print(f"   ✅ Criterion built (smoothing={trainer.label_smoothing})")
+
+        # --- Test data ---
+        print("   Loading test data...")
+        trainer.df = pd.read_csv(trainer.csv_path)
+        trainer.train_ds, trainer.val_ds = trainer._load_data()
+        trainer.train_loader, trainer.val_loader, trainer.test_loader = trainer._create_dataloaders()
+        print(f"   Test samples: {len(trainer.test_ds)}")
+
+        # --- Evaluate on test ---
+        print("\n   Evaluating on TEST set...")
+        trainer.evaluate_on_test()
+
+        # --- Attach metrics ---
+        trainer.metrics = trainer.test_metrics
+        trainer.cm = trainer.test_cm
+        trainer.auc_score = trainer.test_auc
+        trainer.y_true = trainer.test_y_true
+        trainer.y_pred = trainer.test_y_pred
+        trainer.y_prob = trainer.test_y_prob
+        print(f"   ✅ Metrics attached (accuracy={trainer.metrics.get('accuracy', 0):.4f})")
+
+    except Exception as e:
+        print(f"❌ Could not rebuild trainer: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+    # ----- 5. Generate reports (توی reports_dir) -----
+    print("\n📄 Generating reports...")
+    try:
+        # ✅ generate_report خودش reports_dir رو می‌سازه، ولی ما output_path رو پاس می‌دیم
+        # که مطمئن بشیم PDF توی مسیر درست ساخته می‌شه
+        pdf_path = trainer.generate_report(
+            output_path=os.path.join(reports_dir, "CONVNEXT_Report.pdf")
+        )
+        print(f"\n✅ PDF generated: {pdf_path}")
+    except Exception as e:
+        print(f"❌ Report generation failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+    # ----- 6. Verify output files -----
+    print("\n📂 Report files in:", reports_dir)
+    for fname in sorted(os.listdir(reports_dir)):
+        fpath = os.path.join(reports_dir, fname)
+        if os.path.isfile(fpath):
+            size_kb = os.path.getsize(fpath) / 1024
+            print(f"   ✅ {fname} ({size_kb:.1f} KB)")
+
+    print("\n" + "=" * 70)
+    print(f"✅ ALL REPORTS SAVED TO: {reports_dir}")
+    print("=" * 70)
+
+    return pdf_path
 
 # =====================================================
 # EARLY STOPPING
@@ -427,6 +629,8 @@ class ConvNextTrainer:
             "use_sampler": self.use_sampler,
             "device": str(DEVICE),
             "created_at": datetime.now().isoformat(),
+            "model_dir": self.model_dir,  # ← این خط اضافه شد
+            "base_dir": self.base_dir,  # ← این خط اضافه شد
         }
         with open(self.config_path, "w") as f:
             json.dump(config, f, indent=4)
@@ -571,11 +775,11 @@ class ConvNextTrainer:
             val_loss, val_acc = self.evaluate(return_loss=True)
             current_lr = self.scheduler.step()
 
-            # ✅ Early Stopping Check (monitor val_loss)
+            # ✅ Early Stopping Check (monitor val_acc)
             if hasattr(self, 'early_stopping'):
-                if self.early_stopping(val_loss, epoch, self.model):
+                if self.early_stopping(val_acc, epoch, self.model):
                     print(f"\n🛑 Early Stopping at epoch {epoch + 1}")
-                    print(f"   Best Val Loss: {self.early_stopping.best_score:.4f}")
+                    print(f"   Best Val Acc: {self.early_stopping.best_score:.4f}")
                     print(f"   Best Epoch: {self.early_stopping.best_epoch + 1}")
                     break
 
@@ -650,20 +854,38 @@ class ConvNextTrainer:
 
         # ✅ Early Stopping Setup — patience=15
         self.early_stopping = EarlyStopping(
-            patience=10,           # ← 15 → 10
-            min_delta=1e-4,
-            mode='min',
+            patience=3,        # ← 3 → 99 (طبق درخواست)
+            min_delta=2e-4,
+            mode='max',
             verbose=True,
         )
 
         self.train_epoch(epochs=self.epochs_per_phase[1], desc="Stage 2")
 
-        # ✅ Restore بهترین وزن‌ها
+        # ✅ Restore بهترین وزن‌ها (از EarlyStopping)
         if hasattr(self, 'early_stopping') and self.early_stopping.best_weights is not None:
             self.early_stopping.restore_best_weights(self.model)
+            self.model.eval()
+            print(f"✅ Restored best weights from epoch {self.early_stopping.best_epoch + 1}")
 
-        print("\n📥 Loading best model...")
-        self.load(self.save_path)
+            # ✅✅✅ ذخیره بهترین وزن‌ها روی دیسک (برای regenerate reports)
+            save_model_checkpoint(
+                model=self.model,
+                optimizer=self.optimizer,
+                epoch=self.early_stopping.best_epoch,
+                metrics={
+                    "val_acc": self.early_stopping.best_score,
+                    "val_loss": self.early_stopping.best_score,
+                },
+                filename="ConvNext_best.pth",
+                scheduler=self.scheduler,
+                extra_info={"best_accuracy": self.early_stopping.best_score},
+                save_dir=self.model_dir,
+            )
+            print(f"✅ Best weights saved to ConvNext_best.pth (epoch {self.early_stopping.best_epoch + 1})")
+        else:
+            print("\n📥 Loading best model from disk...")
+            self.load(self.save_path)
 
         print("\n📊 Evaluating on TEST set...")
         self.evaluate_on_test()
@@ -731,6 +953,14 @@ class ConvNextTrainer:
         print("📊 EVALUATING ON TEST SET")
         print("=" * 70)
 
+        # ✅ Fallback: اگه criterion ساخته نشده بود (مثلاً در حالت regenerate)
+        if not hasattr(self, 'criterion') or self.criterion is None:
+            from src.AI.ResNet.utils import LabelSmoothingCrossEntropy
+            self.criterion = LabelSmoothingCrossEntropy(
+                smoothing=getattr(self, 'label_smoothing', 0.15)
+            )
+            print(f"   ⚠️ Criterion built on-the-fly (smoothing={self.label_smoothing})")
+
         self.model.eval()
         total_loss = 0
         total_correct = 0
@@ -794,6 +1024,10 @@ class ConvNextTrainer:
 
     # =====================================================
     # REPORT
+    # =====================================================
+
+    # =====================================================
+    # ✅ NEW: Regenerate Reports from Existing Artifacts (no retraining)
     # =====================================================
 
     def generate_report(self, output_path=None):

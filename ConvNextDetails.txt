@@ -1,0 +1,64 @@
+
+🔥 Best Accuracy: 0.8415 (Epoch 8)
+  ✅ Restored best weights from epoch 8
+✅ Restored best weights from epoch 8
+
+📊 Evaluating on TEST set...
+
+======================================================================
+📊 EVALUATING ON TEST SET
+======================================================================
+✅ Metrics computed: Accuracy = 0.9132, AUC = 0.9737
+
+✅ Test Acc:  0.9132
+✅ Test Loss: 0.6587
+✅ Test AUC:  0.9737
+======================================================================
+✅ History saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\ConvNext\convnext\history_ConvNext.json
+✅ Meta saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\ConvNext\convnext\training_meta_ConvNext.json
+
+======================================================================
+✅ Training Complete!
+   Best Val Acc: 0.8415
+   Test Acc:     0.9132
+======================================================================
+2026-11-09 08:06:43,830 - LiverAI - INFO - ✅ convnext completed: 0.8415 in 670.04s
+2026-11-09 08:06:43,831 - LiverAI - INFO - 📄 Generating report for convnext...
+✅ Confusion matrix saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\temp_plots\cm.png
+✅ Metrics bar chart saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\temp_plots\bar.png
+✅ Per-class metrics saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\temp_plots\per_class.png
+✅ Pie chart saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\temp_plots\pie.png
+✅ ROC curves saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\temp_plots\roc.png
+   Average AUC: 0.9539
+
+📸 Generating Grad-CAM for CONVNEXT...
+⚠️ Grad-CAM error: BaseCAM.__call__() missing 1 required positional argument: 'targets'
+✅ Training history saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\temp_plots\history.png
+✅ PDF report saved: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\CONVNEXT_Report.pdf
+   Total pages: 9
+2026-11-09 08:06:48,632 - LiverAI - INFO - ✅ Report generated: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\EfficientNet\reports\CONVNEXT_Report.pdf
+2026-11-09 08:06:48,632 - LiverAI - INFO - 📊 ConvNeXt Results:
+2026-11-09 08:06:48,632 - LiverAI - INFO -    Accuracy: 0.8415
+
+Press Enter to continue...
+
+
+داداش این ادرس اشتباهه.
+باید همه گزارش ها توی این ادرس بره :
+C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\ConvNext\reports\
+
+و همه چیز که مربوط به reports هست باید اینتو باشن مثل pdf - json - plots
+
+که الان نیستن.
+ولی همه .pth ها همه توی این ادرس ذخیره شدن :
+C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\ConvNext\convnext\
+
+شامل .pth ها و .json ها هستش.
+
+
+حالا الان بیا بر اساس خروجی که داده بیا و دوباره خروجی بگیر. و توی این ادرس جدیدی که گفتم خروجی reports هارو بنداز اینجا.
+
+فقط یه گزینه جدید درست کن که بیاد و از خروجی هابی که گرفته این PDF رو کامل بنویسه و تمامی plot ها و json هاروهم ذخیره کنه.
+فقط کامل
+
+100x Think

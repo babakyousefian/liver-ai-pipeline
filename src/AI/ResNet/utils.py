@@ -465,7 +465,7 @@ def apply_augmentation(image: np.ndarray) -> np.ndarray:
     Returns: numpy.ndarray: Augmented image
     """
     try:
-        # Horizontal flip with 50% probability
+        # Horizontal flip with ResNet50% probability
         if np.random.rand() < 0.5:
             image = cv2.flip(image, 1)
 

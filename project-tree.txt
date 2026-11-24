@@ -1,0 +1,2383 @@
+﻿FinalTasks
+├── assets
+│   ├── favicon_io
+│   │   ├── android-chrome-192x192.png
+│   │   ├── android-chrome-512x512.png
+│   │   ├── apple-touch-icon.png
+│   │   ├── favicon.ico
+│   │   ├── favicon-16x16.png
+│   │   ├── favicon-32x32.png
+│   │   └── site.webmanifest
+│   ├── fonts
+│   │   ├── NotoSans-Bold.ttf
+│   │   ├── NotoSans-Italic.ttf
+│   │   ├── NotoSans-Regular.ttf
+│   │   ├── Vazirmatn-Bold.ttf
+│   │   └── Vazirmatn-Regular.ttf
+│   ├── music
+│   │   └── kd_theme.mp3
+│   ├── sounds
+│   │   ├── DashboadClickButtton.mp3
+│   │   ├── ErrorSound.mp3
+│   │   ├── linkClick.mp3
+│   │   ├── loginSound.mp3
+│   │   ├── logoutSound.mp3
+│   │   ├── muteClick.mp3
+│   │   ├── ok_sound.mp3
+│   │   ├── processButton.mp3
+│   │   ├── signinSound.mp3
+│   │   ├── signoutSound.mp3
+│   │   ├── simpleClick.mp3
+│   │   └── warningSound.mp3
+│   ├── favicon.ico
+│   ├── favicon_io.zip
+│   ├── logo.png
+│   └── music3.mp3
+├── audit_logs
+├── core
+│   ├── audit
+│   │   ├── __init__.py
+│   │   ├── logger.py
+│   │   ├── models.py
+│   │   ├── reader.py
+│   │   └── storage.py
+│   ├── crypto
+│   │   ├── __init__.py
+│   │   ├── encrypted_db.py
+│   │   └── key_manager.py
+│   ├── preprocessing
+│   │   ├── __init__.py
+│   │   └── medical_preprocessor.py
+│   ├── security
+│   │   ├── .cache
+│   │   │   └── liver_model.pkl
+│   │   ├── models
+│   │   │   ├── .gitkeep
+│   │   │   └── liver_model.pkl
+│   │   ├── __init__.py
+│   │   ├── auto_lock.py
+│   │   ├── image_guard.py
+│   │   ├── password_strength.py
+│   │   └── totp.py
+│   ├── ui
+│   │   ├── __init__.py
+│   │   ├── confetti.py
+│   │   ├── empty_state.py
+│   │   ├── font_manager.py
+│   │   ├── micro_interactions.py
+│   │   ├── onboarding.py
+│   │   ├── smart.txt
+│   │   ├── smart_suggestions.py
+│   │   └── voice_feedback.py
+│   └── updater
+│       ├── __init__.py
+│       ├── checker.py
+│       ├── downloader.py
+│       ├── health.py
+│       ├── installer.py
+│       ├── models.py
+│       ├── source.py
+│       ├── verifier.py
+│       └── version.py
+├── finalReports
+│   ├── AI_Comparisons
+│   │   ├── AlexNet
+│   │   │   ├── AlexNet
+│   │   │   │   ├── AlexNet_best.pth
+│   │   │   │   ├── AlexNet_checkpoint.pth
+│   │   │   │   ├── AlexNet_last.pth
+│   │   │   │   ├── config_AlexNet.json
+│   │   │   │   ├── history_AlexNet.json
+│   │   │   │   └── training_meta_AlexNet.json
+│   │   │   └── reports
+│   │   │       ├── AlexNet_Report.pdf
+│   │   │       ├── classification_report.txt
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── learning_rate.png
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── Backups
+│   │   │   ├── ConvNext
+│   │   │   │   ├── convnext
+│   │   │   │   │   ├── config_ConvNext.json
+│   │   │   │   │   ├── ConvNext_best.pth
+│   │   │   │   │   ├── ConvNext_checkpoint.pth
+│   │   │   │   │   ├── ConvNext_last.pth
+│   │   │   │   │   ├── history_ConvNext.json
+│   │   │   │   │   └── training_meta_ConvNext.json
+│   │   │   │   └── reports
+│   │   │   │       ├── classification_report.txt
+│   │   │   │       ├── confusion_matrix.png
+│   │   │   │       ├── confusion_matrix_raw.png
+│   │   │   │       ├── ConvNextReport.pdf
+│   │   │   │       ├── learning_rate.png
+│   │   │   │       ├── metrics.json
+│   │   │   │       ├── metrics_bar.png
+│   │   │   │       ├── per_class_metrics.png
+│   │   │   │       ├── performance_pie.png
+│   │   │   │       ├── predictions.csv
+│   │   │   │       ├── roc_curves.png
+│   │   │   │       ├── summary.txt
+│   │   │   │       ├── train_val_gap.png
+│   │   │   │       └── training_history.png
+│   │   │   ├── DensNet
+│   │   │   │   ├── DensNet
+│   │   │   │   │   ├── config_DensNet.json
+│   │   │   │   │   ├── DensNet_best.pth
+│   │   │   │   │   ├── DensNet_checkpoint.pth
+│   │   │   │   │   ├── DensNet_last.pth
+│   │   │   │   │   ├── history_DensNet.json
+│   │   │   │   │   └── training_meta_DensNet.json
+│   │   │   │   └── reports
+│   │   │   │       ├── classification_report.txt
+│   │   │   │       ├── confusion_matrix.png
+│   │   │   │       ├── confusion_matrix_raw.png
+│   │   │   │       ├── DensNetReport.pdf
+│   │   │   │       ├── learning_rate.png
+│   │   │   │       ├── metrics.json
+│   │   │   │       ├── metrics_bar.png
+│   │   │   │       ├── per_class_metrics.png
+│   │   │   │       ├── performance_pie.png
+│   │   │   │       ├── predictions.csv
+│   │   │   │       ├── roc_curves.png
+│   │   │   │       ├── summary.txt
+│   │   │   │       ├── train_val_gap.png
+│   │   │   │       └── training_history.png
+│   │   │   └── VGG16
+│   │   │       ├── reports
+│   │   │       │   ├── classification_report.txt
+│   │   │       │   ├── confusion_matrix.png
+│   │   │       │   ├── confusion_matrix_raw.png
+│   │   │       │   ├── learning_rate.png
+│   │   │       │   ├── metrics.json
+│   │   │       │   ├── metrics_bar.png
+│   │   │       │   ├── per_class_metrics.png
+│   │   │       │   ├── performance_pie.png
+│   │   │       │   ├── predictions.csv
+│   │   │       │   ├── roc_curves.png
+│   │   │       │   ├── summary.txt
+│   │   │       │   ├── train_val_gap.png
+│   │   │       │   ├── training_history.png
+│   │   │       │   └── VGG16_Report.pdf
+│   │   │       └── vgg16
+│   │   │           ├── config_vgg16.json
+│   │   │           ├── history_VGG16.json
+│   │   │           ├── training_meta_VGG16.json
+│   │   │           ├── vgg16_best.pth
+│   │   │           ├── vgg16_checkpoint.pth
+│   │   │           └── vgg16_last.pth
+│   │   ├── CNN
+│   │   │   ├── CNN
+│   │   │   │   ├── CNN_best.pth
+│   │   │   │   ├── CNN_checkpoint.pth
+│   │   │   │   ├── CNN_last.pth
+│   │   │   │   ├── config_CNN.json
+│   │   │   │   ├── history_CNN.json
+│   │   │   │   └── training_meta_CNN.json
+│   │   │   └── reports
+│   │   │       ├── classification_report.txt
+│   │   │       ├── CNNReport.pdf
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── learning_rate.png
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── CNNLSTM
+│   │   │   ├── CNNLSTM
+│   │   │   │   ├── CNNLSTM_best.pth
+│   │   │   │   ├── CNNLSTM_checkpoint.pth
+│   │   │   │   ├── CNNLSTM_last.pth
+│   │   │   │   ├── config_CNNLSTM.json
+│   │   │   │   ├── history_CNNLSTM.json
+│   │   │   │   └── training_meta_CNNLSTM.json
+│   │   │   └── reports
+│   │   │       ├── classification_report.txt
+│   │   │       ├── CNNLSTMReport.pdf
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── learning_rate.png
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── ConvNext
+│   │   │   ├── convnext
+│   │   │   │   ├── config_ConvNext.json
+│   │   │   │   ├── ConvNext_best.pth
+│   │   │   │   ├── ConvNext_checkpoint.pth
+│   │   │   │   ├── ConvNext_last.pth
+│   │   │   │   ├── history_ConvNext.json
+│   │   │   │   └── training_meta_ConvNext.json
+│   │   │   └── reports
+│   │   │       ├── classification_report.txt
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── ConvNextReport.pdf
+│   │   │       ├── learning_rate.png
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── DensNet
+│   │   │   ├── DensNet
+│   │   │   │   ├── config_DensNet.json
+│   │   │   │   ├── DensNet_best.pth
+│   │   │   │   ├── DensNet_checkpoint.pth
+│   │   │   │   ├── DensNet_last.pth
+│   │   │   │   ├── history_DensNet.json
+│   │   │   │   └── training_meta_DensNet.json
+│   │   │   └── reports
+│   │   │       ├── classification_report.txt
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── DensNetReport.pdf
+│   │   │       ├── learning_rate.png
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── EfficientNet
+│   │   │   ├── b0
+│   │   │   │   ├── config_efficientnet_b0.json
+│   │   │   │   ├── efficientnet_b0_best.pth
+│   │   │   │   ├── efficientnet_b0_checkpoint.pth
+│   │   │   │   └── efficientnet_b0_last.pth
+│   │   │   ├── b1
+│   │   │   │   ├── config_efficientnet_b1.json
+│   │   │   │   ├── efficientnet_b1_best.pth
+│   │   │   │   ├── efficientnet_b1_checkpoint.pth
+│   │   │   │   └── efficientnet_b1_last.pth
+│   │   │   └── reports
+│   │   │       ├── B0Details.txt
+│   │   │       ├── B1Details.txt
+│   │   │       ├── CONVNEXT_Report.pdf
+│   │   │       ├── DENSNET_Report.pdf
+│   │   │       ├── efficientnet_b0_report.json
+│   │   │       ├── efficientnet_b1_report.json
+│   │   │       ├── EfficientNet-B0_Report.pdf
+│   │   │       └── EfficientNet-B1_Report.pdf
+│   │   ├── Final_Comparisons
+│   │   │   ├── comparison_table.csv
+│   │   │   └── Comprehensive_Model_Comparison_Report.pdf
+│   │   ├── GoogleNet
+│   │   │   ├── GoogleNet
+│   │   │   │   ├── config_GoogleNet.json
+│   │   │   │   ├── GoogleNet_best.pth
+│   │   │   │   ├── GoogleNet_checkpoint.pth
+│   │   │   │   ├── GoogleNet_last.pth
+│   │   │   │   ├── history_GoogleNet.json
+│   │   │   │   └── training_meta_GoogleNet.json
+│   │   │   └── reports
+│   │   │       ├── classification_report.txt
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── GoogleNet_Report.pdf
+│   │   │       ├── learning_rate.png
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── Literature_Comparison
+│   │   │   ├── comparison_table.csv
+│   │   │   └── Literature_Comparison_Report.pdf
+│   │   ├── LSTM
+│   │   │   ├── LSTM
+│   │   │   │   ├── config_LSTM.json
+│   │   │   │   ├── history_LSTM.json
+│   │   │   │   ├── LSTM_best.pth
+│   │   │   │   ├── LSTM_checkpoint.pth
+│   │   │   │   ├── LSTM_last.pth
+│   │   │   │   └── training_meta_LSTM.json
+│   │   │   └── reports
+│   │   │       ├── classification_report.txt
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── learning_rate.png
+│   │   │       ├── LSTMReport.pdf
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── MobileNetV2
+│   │   │   ├── mobilenetv2
+│   │   │   │   ├── config_mobilenetv2.json
+│   │   │   │   ├── history_MobileNetV2.json
+│   │   │   │   ├── mobilenetv2_best.pth
+│   │   │   │   ├── mobilenetv2_checkpoint.pth
+│   │   │   │   ├── mobilenetv2_last.pth
+│   │   │   │   └── training_meta_MobileNetV2.json
+│   │   │   └── reports
+│   │   │       ├── classification_report.txt
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── learning_rate.png
+│   │   │       ├── metrics.json
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── MobileNetV2_Report.pdf
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── performance_pie.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── train_val_gap.png
+│   │   │       └── training_history.png
+│   │   ├── ResNet
+│   │   │   ├── reports
+│   │   │   │   ├── 18Details.txt
+│   │   │   │   ├── 50Details.txt
+│   │   │   │   ├── resnet18_report.json
+│   │   │   │   ├── ResNet18_Report.pdf
+│   │   │   │   ├── resnet50_report.json
+│   │   │   │   └── ResNet50_Report.pdf
+│   │   │   ├── resnet18
+│   │   │   │   ├── config_resnet18.json
+│   │   │   │   ├── resnet18_best.pth
+│   │   │   │   ├── resnet18_checkpoint.pth
+│   │   │   │   └── resnet18_last.pth
+│   │   │   └── resnet50
+│   │   │       ├── config_resnet50.json
+│   │   │       ├── resnet50_best.pth
+│   │   │       ├── resnet50_checkpoint.pth
+│   │   │       └── resnet50_last.pth
+│   │   ├── Swin_Transformer
+│   │   │   ├── reports
+│   │   │   │   ├── classification_report.txt
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── confusion_matrix_raw.png
+│   │   │   │   ├── learning_rate.png
+│   │   │   │   ├── metrics.json
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── per_class_metrics.png
+│   │   │   │   ├── performance_pie.png
+│   │   │   │   ├── predictions.csv
+│   │   │   │   ├── roc_curves.png
+│   │   │   │   ├── summary.txt
+│   │   │   │   ├── Swin_Transformer_Report.pdf
+│   │   │   │   ├── train_val_gap.png
+│   │   │   │   └── training_history.png
+│   │   │   └── Swin_Transformer
+│   │   │       ├── config_Swin_Transformer.json
+│   │   │       ├── history_Swin_Transformer.json
+│   │   │       ├── Swin_Transformer_best.pth
+│   │   │       ├── Swin_Transformer_checkpoint.pth
+│   │   │       ├── Swin_Transformer_last.pth
+│   │   │       └── training_meta_Swin_Transformer.json
+│   │   ├── VGG16
+│   │   │   ├── reports
+│   │   │   │   ├── classification_report.txt
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── confusion_matrix_raw.png
+│   │   │   │   ├── learning_rate.png
+│   │   │   │   ├── metrics.json
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── per_class_metrics.png
+│   │   │   │   ├── performance_pie.png
+│   │   │   │   ├── predictions.csv
+│   │   │   │   ├── roc_curves.png
+│   │   │   │   ├── summary.txt
+│   │   │   │   ├── train_val_gap.png
+│   │   │   │   ├── training_history.png
+│   │   │   │   └── VGG16_Report.pdf
+│   │   │   └── vgg16
+│   │   │       ├── config_vgg16.json
+│   │   │       ├── history_VGG16.json
+│   │   │       ├── training_meta_VGG16.json
+│   │   │       ├── vgg16_best.pth
+│   │   │       ├── vgg16_checkpoint.pth
+│   │   │       └── vgg16_last.pth
+│   │   └── visioTransformer
+│   │       ├── reports
+│   │       │   ├── classification_report.txt
+│   │       │   ├── confusion_matrix.png
+│   │       │   ├── confusion_matrix_raw.png
+│   │       │   ├── learning_rate.png
+│   │       │   ├── metrics.json
+│   │       │   ├── metrics_bar.png
+│   │       │   ├── per_class_metrics.png
+│   │       │   ├── performance_pie.png
+│   │       │   ├── predictions.csv
+│   │       │   ├── roc_curves.png
+│   │       │   ├── summary.txt
+│   │       │   ├── train_val_gap.png
+│   │       │   ├── training_history.png
+│   │       │   └── visioTransformer_Report.pdf
+│   │       └── visioTransformer
+│   │           ├── config_visioTransformer.json
+│   │           ├── history_visioTransformer.json
+│   │           ├── training_meta_visioTransformer.json
+│   │           ├── visioTransformer_best.pth
+│   │           ├── visioTransformer_checkpoint.pth
+│   │           └── visioTransformer_last.pth
+│   ├── bestModels
+│   │   ├── AlexNet
+│   │   │   └── alexnetBEST.pth
+│   │   ├── bestKDEnsemble
+│   │   │   ├── bestKDE.pth
+│   │   │   └── selection_meta.json
+│   │   ├── bestKDEnsembles
+│   │   │   └── DenseNet121
+│   │   │       ├── advanced_eval.png
+│   │   │       ├── confusion_matrix.png
+│   │   │       ├── confusion_matrix_raw.png
+│   │   │       ├── history_kd_densenet.json
+│   │   │       ├── kd_densenet_best.pth
+│   │   │       ├── kd_densenet_last.pth
+│   │   │       ├── kd_metrics.json
+│   │   │       ├── KD_Report.pdf
+│   │   │       ├── lr_schedule.png
+│   │   │       ├── metrics_bar.png
+│   │   │       ├── per_class_metrics.png
+│   │   │       ├── predictions.csv
+│   │   │       ├── roc_curves.png
+│   │   │       ├── summary.txt
+│   │   │       ├── teacher_agreement.png
+│   │   │       ├── train_val_gap.png
+│   │   │       ├── training_history.png
+│   │   │       ├── training_meta_kd_densenet.json
+│   │   │       ├── xai_captum.png
+│   │   │       ├── xai_lime.png
+│   │   │       ├── xai_netron.onnx
+│   │   │       └── xai_netron.png
+│   │   ├── CNNLSTM
+│   │   │   └── cnnlstmBEST.pth
+│   │   ├── ConvNext
+│   │   │   └── convnextBEST.pth
+│   │   ├── DenseNet
+│   │   │   └── densenetBEST.pth
+│   │   ├── MobileNetV2
+│   │   │   └── mobilenetv2BEST.pth
+│   │   ├── SwinTransformer
+│   │   │   └── Swin_TransformerBEST.pth
+│   │   ├── VGG16
+│   │   │   └── vgg16BEST.pth
+│   │   ├── VisionTransformer
+│   │   │   └── visiontransformerBEST.pth
+│   │   ├── summary.json
+│   │   └── summary.txt
+│   ├── models
+│   │   ├── AlexNet
+│   │   │   ├── checkpoints
+│   │   │   │   ├── alexnet_best.pth
+│   │   │   │   ├── alexnet_final.pth
+│   │   │   │   └── alexnet_last.pth
+│   │   │   ├── configs
+│   │   │   │   └── config_alexnet.json
+│   │   │   ├── plots
+│   │   │   │   ├── 01_loss_history.png
+│   │   │   │   ├── 02_accuracy_history.png
+│   │   │   │   ├── 03_gap_loss.png
+│   │   │   │   ├── 04_gap_accuracy.png
+│   │   │   │   ├── 05_loss_and_gap.png
+│   │   │   │   ├── 06_lr_schedule.png
+│   │   │   │   ├── 07_metrics_history.png
+│   │   │   │   ├── class_distribution_pie.png
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── confusion_matrix_raw.png
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── per_class_metrics.png
+│   │   │   │   ├── predictions_distribution.png
+│   │   │   │   └── roc_curves.png
+│   │   │   └── reports
+│   │   │       ├── alexnet_task5_report.json
+│   │   │       ├── AlexNet_Task5_Report.pdf
+│   │   │       ├── alextnet_task5_report.json
+│   │   │       └── metrics.json
+│   │   ├── CNNLSTM
+│   │   │   ├── checkpoints
+│   │   │   │   ├── cnnlstm_best.pth
+│   │   │   │   ├── cnnlstm_checkpoint.pth
+│   │   │   │   ├── cnnlstm_final.pth
+│   │   │   │   └── cnnlstm_last.pth
+│   │   │   ├── configs
+│   │   │   │   └── config_cnnlstm.json
+│   │   │   ├── plots
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── roc_curves.png
+│   │   │   │   ├── train_val_gap.png
+│   │   │   │   └── training_history.png
+│   │   │   └── reports
+│   │   │       ├── cnnlstm_task5_report.json
+│   │   │       ├── CNNLSTM_Task5_Report.pdf
+│   │   │       └── metrics.json
+│   │   ├── ConvNext
+│   │   │   ├── checkpoints
+│   │   │   │   ├── ConvNext_best.pth
+│   │   │   │   ├── ConvNext_checkpoint.pth
+│   │   │   │   ├── ConvNext_final.pth
+│   │   │   │   └── ConvNext_last.pth
+│   │   │   ├── configs
+│   │   │   │   └── config_ConvNext.json
+│   │   │   ├── plots
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── roc_curves.png
+│   │   │   │   ├── train_val_gap.png
+│   │   │   │   └── training_history.png
+│   │   │   └── reports
+│   │   │       ├── convnext_task5_report.json
+│   │   │       ├── ConvNext_Task5_Report.pdf
+│   │   │       └── metrics.json
+│   │   ├── DenseNet
+│   │   │   ├── checkpoints
+│   │   │   │   ├── DenseNet_best.pth
+│   │   │   │   ├── DenseNet_final.pth
+│   │   │   │   └── DenseNet_last.pth
+│   │   │   ├── configs
+│   │   │   │   └── config_DenseNet.json
+│   │   │   ├── plots
+│   │   │   │   ├── 01_loss_history.png
+│   │   │   │   ├── 02_accuracy_history.png
+│   │   │   │   ├── 03_gap_loss.png
+│   │   │   │   ├── 04_gap_accuracy.png
+│   │   │   │   ├── 05_loss_and_gap.png
+│   │   │   │   ├── 06_lr_schedule.png
+│   │   │   │   ├── 07_metrics_history.png
+│   │   │   │   ├── class_distribution_pie.png
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── confusion_matrix_raw.png
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── per_class_metrics.png
+│   │   │   │   ├── predictions_distribution.png
+│   │   │   │   └── roc_curves.png
+│   │   │   └── reports
+│   │   │       ├── DenseNet_task5_report.json
+│   │   │       ├── DenseNet_Task5_Report.pdf
+│   │   │       └── metrics.json
+│   │   ├── efficientnet
+│   │   │   ├── B0
+│   │   │   │   ├── checkpoints
+│   │   │   │   │   ├── efficientnet_b0_best.pth
+│   │   │   │   │   ├── efficientnet_b0_final.pth
+│   │   │   │   │   └── efficientnet_b0_last.pth
+│   │   │   │   ├── configs
+│   │   │   │   │   └── config_efficientnet_b0.json
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── cv_results.png
+│   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   ├── per_class_metrics.png
+│   │   │   │   │   └── roc_curves.png
+│   │   │   │   └── reports
+│   │   │   │       ├── B0Reports.txt
+│   │   │   │       ├── efficientnet-b0_task5_report.json
+│   │   │   │       ├── EfficientNet-B0_Task5_Report.pdf
+│   │   │   │       └── metrics.json
+│   │   │   └── B1
+│   │   │       ├── checkpoints
+│   │   │       │   ├── efficientnet_b1_best.pth
+│   │   │       │   ├── efficientnet_b1_final.pth
+│   │   │       │   └── efficientnet_b1_last.pth
+│   │   │       ├── configs
+│   │   │       │   └── config_efficientnet_b1.json
+│   │   │       ├── plots
+│   │   │       │   ├── confusion_matrix.png
+│   │   │       │   ├── cv_results.png
+│   │   │       │   ├── metrics_bar.png
+│   │   │       │   ├── per_class_metrics.png
+│   │   │       │   └── roc_curves.png
+│   │   │       └── reports
+│   │   │           ├── B1Reports.txt
+│   │   │           ├── efficientnet-b1_task5_report.json
+│   │   │           ├── EfficientNet-B1_Task5_Report.pdf
+│   │   │           └── metrics.json
+│   │   ├── MobileNetV2
+│   │   │   ├── checkpoints
+│   │   │   │   ├── mobilenetV2_best.pth
+│   │   │   │   ├── mobilenetV2_checkpoint.pth
+│   │   │   │   ├── mobilenetV2_final.pth
+│   │   │   │   └── mobilenetV2_last.pth
+│   │   │   ├── configs
+│   │   │   │   └── config_mobilenetV2.json
+│   │   │   ├── plots
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── roc_curves.png
+│   │   │   │   ├── train_val_gap.png
+│   │   │   │   └── training_history.png
+│   │   │   └── reports
+│   │   │       ├── metrics.json
+│   │   │       ├── mobilenetv2_task5_report.json
+│   │   │       └── MobileNetV2_Task5_Report.pdf
+│   │   ├── resnet
+│   │   │   ├── resnet18
+│   │   │   │   ├── checkpoints
+│   │   │   │   │   ├── resnet18_best.pth
+│   │   │   │   │   ├── resnet18_checkpoint.pth
+│   │   │   │   │   ├── resnet18_final.pth
+│   │   │   │   │   └── resnet18_last.pth
+│   │   │   │   ├── configs
+│   │   │   │   │   └── config_resnet18.json
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   ├── per_class_metrics.png
+│   │   │   │   │   ├── roc_curves.png
+│   │   │   │   │   └── training_history.png
+│   │   │   │   └── reports
+│   │   │   │       ├── 18Reports.txt
+│   │   │   │       ├── metrics.json
+│   │   │   │       ├── resnet18_task5_report.json
+│   │   │   │       └── ResNet18_Task5_Report.pdf
+│   │   │   └── resnet50
+│   │   │       ├── checkpoints
+│   │   │       │   ├── resnet50_best.pth
+│   │   │       │   ├── resnet50_final.pth
+│   │   │       │   └── resnet50_last.pth
+│   │   │       ├── configs
+│   │   │       │   └── config_resnet50.json
+│   │   │       ├── plots
+│   │   │       │   ├── confusion_matrix.png
+│   │   │       │   ├── metrics_bar.png
+│   │   │       │   ├── per_class_metrics.png
+│   │   │       │   └── roc_curves.png
+│   │   │       └── reports
+│   │   │           ├── 50Reports.txt
+│   │   │           ├── metrics.json
+│   │   │           ├── resnet50_task5_report.json
+│   │   │           └── ResNet50_Task5_Report.pdf
+│   │   ├── VGG16
+│   │   │   ├── checkpoints
+│   │   │   │   ├── vgg16_best.pth
+│   │   │   │   ├── vgg16_checkpoint.pth
+│   │   │   │   ├── vgg16_final.pth
+│   │   │   │   └── vgg16_last.pth
+│   │   │   ├── configs
+│   │   │   │   └── config_vgg16.json
+│   │   │   ├── plots
+│   │   │   │   ├── confusion_matrix.png
+│   │   │   │   ├── metrics_bar.png
+│   │   │   │   ├── roc_curves.png
+│   │   │   │   ├── train_val_gap.png
+│   │   │   │   └── training_history.png
+│   │   │   └── reports
+│   │   │       ├── vgg16_task5_report.json
+│   │   │       └── VGG16_Task5_Report.pdf
+│   │   └── visio_transformer
+│   │       ├── checkpoints
+│   │       │   ├── visio_transformer_best.pth
+│   │       │   ├── visio_transformer_final.pth
+│   │       │   └── visio_transformer_last.pth
+│   │       ├── configs
+│   │       │   └── config_visio_transformer.json
+│   │       ├── plots
+│   │       │   ├── 01_loss_history.png
+│   │       │   ├── 02_accuracy_history.png
+│   │       │   ├── 03_gap_loss.png
+│   │       │   ├── 04_gap_accuracy.png
+│   │       │   ├── 05_loss_and_gap.png
+│   │       │   ├── 06_lr_schedule.png
+│   │       │   ├── 07_metrics_history.png
+│   │       │   ├── class_distribution_pie.png
+│   │       │   ├── confusion_matrix.png
+│   │       │   ├── confusion_matrix_raw.png
+│   │       │   ├── metrics_bar.png
+│   │       │   ├── per_class_metrics.png
+│   │       │   ├── predictions_distribution.png
+│   │       │   └── roc_curves.png
+│   │       └── reports
+│   │           ├── metrics.json
+│   │           ├── visio_transformer_task5_report.json
+│   │           └── ViT_Task5_Report.pdf
+│   ├── report_assets
+│   ├── selfSupervisedLearning
+│   │   ├── AlexNet
+│   │   │   ├── alexnet
+│   │   │   │   └── SSL_checkpoints
+│   │   │   │       ├── architecture
+│   │   │   │       │   ├── byol
+│   │   │   │       │   │   ├── alexnet_best_update_byol.pth
+│   │   │   │       │   │   ├── alexnet_checkpoint_update_byol.pth
+│   │   │   │       │   │   ├── alexnet_final_update_byol.pth
+│   │   │   │       │   │   └── alexnet_last_update_byol.pth
+│   │   │   │       │   ├── mae
+│   │   │   │       │   │   ├── alexnet_best_update_mae.pth
+│   │   │   │       │   │   ├── alexnet_checkpoint_update_mae.pth
+│   │   │   │       │   │   ├── alexnet_final_update_mae.pth
+│   │   │   │       │   │   └── alexnet_last_update_mae.pth
+│   │   │   │       │   ├── simclr
+│   │   │   │       │   │   ├── alexnet_best_update_simclr.pth
+│   │   │   │       │   │   ├── alexnet_checkpoint_update_simclr.pth
+│   │   │   │       │   │   ├── alexnet_final_update_simclr.pth
+│   │   │   │       │   │   └── alexnet_last_update_simclr.pth
+│   │   │   │       │   ├── AlexNet.html
+│   │   │   │       │   ├── AlexNet.onnx
+│   │   │   │       │   └── AlexNet_architecture_info.json
+│   │   │   │       ├── early_stopping
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_0_20261024_072413.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_1_20261024_072638.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_10_20261024_074650.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_11_20261024_074902.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_12_20261024_075143.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_14_20261024_075616.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_15_20261024_075823.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_16_20261024_080032.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_18_20261024_080437.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_19_20261024_080641.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_2_20261024_072900.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_21_20261024_081046.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_23_20261024_081452.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_24_20261024_081656.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_25_20261024_081900.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_26_20261024_082102.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_27_20261024_082306.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_29_20261024_082713.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_3_20261024_073121.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_30_20261024_082917.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_33_20261024_083525.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_36_20261024_084133.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_39_20261024_084743.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_4_20261024_073344.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_40_20261024_084947.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_43_20261024_085556.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_47_20261024_090411.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_5_20261024_073608.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_52_20261024_091425.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_56_20261024_092236.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_59_20261024_092844.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_6_20261024_073828.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_8_20261024_074239.pth
+│   │   │   │       │   ├── alexnet_simclr_best_epoch_9_20261024_074446.pth
+│   │   │   │       │   ├── model_byol_best_epoch_0_20261024_043220.pth
+│   │   │   │       │   ├── model_byol_best_epoch_0_20261024_051836.pth
+│   │   │   │       │   ├── model_byol_best_epoch_1_20261024_052004.pth
+│   │   │   │       │   ├── model_byol_best_epoch_2_20261024_052137.pth
+│   │   │   │       │   ├── model_byol_best_epoch_3_20261024_052314.pth
+│   │   │   │       │   ├── model_byol_best_epoch_4_20261024_052453.pth
+│   │   │   │       │   ├── model_byol_best_epoch_5_20261024_052621.pth
+│   │   │   │       │   ├── model_byol_best_epoch_6_20261024_052755.pth
+│   │   │   │       │   ├── model_byol_best_epoch_9_20261024_053231.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261024_225028.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261024_231131.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261024_231814.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261024_234303.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261024_225113.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261024_231259.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261024_231848.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261024_234404.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_10_20261024_234836.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_11_20261024_232441.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_11_20261024_234911.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_12_20261024_234946.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_13_20261024_235023.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_14_20261024_235101.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_15_20261024_235133.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_16_20261024_235203.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_17_20261024_232744.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_17_20261024_235233.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_18_20261024_235304.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_19_20261024_235334.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261024_225148.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261024_231348.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261024_232002.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261024_234434.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_21_20261024_235436.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_23_20261024_235537.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_25_20261024_235639.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_28_20261024_235810.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261024_225223.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261024_232033.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261024_234503.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_34_20261025_000111.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_4_20261024_225259.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_4_20261024_232103.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_4_20261024_234534.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_43_20261025_000542.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_5_20261024_225335.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_5_20261024_232135.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_5_20261024_234603.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_6_20261024_225410.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_6_20261024_232206.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_6_20261024_234634.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_7_20261024_225447.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_7_20261024_232236.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_7_20261024_234704.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_8_20261024_225529.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_8_20261024_232308.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_8_20261024_234734.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_9_20261024_232339.pth
+│   │   │   │       │   └── model_unknown_best_epoch_9_20261024_234805.pth
+│   │   │   │       ├── interpretability
+│   │   │   │       │   ├── gradcam.png
+│   │   │   │       │   ├── integrated_gradients.png
+│   │   │   │       │   ├── lime_explanation_label_0.png
+│   │   │   │       │   └── shap_summary.png
+│   │   │   │       ├── optuna
+│   │   │   │       ├── plots
+│   │   │   │       │   ├── confusion_matrix.png
+│   │   │   │       │   ├── metrics_bar.png
+│   │   │   │       │   ├── per_class_recall.png
+│   │   │   │       │   ├── pie_chart.png
+│   │   │   │       │   └── roc_curves.png
+│   │   │   │       ├── tensorboard
+│   │   │   │       │   ├── events.out.tfevents.1792841427.DESKTOP-K8C69RJ.3176.0
+│   │   │   │       │   ├── events.out.tfevents.1792844202.DESKTOP-K8C69RJ.2468.0
+│   │   │   │       │   ├── events.out.tfevents.1792851688.DESKTOP-K8C69RJ.14616.0
+│   │   │   │       │   ├── events.out.tfevents.1792907377.DESKTOP-K8C69RJ.3032.0
+│   │   │   │       │   ├── events.out.tfevents.1792908250.DESKTOP-K8C69RJ.3372.0
+│   │   │   │       │   ├── events.out.tfevents.1792908643.DESKTOP-K8C69RJ.2832.0
+│   │   │   │       │   ├── events.out.tfevents.1792909060.DESKTOP-K8C69RJ.10780.0
+│   │   │   │       │   ├── events.out.tfevents.1792910500.DESKTOP-K8C69RJ.7356.0
+│   │   │   │       │   ├── events.out.tfevents.1793006146.DESKTOP-K8C69RJ.19660.0
+│   │   │   │       │   ├── events.out.tfevents.1793006153.DESKTOP-K8C69RJ.19660.1
+│   │   │   │       │   ├── events.out.tfevents.1793006160.DESKTOP-K8C69RJ.19660.2
+│   │   │   │       │   ├── events.out.tfevents.1793006660.DESKTOP-K8C69RJ.13928.0
+│   │   │   │       │   ├── events.out.tfevents.1793006666.DESKTOP-K8C69RJ.13928.1
+│   │   │   │       │   └── events.out.tfevents.1793006672.DESKTOP-K8C69RJ.13928.2
+│   │   │   │       ├── alexnet_ssl_byol_report.pdf
+│   │   │   │       ├── alexnet_ssl_mae_report.pdf
+│   │   │   │       └── alexnet_ssl_simclr_report.pdf
+│   │   │   └── weightTransformer
+│   │   │       ├── alexnet_transferred_from_byol.pth
+│   │   │       └── best_method_summary.json
+│   │   ├── Backups
+│   │   │   └── KD_EnsembleModels
+│   │   │       └── DenseNetVSAlexnet
+│   │   │           ├── cv
+│   │   │           │   └── cv_folds.png
+│   │   │           ├── interpretability
+│   │   │           ├── plots
+│   │   │           │   ├── ci95.png
+│   │   │           │   ├── confusion_matrix.png
+│   │   │           │   ├── metrics_bar.png
+│   │   │           │   ├── per_class.png
+│   │   │           │   ├── per_seed.png
+│   │   │           │   ├── roc_curves.png
+│   │   │           │   └── training_curves.png
+│   │   │           ├── seeds
+│   │   │           │   ├── student_seed123.pth
+│   │   │           │   ├── student_seed2024.pth
+│   │   │           │   └── student_seed42.pth
+│   │   │           ├── kd_densenet_to_alexnet_final.pth
+│   │   │           ├── KD_DenseNet_to_ALEXNET_Report.pdf
+│   │   │           └── kd_metrics.json
+│   │   ├── DenseNet
+│   │   │   ├── densenet
+│   │   │   │   └── SSL_checkpoints
+│   │   │   │       ├── architecture
+│   │   │   │       │   ├── byol
+│   │   │   │       │   │   ├── densenet_best_update_byol.pth
+│   │   │   │       │   │   ├── densenet_checkpoint_update_byol.pth
+│   │   │   │       │   │   ├── densenet_final_update_byol.pth
+│   │   │   │       │   │   └── densenet_last_update_byol.pth
+│   │   │   │       │   ├── mae
+│   │   │   │       │   │   ├── densenet_best_update_mae.pth
+│   │   │   │       │   │   ├── densenet_checkpoint_update_mae.pth
+│   │   │   │       │   │   ├── densenet_final_update_mae.pth
+│   │   │   │       │   │   └── densenet_last_update_mae.pth
+│   │   │   │       │   └── simclr
+│   │   │   │       │       ├── densenet_best_update_simclr.pth
+│   │   │   │       │       ├── densenet_checkpoint_update_simclr.pth
+│   │   │   │       │       ├── densenet_final_update_simclr.pth
+│   │   │   │       │       └── densenet_last_update_simclr.pth
+│   │   │   │       ├── early_stopping
+│   │   │   │       │   ├── densenet_simclr_best_epoch_0_20261030_003852.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_1_20261030_004212.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_10_20261030_011124.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_11_20261030_011437.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_12_20261030_011752.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_13_20261030_012107.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_14_20261030_012419.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_15_20261030_012731.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_16_20261030_013045.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_17_20261030_013359.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_18_20261030_013715.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_19_20261030_014030.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_21_20261030_014657.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_22_20261030_015012.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_23_20261030_015354.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_25_20261030_020024.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_26_20261030_020339.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_28_20261030_021008.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_29_20261030_021324.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_3_20261030_004845.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_4_20261030_005156.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_5_20261030_005510.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_6_20261030_005824.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_7_20261030_010140.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_8_20261030_010455.pth
+│   │   │   │       │   ├── densenet_simclr_best_epoch_9_20261030_010811.pth
+│   │   │   │       │   ├── model_byol_best_epoch_0_20261029_234930.pth
+│   │   │   │       │   ├── model_byol_best_epoch_1_20261029_235112.pth
+│   │   │   │       │   ├── model_byol_best_epoch_13_20261030_001526.pth
+│   │   │   │       │   ├── model_byol_best_epoch_14_20261030_001717.pth
+│   │   │   │       │   ├── model_byol_best_epoch_2_20261029_235317.pth
+│   │   │   │       │   ├── model_byol_best_epoch_3_20261029_235530.pth
+│   │   │   │       │   ├── model_byol_best_epoch_5_20261030_000024.pth
+│   │   │   │       │   ├── model_byol_best_epoch_7_20261030_000406.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261030_022207.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261030_022314.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_10_20261030_023453.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_11_20261030_023613.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_12_20261030_023732.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_13_20261030_023851.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_14_20261030_024011.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_15_20261030_024131.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_18_20261030_024532.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261030_022422.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_20_20261030_024810.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_23_20261030_025207.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261030_022535.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_4_20261030_022656.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_5_20261030_022815.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_6_20261030_022934.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_7_20261030_023054.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_8_20261030_023213.pth
+│   │   │   │       │   └── model_unknown_best_epoch_9_20261030_023333.pth
+│   │   │   │       ├── interpretability
+│   │   │   │       ├── optuna
+│   │   │   │       └── tensorboard
+│   │   │   │           ├── events.out.tfevents.1793267554.DESKTOP-K8C69RJ.20052.0
+│   │   │   │           ├── events.out.tfevents.1793338634.DESKTOP-K8C69RJ.10760.0
+│   │   │   │           ├── events.out.tfevents.1793338918.DESKTOP-K8C69RJ.5756.0
+│   │   │   │           ├── events.out.tfevents.1793339346.DESKTOP-K8C69RJ.8104.0
+│   │   │   │           ├── events.out.tfevents.1793339767.DESKTOP-K8C69RJ.6372.0
+│   │   │   │           ├── events.out.tfevents.1793339931.DESKTOP-K8C69RJ.7992.0
+│   │   │   │           ├── events.out.tfevents.1793341880.DESKTOP-K8C69RJ.7420.0
+│   │   │   │           ├── events.out.tfevents.1793342302.DESKTOP-K8C69RJ.2228.0
+│   │   │   │           ├── events.out.tfevents.1793342832.DESKTOP-K8C69RJ.21024.0
+│   │   │   │           ├── events.out.tfevents.1793345675.DESKTOP-K8C69RJ.11008.0
+│   │   │   │           ├── events.out.tfevents.1793352045.DESKTOP-K8C69RJ.11008.1
+│   │   │   │           ├── events.out.tfevents.1793354040.DESKTOP-K8C69RJ.11008.2
+│   │   │   │           ├── events.out.tfevents.1793354049.DESKTOP-K8C69RJ.11008.3
+│   │   │   │           └── events.out.tfevents.1793354059.DESKTOP-K8C69RJ.11008.4
+│   │   │   └── weightTransformer
+│   │   │       ├── best_method_summary.json
+│   │   │       ├── densenet_transferred_from_byol.pth
+│   │   │       └── densenet_transferred_from_imagenet.pth
+│   │   ├── EfficientNet
+│   │   │   ├── B0
+│   │   │   │   └── SSL_checkpoints
+│   │   │   │       ├── architecture
+│   │   │   │       │   ├── byol
+│   │   │   │       │   │   ├── b0_ssl_byol_best.pth
+│   │   │   │       │   │   ├── b0_ssl_byol_checkpoint.pth
+│   │   │   │       │   │   ├── b0_ssl_byol_epoch_10.pth
+│   │   │   │       │   │   ├── b0_ssl_byol_epoch_20.pth
+│   │   │   │       │   │   ├── b0_ssl_byol_epoch_30.pth
+│   │   │   │       │   │   ├── b0_ssl_byol_final.pth
+│   │   │   │       │   │   └── b0_ssl_byol_last.pth
+│   │   │   │       │   ├── mae
+│   │   │   │       │   │   ├── b0_ssl_mae_best.pth
+│   │   │   │       │   │   ├── b0_ssl_mae_checkpoint.pth
+│   │   │   │       │   │   ├── b0_ssl_mae_epoch_10.pth
+│   │   │   │       │   │   ├── b0_ssl_mae_epoch_20.pth
+│   │   │   │       │   │   ├── b0_ssl_mae_epoch_30.pth
+│   │   │   │       │   │   ├── b0_ssl_mae_final.pth
+│   │   │   │       │   │   └── b0_ssl_mae_last.pth
+│   │   │   │       │   └── simclr
+│   │   │   │       │       ├── b0_ssl_simclr_best.pth
+│   │   │   │       │       ├── b0_ssl_simclr_checkpoint.pth
+│   │   │   │       │       ├── b0_ssl_simclr_epoch_10.pth
+│   │   │   │       │       ├── b0_ssl_simclr_epoch_20.pth
+│   │   │   │       │       ├── b0_ssl_simclr_epoch_30.pth
+│   │   │   │       │       ├── b0_ssl_simclr_final.pth
+│   │   │   │       │       └── b0_ssl_simclr_last.pth
+│   │   │   │       ├── early_stopping
+│   │   │   │       │   ├── efficientnetb0_simclr_best_epoch_0_20261008_010907.pth
+│   │   │   │       │   ├── efficientnetb0_simclr_best_epoch_16_20261008_014255.pth
+│   │   │   │       │   ├── efficientnetb0_simclr_best_epoch_17_20261008_014458.pth
+│   │   │   │       │   ├── efficientnetb0_simclr_best_epoch_3_20261008_011532.pth
+│   │   │   │       │   ├── model_byol_best_epoch_0_20261008_002650.pth
+│   │   │   │       │   ├── model_byol_best_epoch_1_20261008_002749.pth
+│   │   │   │       │   ├── model_byol_best_epoch_10_20261008_003712.pth
+│   │   │   │       │   ├── model_byol_best_epoch_12_20261008_003918.pth
+│   │   │   │       │   ├── model_byol_best_epoch_2_20261008_002850.pth
+│   │   │   │       │   ├── model_byol_best_epoch_21_20261008_004842.pth
+│   │   │   │       │   ├── model_byol_best_epoch_3_20261008_002952.pth
+│   │   │   │       │   ├── model_byol_best_epoch_4_20261008_003056.pth
+│   │   │   │       │   ├── model_byol_best_epoch_5_20261008_003159.pth
+│   │   │   │       │   ├── model_byol_best_epoch_9_20261008_003608.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261008_031527.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261008_031628.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_10_20261008_032352.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_11_20261008_032443.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_12_20261008_032534.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_13_20261008_032623.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_14_20261008_032714.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_15_20261008_032806.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_16_20261008_032855.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_18_20261008_033033.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261008_031717.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_22_20261008_033355.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261008_031805.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_4_20261008_031853.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_5_20261008_031940.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_6_20261008_032029.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_7_20261008_032119.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_8_20261008_032210.pth
+│   │   │   │       │   └── model_unknown_best_epoch_9_20261008_032300.pth
+│   │   │   │       ├── interpretability
+│   │   │   │       ├── optuna
+│   │   │   │       └── tensorboard
+│   │   │   │           ├── events.out.tfevents.1791444329.DESKTOP-K8C69RJ.4220.0
+│   │   │   │           ├── events.out.tfevents.1791446805.DESKTOP-K8C69RJ.9704.0
+│   │   │   │           ├── events.out.tfevents.1791452932.DESKTOP-K8C69RJ.9704.1
+│   │   │   │           ├── events.out.tfevents.1791454451.DESKTOP-K8C69RJ.8364.0
+│   │   │   │           ├── events.out.tfevents.1791459016.DESKTOP-K8C69RJ.17044.0
+│   │   │   │           ├── events.out.tfevents.1791459025.DESKTOP-K8C69RJ.17044.1
+│   │   │   │           └── events.out.tfevents.1791459033.DESKTOP-K8C69RJ.17044.2
+│   │   │   └── weightTransformer
+│   │   │       ├── b1_transferred_from_byol.pth
+│   │   │       ├── efficinetnet_b1_best_base.pth
+│   │   │       └── transfer_summary.json
+│   │   ├── final_models
+│   │   │   ├── ensemble_kd_student_final.pth
+│   │   │   ├── final_model.pth
+│   │   │   ├── resnet50_finetuned_best.pth
+│   │   │   └── resnet50_finetuned_from_simclr_final.pth
+│   │   ├── GA_Optimization
+│   │   │   ├── efficientnet_b0
+│   │   │   │   ├── best_params.json
+│   │   │   │   └── ga_report_efficientnet_b0.pdf
+│   │   │   ├── efficientnet_b1
+│   │   │   │   ├── best_params.json
+│   │   │   │   └── ga_report_efficientnet_b1.pdf
+│   │   │   ├── resnet18
+│   │   │   │   ├── best_params.json
+│   │   │   │   ├── ga_checkpoint.json
+│   │   │   │   └── ga_report_resnet18.pdf
+│   │   │   └── resnet50
+│   │   │       ├── best_params.json
+│   │   │       └── ga_report_resnet50.pdf
+│   │   ├── GAN
+│   │   │   ├── G1
+│   │   │   │   ├── fid_score.json
+│   │   │   │   ├── fid_score.txt
+│   │   │   │   ├── gan_epoch_100.pth
+│   │   │   │   ├── gan_epoch_125.pth
+│   │   │   │   ├── gan_epoch_150.pth
+│   │   │   │   ├── gan_epoch_175.pth
+│   │   │   │   ├── gan_epoch_200.pth
+│   │   │   │   ├── gan_epoch_25.pth
+│   │   │   │   ├── gan_epoch_50.pth
+│   │   │   │   ├── gan_epoch_75.pth
+│   │   │   │   ├── gan_final.pth
+│   │   │   │   ├── generated_epoch_100.png
+│   │   │   │   ├── generated_epoch_125.png
+│   │   │   │   ├── generated_epoch_150.png
+│   │   │   │   ├── generated_epoch_175.png
+│   │   │   │   ├── generated_epoch_200.png
+│   │   │   │   ├── generated_epoch_25.png
+│   │   │   │   ├── generated_epoch_50.png
+│   │   │   │   └── generated_epoch_75.png
+│   │   │   ├── G2
+│   │   │   │   ├── fid_score.json
+│   │   │   │   ├── fid_score.txt
+│   │   │   │   ├── gan_epoch_100.pth
+│   │   │   │   ├── gan_epoch_125.pth
+│   │   │   │   ├── gan_epoch_150.pth
+│   │   │   │   ├── gan_epoch_175.pth
+│   │   │   │   ├── gan_epoch_200.pth
+│   │   │   │   ├── gan_epoch_225.pth
+│   │   │   │   ├── gan_epoch_25.pth
+│   │   │   │   ├── gan_epoch_250.pth
+│   │   │   │   ├── gan_epoch_275.pth
+│   │   │   │   ├── gan_epoch_300.pth
+│   │   │   │   ├── gan_epoch_325.pth
+│   │   │   │   ├── gan_epoch_350.pth
+│   │   │   │   ├── gan_epoch_375.pth
+│   │   │   │   ├── gan_epoch_400.pth
+│   │   │   │   ├── gan_epoch_50.pth
+│   │   │   │   ├── gan_epoch_75.pth
+│   │   │   │   ├── gan_final.pth
+│   │   │   │   ├── generated_epoch_100.png
+│   │   │   │   ├── generated_epoch_125.png
+│   │   │   │   ├── generated_epoch_150.png
+│   │   │   │   ├── generated_epoch_175.png
+│   │   │   │   ├── generated_epoch_200.png
+│   │   │   │   ├── generated_epoch_225.png
+│   │   │   │   ├── generated_epoch_25.png
+│   │   │   │   ├── generated_epoch_250.png
+│   │   │   │   ├── generated_epoch_275.png
+│   │   │   │   ├── generated_epoch_300.png
+│   │   │   │   ├── generated_epoch_325.png
+│   │   │   │   ├── generated_epoch_350.png
+│   │   │   │   ├── generated_epoch_375.png
+│   │   │   │   ├── generated_epoch_400.png
+│   │   │   │   ├── generated_epoch_50.png
+│   │   │   │   └── generated_epoch_75.png
+│   │   │   └── G3
+│   │   │       ├── fid_score.json
+│   │   │       ├── fid_score.txt
+│   │   │       ├── gan_epoch_100.pth
+│   │   │       ├── gan_epoch_125.pth
+│   │   │       ├── gan_epoch_150.pth
+│   │   │       ├── gan_epoch_175.pth
+│   │   │       ├── gan_epoch_200.pth
+│   │   │       ├── gan_epoch_225.pth
+│   │   │       ├── gan_epoch_25.pth
+│   │   │       ├── gan_epoch_250.pth
+│   │   │       ├── gan_epoch_275.pth
+│   │   │       ├── gan_epoch_300.pth
+│   │   │       ├── gan_epoch_50.pth
+│   │   │       ├── gan_epoch_75.pth
+│   │   │       ├── gan_final.pth
+│   │   │       ├── generated_epoch_100.png
+│   │   │       ├── generated_epoch_125.png
+│   │   │       ├── generated_epoch_150.png
+│   │   │       ├── generated_epoch_175.png
+│   │   │       ├── generated_epoch_200.png
+│   │   │       ├── generated_epoch_225.png
+│   │   │       ├── generated_epoch_25.png
+│   │   │       ├── generated_epoch_250.png
+│   │   │       ├── generated_epoch_275.png
+│   │   │       ├── generated_epoch_300.png
+│   │   │       ├── generated_epoch_50.png
+│   │   │       └── generated_epoch_75.png
+│   │   ├── KD_EnsembleModels
+│   │   │   ├── BestModels
+│   │   │   │   ├── best_ensemble_models.pth
+│   │   │   │   └── best_model_summary.json
+│   │   │   ├── DenseNetVSAlexnet
+│   │   │   │   ├── cv
+│   │   │   │   │   └── cv_folds.png
+│   │   │   │   ├── interpretability
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── ci95.png
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   ├── per_class.png
+│   │   │   │   │   ├── per_seed.png
+│   │   │   │   │   ├── roc_curves.png
+│   │   │   │   │   └── training_curves.png
+│   │   │   │   ├── seeds
+│   │   │   │   │   ├── student_seed123.pth
+│   │   │   │   │   ├── student_seed2024.pth
+│   │   │   │   │   └── student_seed42.pth
+│   │   │   │   ├── kd_densenet_to_alexnet_final.pth
+│   │   │   │   ├── KD_DenseNet_to_ALEXNET_Report.pdf
+│   │   │   │   └── kd_metrics.json
+│   │   │   ├── DenseNetVSMobileNetV2
+│   │   │   │   ├── cv
+│   │   │   │   │   └── cv_folds.png
+│   │   │   │   ├── interpretability
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── ci95.png
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   ├── per_class.png
+│   │   │   │   │   ├── per_seed.png
+│   │   │   │   │   ├── roc_curves.png
+│   │   │   │   │   └── training_curves.png
+│   │   │   │   ├── seeds
+│   │   │   │   │   ├── student_seed123.pth
+│   │   │   │   │   ├── student_seed2024.pth
+│   │   │   │   │   └── student_seed42.pth
+│   │   │   │   ├── kd_densenet_to_mobilenetv2_final.pth
+│   │   │   │   ├── KD_DenseNet_to_MOBILENETV2_Report.pdf
+│   │   │   │   └── kd_metrics.json
+│   │   │   ├── DenseNetVSVGG16
+│   │   │   │   ├── cv
+│   │   │   │   │   └── cv_folds.png
+│   │   │   │   ├── interpretability
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── ci95.png
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   ├── per_class.png
+│   │   │   │   │   ├── per_seed.png
+│   │   │   │   │   ├── roc_curves.png
+│   │   │   │   │   └── training_curves.png
+│   │   │   │   ├── seeds
+│   │   │   │   │   ├── student_seed123.pth
+│   │   │   │   │   ├── student_seed2024.pth
+│   │   │   │   │   └── student_seed42.pth
+│   │   │   │   ├── kd_densenet_to_vgg16_final.pth
+│   │   │   │   ├── KD_DenseNet_to_VGG16_Report.pdf
+│   │   │   │   └── kd_metrics.json
+│   │   │   └── KDFinal
+│   │   │       ├── ci
+│   │   │       │   └── ci95.png
+│   │   │       ├── cv
+│   │   │       │   └── cv_folds.png
+│   │   │       ├── interpretability
+│   │   │       │   ├── gradcam.png
+│   │   │       │   ├── integrated_gradients.png
+│   │   │       │   ├── lime.png
+│   │   │       │   └── shap.png
+│   │   │       ├── plots
+│   │   │       │   ├── confusion_matrix.png
+│   │   │       │   ├── metrics_bar.png
+│   │   │       │   ├── per_class.png
+│   │   │       │   ├── per_seed.png
+│   │   │       │   ├── roc_curves.png
+│   │   │       │   └── training_curves.png
+│   │   │       ├── seeds
+│   │   │       │   ├── student_seed123.pth
+│   │   │       │   ├── student_seed123_kd_only.pth
+│   │   │       │   ├── student_seed123_polish.pth
+│   │   │       │   ├── student_seed2024.pth
+│   │   │       │   ├── student_seed2024_kd_only.pth
+│   │   │       │   ├── student_seed2024_polish.pth
+│   │   │       │   ├── student_seed42.pth
+│   │   │       │   ├── student_seed42_kd_only.pth
+│   │   │       │   └── student_seed42_polish.pth
+│   │   │       ├── final_best_model.pth
+│   │   │       ├── final_best_model_reports.pdf
+│   │   │       └── kd_metrics.json
+│   │   ├── MobileNetV2
+│   │   │   ├── mobilenetv2
+│   │   │   │   └── SSL_checkpoints
+│   │   │   │       ├── architecture
+│   │   │   │       │   ├── byol
+│   │   │   │       │   │   ├── mobilenetv2_best_update_byol.pth
+│   │   │   │       │   │   ├── mobilenetv2_checkpoint_update_byol.pth
+│   │   │   │       │   │   ├── mobilenetv2_final_update_byol.pth
+│   │   │   │       │   │   └── mobilenetv2_last_update_byol.pth
+│   │   │   │       │   ├── mae
+│   │   │   │       │   │   ├── mobilenetv2_best_update_mae.pth
+│   │   │   │       │   │   ├── mobilenetv2_checkpoint_update_mae.pth
+│   │   │   │       │   │   ├── mobilenetv2_final_update_mae.pth
+│   │   │   │       │   │   └── mobilenetv2_last_update_mae.pth
+│   │   │   │       │   ├── simclr
+│   │   │   │       │   │   ├── mobilenetv2_best_update_simclr.pth
+│   │   │   │       │   │   ├── mobilenetv2_checkpoint_update_simclr.pth
+│   │   │   │       │   │   ├── mobilenetv2_final_update_simclr.pth
+│   │   │   │       │   │   └── mobilenetv2_last_update_simclr.pth
+│   │   │   │       │   ├── MobileNetV2.html
+│   │   │   │       │   ├── MobileNetV2.onnx
+│   │   │   │       │   └── MobileNetV2_architecture_info.json
+│   │   │   │       ├── early_stopping
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_0_20261026_221553.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_1_20261026_221821.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_10_20261026_224323.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_12_20261026_224849.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_13_20261026_225133.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_14_20261026_225417.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_15_20261026_225704.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_16_20261026_225948.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_19_20261026_230802.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_2_20261026_222149.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_20_20261026_231051.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_21_20261026_231340.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_22_20261026_231625.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_24_20261026_232156.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_27_20261026_233010.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_28_20261026_233303.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_3_20261026_222431.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_35_20261026_235246.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_36_20261026_235531.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_37_20261026_235818.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_38_20261027_000106.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_39_20261027_000355.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_4_20261026_222713.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_40_20261027_000646.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_42_20261027_001218.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_43_20261027_001505.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_44_20261027_001758.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_45_20261027_002131.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_48_20261027_003020.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_5_20261026_222954.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_51_20261027_003851.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_52_20261027_004144.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_54_20261027_004723.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_59_20261027_010119.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_61_20261027_010659.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_63_20261027_011301.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_66_20261027_012235.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_7_20261026_223516.pth
+│   │   │   │       │   ├── mobilenetv2_simclr_best_epoch_77_20261027_015330.pth
+│   │   │   │       │   ├── model_byol_best_epoch_0_20261026_053540.pth
+│   │   │   │       │   ├── model_byol_best_epoch_0_20261026_071356.pth
+│   │   │   │       │   ├── model_byol_best_epoch_1_20261026_053832.pth
+│   │   │   │       │   ├── model_byol_best_epoch_1_20261026_071640.pth
+│   │   │   │       │   ├── model_byol_best_epoch_11_20261026_073904.pth
+│   │   │   │       │   ├── model_byol_best_epoch_12_20261026_074100.pth
+│   │   │   │       │   ├── model_byol_best_epoch_15_20261026_060539.pth
+│   │   │   │       │   ├── model_byol_best_epoch_16_20261026_060735.pth
+│   │   │   │       │   ├── model_byol_best_epoch_18_20261026_061126.pth
+│   │   │   │       │   ├── model_byol_best_epoch_2_20261026_054024.pth
+│   │   │   │       │   ├── model_byol_best_epoch_2_20261026_071937.pth
+│   │   │   │       │   ├── model_byol_best_epoch_20_20261026_061523.pth
+│   │   │   │       │   ├── model_byol_best_epoch_21_20261026_075817.pth
+│   │   │   │       │   ├── model_byol_best_epoch_22_20261026_061913.pth
+│   │   │   │       │   ├── model_byol_best_epoch_22_20261026_080012.pth
+│   │   │   │       │   ├── model_byol_best_epoch_23_20261026_062110.pth
+│   │   │   │       │   ├── model_byol_best_epoch_23_20261026_080208.pth
+│   │   │   │       │   ├── model_byol_best_epoch_26_20261026_062700.pth
+│   │   │   │       │   ├── model_byol_best_epoch_27_20261026_080950.pth
+│   │   │   │       │   ├── model_byol_best_epoch_29_20261026_063245.pth
+│   │   │   │       │   ├── model_byol_best_epoch_3_20261026_054226.pth
+│   │   │   │       │   ├── model_byol_best_epoch_3_20261026_072212.pth
+│   │   │   │       │   ├── model_byol_best_epoch_31_20261026_063637.pth
+│   │   │   │       │   ├── model_byol_best_epoch_4_20261026_054423.pth
+│   │   │   │       │   ├── model_byol_best_epoch_4_20261026_072448.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261027_020614.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261027_020649.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_10_20261027_021243.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_11_20261027_021324.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_12_20261027_021405.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_13_20261027_021445.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_14_20261027_021526.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_15_20261027_021607.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_16_20261027_021648.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_17_20261027_021729.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_18_20261027_021809.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_19_20261027_021849.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261027_020723.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_20_20261027_021929.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_21_20261027_022009.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_25_20261027_022251.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_26_20261027_022332.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_29_20261027_022533.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261027_020757.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_34_20261027_022853.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_4_20261027_020836.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_41_20261027_023336.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_5_20261027_020916.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_54_20261027_024218.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_6_20261027_021000.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_7_20261027_021040.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_8_20261027_021121.pth
+│   │   │   │       │   └── model_unknown_best_epoch_9_20261027_021202.pth
+│   │   │   │       ├── interpretability
+│   │   │   │       ├── optuna
+│   │   │   │       ├── plots
+│   │   │   │       │   ├── confusion_matrix.png
+│   │   │   │       │   └── metrics_bar.png
+│   │   │   │       ├── tensorboard
+│   │   │   │       │   ├── events.out.tfevents.1793018027.DESKTOP-K8C69RJ.9116.0
+│   │   │   │       │   ├── events.out.tfevents.1793023343.DESKTOP-K8C69RJ.4092.0
+│   │   │   │       │   ├── events.out.tfevents.1793023809.DESKTOP-K8C69RJ.15444.0
+│   │   │   │       │   ├── events.out.tfevents.1793078000.DESKTOP-K8C69RJ.18272.0
+│   │   │   │       │   ├── events.out.tfevents.1793091939.DESKTOP-K8C69RJ.18272.1
+│   │   │   │       │   ├── events.out.tfevents.1793094973.DESKTOP-K8C69RJ.18272.2
+│   │   │   │       │   ├── events.out.tfevents.1793094981.DESKTOP-K8C69RJ.18272.3
+│   │   │   │       │   └── events.out.tfevents.1793094989.DESKTOP-K8C69RJ.18272.4
+│   │   │   │       ├── mobilenetv2_ssl_byol_report.pdf
+│   │   │   │       ├── mobilenetv2_ssl_mae_report.pdf
+│   │   │   │       └── mobilenetv2_ssl_simclr_report.pdf
+│   │   │   └── weightTransformer
+│   │   │       ├── best_method_summary.json
+│   │   │       └── mobilenetv2_transferred_from_byol.pth
+│   │   ├── ResNet
+│   │   │   ├── 18
+│   │   │   │   └── SSL_checkpoints
+│   │   │   │       ├── architecture
+│   │   │   │       │   ├── byol
+│   │   │   │       │   │   ├── resnet18_best_update_byol.pth
+│   │   │   │       │   │   ├── resnet18_checkpoint_update_byol.pth
+│   │   │   │       │   │   ├── resnet18_final_update_byol.pth
+│   │   │   │       │   │   └── resnet18_last_update_byol.pth
+│   │   │   │       │   ├── mae
+│   │   │   │       │   │   ├── resnet18_best_update_mae.pth
+│   │   │   │       │   │   ├── resnet18_checkpoint_update_mae.pth
+│   │   │   │       │   │   ├── resnet18_final_update_mae.pth
+│   │   │   │       │   │   └── resnet18_last_update_mae.pth
+│   │   │   │       │   └── simclr
+│   │   │   │       │       ├── resnet18_best_update_simclr.pth
+│   │   │   │       │       ├── resnet18_checkpoint_update_simclr.pth
+│   │   │   │       │       ├── resnet18_final_update_simclr.pth
+│   │   │   │       │       └── resnet18_last_update_simclr.pth
+│   │   │   │       ├── early_stopping
+│   │   │   │       │   ├── model_byol_best_epoch_0_20260927_065051.pth
+│   │   │   │       │   ├── model_byol_best_epoch_0_20261001_074415.pth
+│   │   │   │       │   ├── model_byol_best_epoch_1_20260927_065251.pth
+│   │   │   │       │   ├── model_byol_best_epoch_1_20261001_074602.pth
+│   │   │   │       │   ├── model_byol_best_epoch_11_20261001_080327.pth
+│   │   │   │       │   ├── model_byol_best_epoch_2_20260927_065508.pth
+│   │   │   │       │   ├── model_byol_best_epoch_2_20261001_074747.pth
+│   │   │   │       │   ├── model_byol_best_epoch_3_20260927_065713.pth
+│   │   │   │       │   ├── model_byol_best_epoch_3_20261001_074937.pth
+│   │   │   │       │   ├── model_byol_best_epoch_4_20261001_075121.pth
+│   │   │   │       │   ├── model_byol_best_epoch_5_20261001_075302.pth
+│   │   │   │       │   ├── model_byol_best_epoch_7_20261001_075630.pth
+│   │   │   │       │   ├── model_byol_best_epoch_8_20260927_070718.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261002_051340.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261002_052759.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_0_20261003_010019.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261002_051400.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261002_052812.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_1_20261003_010053.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_10_20261003_010700.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_11_20261003_010739.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_12_20261003_010823.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_13_20261003_010859.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_14_20261003_010937.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_15_20261003_011014.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_16_20261003_011055.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_17_20261003_011136.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_18_20261003_011214.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_19_20261003_011252.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261002_051421.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261002_052826.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_2_20261003_010128.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_20_20261003_011330.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_21_20261003_011409.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_22_20261003_011450.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_23_20261003_011531.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_24_20261003_011609.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_25_20261003_011647.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_26_20261003_011726.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_27_20261003_011808.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_28_20261003_011849.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_29_20261003_011925.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261002_051442.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261002_052840.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_3_20261003_010205.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_30_20261003_012003.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_31_20261003_012042.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_32_20261003_012121.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_33_20261003_012200.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_34_20261003_012239.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_35_20261003_012319.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_36_20261003_012359.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_37_20261003_012438.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_38_20261003_012518.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_39_20261003_012557.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_4_20261003_010302.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_5_20261003_010342.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_6_20261003_010422.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_7_20261003_010501.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_8_20261003_010540.pth
+│   │   │   │       │   ├── model_unknown_best_epoch_9_20261003_010619.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_0_20261001_225948.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_0_20261001_232221.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_1_20261001_232412.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_11_20261001_234150.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_13_20261001_234516.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_14_20261001_234700.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_17_20261001_235215.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_19_20261001_235542.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_2_20261001_232559.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_21_20261001_235913.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_22_20261002_000058.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_24_20261002_000433.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_25_20261002_000615.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_26_20261002_000802.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_28_20261002_001132.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_3_20261001_232748.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_31_20261002_001650.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_37_20261002_002755.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_4_20261001_232933.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_5_20261001_233118.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_6_20261001_233305.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_7_20261001_233447.pth
+│   │   │   │       │   ├── resnet18_simclr_best_epoch_8_20261001_233635.pth
+│   │   │   │       │   └── resnet18_simclr_best_epoch_9_20261001_233817.pth
+│   │   │   │       ├── interpretability
+│   │   │   │       ├── optuna
+│   │   │   │       └── tensorboard
+│   │   │   │           ├── events.out.tfevents.1790516914.DESKTOP-K8C69RJ.1840.0
+│   │   │   │           ├── events.out.tfevents.1790865059.DESKTOP-K8C69RJ.17012.0
+│   │   │   │           ├── events.out.tfevents.1790865372.DESKTOP-K8C69RJ.17232.0
+│   │   │   │           ├── events.out.tfevents.1790865711.DESKTOP-K8C69RJ.11192.0
+│   │   │   │           ├── events.out.tfevents.1790920602.DESKTOP-K8C69RJ.12556.0
+│   │   │   │           ├── events.out.tfevents.1790921986.DESKTOP-K8C69RJ.18408.0
+│   │   │   │           ├── events.out.tfevents.1790941027.DESKTOP-K8C69RJ.3972.0
+│   │   │   │           ├── events.out.tfevents.1790943150.DESKTOP-K8C69RJ.18488.0
+│   │   │   │           ├── events.out.tfevents.1790943999.DESKTOP-K8C69RJ.8352.0
+│   │   │   │           ├── events.out.tfevents.1791014263.DESKTOP-K8C69RJ.17840.0
+│   │   │   │           ├── events.out.tfevents.1791052707.DESKTOP-K8C69RJ.21716.0
+│   │   │   │           ├── events.out.tfevents.1791053965.DESKTOP-K8C69RJ.20048.0
+│   │   │   │           ├── events.out.tfevents.1791053973.DESKTOP-K8C69RJ.20048.1
+│   │   │   │           ├── events.out.tfevents.1791053981.DESKTOP-K8C69RJ.20048.2
+│   │   │   │           ├── events.out.tfevents.1791099565.DESKTOP-K8C69RJ.4036.0
+│   │   │   │           ├── events.out.tfevents.1791099574.DESKTOP-K8C69RJ.4036.1
+│   │   │   │           ├── events.out.tfevents.1791099581.DESKTOP-K8C69RJ.4036.2
+│   │   │   │           ├── events.out.tfevents.1791100242.DESKTOP-K8C69RJ.11388.0
+│   │   │   │           ├── events.out.tfevents.1791100249.DESKTOP-K8C69RJ.11388.1
+│   │   │   │           └── events.out.tfevents.1791100256.DESKTOP-K8C69RJ.11388.2
+│   │   │   └── weightTransformer
+│   │   │       ├── resnet50_base.pth
+│   │   │       ├── resnet50_transferred_from_simclr.pth
+│   │   │       └── transfer_summary.json
+│   │   ├── SSL_Reporter
+│   │   │   ├── alexnet_finetune
+│   │   │   │   ├── architecture
+│   │   │   │   │   ├── AlexNet.html
+│   │   │   │   │   ├── AlexNet.onnx
+│   │   │   │   │   └── AlexNet_architecture_info.json
+│   │   │   │   ├── cv
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── gradcam.png
+│   │   │   │   │   ├── integrated_gradients.png
+│   │   │   │   │   ├── lime_explanation_label_0.png
+│   │   │   │   │   ├── lime_explanation_label_1.png
+│   │   │   │   │   ├── lime_explanation_label_2.png
+│   │   │   │   │   └── shap_summary.png
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── 01_loss_history.png
+│   │   │   │   │   ├── 03_metrics_bar.png
+│   │   │   │   │   ├── 04_confusion_matrix.png
+│   │   │   │   │   ├── 04b_class_pie.png
+│   │   │   │   │   ├── 05_per_class_recall.png
+│   │   │   │   │   ├── 07_cv_folds.png
+│   │   │   │   │   ├── 08_ssl_comparison_bar.png
+│   │   │   │   │   └── 08b_ssl_comparison_radar.png
+│   │   │   │   ├── alexnet_finetune_report.pdf
+│   │   │   │   ├── alexnet_finetuned_final.pth
+│   │   │   │   └── metrics.json
+│   │   │   ├── b1_finetune
+│   │   │   │   ├── architecture
+│   │   │   │   │   ├── EfficientNet-B1.html
+│   │   │   │   │   ├── EfficientNet-B1.onnx
+│   │   │   │   │   └── EfficientNet-B1_architecture_info.json
+│   │   │   │   ├── cv
+│   │   │   │   │   ├── fold_1
+│   │   │   │   │   │   └── b1_finetuned_best.pth
+│   │   │   │   │   ├── fold_2
+│   │   │   │   │   │   └── b1_finetuned_best.pth
+│   │   │   │   │   ├── fold_3
+│   │   │   │   │   │   └── b1_finetuned_best.pth
+│   │   │   │   │   ├── fold_4
+│   │   │   │   │   │   └── b1_finetuned_best.pth
+│   │   │   │   │   ├── fold_5
+│   │   │   │   │   │   └── b1_finetuned_best.pth
+│   │   │   │   │   └── cv_summary.json
+│   │   │   │   ├── ensemble
+│   │   │   │   │   ├── seed_123
+│   │   │   │   │   │   └── b1_best.pth
+│   │   │   │   │   ├── seed_2024
+│   │   │   │   │   │   └── b1_best.pth
+│   │   │   │   │   └── seed_42
+│   │   │   │   │       └── b1_best.pth
+│   │   │   │   ├── finetune_plots
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── gradcam.png
+│   │   │   │   │   ├── integrated_gradients.png
+│   │   │   │   │   ├── lime_explanation.png
+│   │   │   │   │   ├── lime_explanation_label_0.png
+│   │   │   │   │   └── shap_summary.png
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── 01_loss_train_val.png
+│   │   │   │   │   ├── 02_lr_schedule.png
+│   │   │   │   │   ├── 03_metrics_bar.png
+│   │   │   │   │   ├── 04_per_class_metrics.png
+│   │   │   │   │   ├── 05_confusion_matrix.png
+│   │   │   │   │   ├── 06_roc_curves.png
+│   │   │   │   │   ├── 07_class_distribution_pie.png
+│   │   │   │   │   ├── 08_accuracy_vs_epoch.png
+│   │   │   │   │   ├── 09_auc_vs_epoch.png
+│   │   │   │   │   ├── 10_cv_folds.png
+│   │   │   │   │   ├── 11_ci95_bars.png
+│   │   │   │   │   ├── 12_flow_diagram.png
+│   │   │   │   │   └── 13_f1_vs_epoch.png
+│   │   │   │   ├── b1_finetune_report.pdf
+│   │   │   │   ├── b1_finetuned_final.pth
+│   │   │   │   └── metrics.json
+│   │   │   ├── comparisonsReporter
+│   │   │   │   ├── architecture
+│   │   │   │   │   ├── EfficientNet-B0.html
+│   │   │   │   │   ├── EfficientNet-B0.onnx
+│   │   │   │   │   ├── EfficientNet-B0_architecture_info.json
+│   │   │   │   │   ├── ResNet18.html
+│   │   │   │   │   ├── ResNet18.onnx
+│   │   │   │   │   └── ResNet18_architecture_info.json
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── gradcam.png
+│   │   │   │   │   ├── integrated_gradients.png
+│   │   │   │   │   ├── lime_explanation_label_0.png
+│   │   │   │   │   ├── lime_explanation_label_1.png
+│   │   │   │   │   ├── lime_explanation_label_2.png
+│   │   │   │   │   └── shap_summary.png
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── accuracy_comparison.png
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── metrics_bar_chart.png
+│   │   │   │   │   ├── pie_chart.png
+│   │   │   │   │   └── roc_curves.png
+│   │   │   │   ├── efficientnet_b0_ssl_byol_report.pdf
+│   │   │   │   ├── efficientnet_b0_ssl_byol_summary.json
+│   │   │   │   ├── efficientnet_b0_ssl_mae_report.pdf
+│   │   │   │   ├── efficientnet_b0_ssl_mae_summary.json
+│   │   │   │   ├── efficientnet_b0_ssl_simclr_report.pdf
+│   │   │   │   ├── efficientnet_b0_ssl_simclr_summary.json
+│   │   │   │   ├── resnet18_ssl_byol_report.pdf
+│   │   │   │   ├── resnet18_ssl_byol_summary.json
+│   │   │   │   ├── resnet18_ssl_mae_report.pdf
+│   │   │   │   ├── resnet18_ssl_mae_summary.json
+│   │   │   │   ├── resnet18_ssl_simclr_report.pdf
+│   │   │   │   └── resnet18_ssl_simclr_summary.json
+│   │   │   ├── comparisonsReporterBetweenModels
+│   │   │   ├── crossValidation
+│   │   │   │   ├── efficientnet_b0_byol
+│   │   │   │   │   ├── plots
+│   │   │   │   │   │   ├── accuracy_per_fold.png
+│   │   │   │   │   │   ├── best_fold_confusion_matrix.png
+│   │   │   │   │   │   └── metrics_comparison.png
+│   │   │   │   │   ├── cv_report_efficientnet_b0_byol.csv
+│   │   │   │   │   └── cv_report_efficientnet_b0_byol.json
+│   │   │   │   ├── efficientnet_b0_mae
+│   │   │   │   │   ├── plots
+│   │   │   │   │   │   ├── accuracy_per_fold.png
+│   │   │   │   │   │   ├── best_fold_confusion_matrix.png
+│   │   │   │   │   │   └── metrics_comparison.png
+│   │   │   │   │   ├── cv_report_efficientnet_b0_mae.csv
+│   │   │   │   │   └── cv_report_efficientnet_b0_mae.json
+│   │   │   │   ├── efficientnet_b0_simclr
+│   │   │   │   │   ├── plots
+│   │   │   │   │   │   ├── accuracy_per_fold.png
+│   │   │   │   │   │   ├── best_fold_confusion_matrix.png
+│   │   │   │   │   │   └── metrics_comparison.png
+│   │   │   │   │   ├── cv_report_efficientnet_b0_simclr.csv
+│   │   │   │   │   └── cv_report_efficientnet_b0_simclr.json
+│   │   │   │   └── resnet18_byol
+│   │   │   │       └── plots
+│   │   │   ├── densenet_finetune
+│   │   │   │   ├── architecture
+│   │   │   │   │   ├── DenseNet.html
+│   │   │   │   │   ├── DenseNet.onnx
+│   │   │   │   │   └── DenseNet_architecture_info.json
+│   │   │   │   ├── cv
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── gradcam.png
+│   │   │   │   │   ├── integrated_gradients.png
+│   │   │   │   │   ├── lime_explanation_label_0.png
+│   │   │   │   │   ├── lime_explanation_label_1.png
+│   │   │   │   │   ├── lime_explanation_label_2.png
+│   │   │   │   │   └── shap_summary.png
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── 01_loss_history.png
+│   │   │   │   │   ├── 03_metrics_bar.png
+│   │   │   │   │   ├── 04_confusion_matrix.png
+│   │   │   │   │   ├── 05_per_class_recall.png
+│   │   │   │   │   ├── 07_cv_folds.png
+│   │   │   │   │   └── 08_ssl_comparison_bar.png
+│   │   │   │   ├── densenet_finetune_report.pdf
+│   │   │   │   ├── densenet_finetuned_final.pth
+│   │   │   │   └── metrics.json
+│   │   │   ├── dual_model_report
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── b1
+│   │   │   │   │   │   ├── gradcam.png
+│   │   │   │   │   │   ├── integrated_gradients.png
+│   │   │   │   │   │   ├── lime_explanation_label_0.png
+│   │   │   │   │   │   └── shap_summary.png
+│   │   │   │   │   └── resnet50
+│   │   │   │   │       ├── gradcam.png
+│   │   │   │   │       ├── integrated_gradients.png
+│   │   │   │   │       ├── lime_explanation_label_0.png
+│   │   │   │   │       └── shap_summary.png
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── b1
+│   │   │   │   │   │   ├── class_distribution.png
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class_metrics.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── resnet50
+│   │   │   │   │   │   ├── class_distribution.png
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class_metrics.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── comparison_bar.png
+│   │   │   │   │   └── comparison_radar.png
+│   │   │   │   ├── Dual_Model_Comparison_Report.pdf
+│   │   │   │   └── dual_model_metrics.json
+│   │   │   ├── finalReportersAndConclusions
+│   │   │   ├── FindBestNewModels
+│   │   │   │   ├── best_models.pth
+│   │   │   │   └── best_models_report.json
+│   │   │   ├── individualsReporter
+│   │   │   ├── kd_ensemble
+│   │   │   │   ├── cv
+│   │   │   │   ├── interpretability
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── ci95.png
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── cv_folds.png
+│   │   │   │   │   ├── kd_curves.png
+│   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   ├── per_class.png
+│   │   │   │   │   └── roc_curves.png
+│   │   │   │   ├── KD_Ensemble_Report.pdf
+│   │   │   │   └── kd_metrics.json
+│   │   │   ├── mobilenetv2_finetune
+│   │   │   │   ├── architecture
+│   │   │   │   │   ├── MobileNetV2.html
+│   │   │   │   │   ├── MobileNetV2.onnx
+│   │   │   │   │   └── MobileNetV2_architecture_info.json
+│   │   │   │   ├── cv
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── gradcam.png
+│   │   │   │   │   ├── integrated_gradients.png
+│   │   │   │   │   ├── lime_explanation_label_0.png
+│   │   │   │   │   ├── lime_explanation_label_1.png
+│   │   │   │   │   ├── lime_explanation_label_2.png
+│   │   │   │   │   └── shap_summary.png
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── 01_loss_history.png
+│   │   │   │   │   ├── 03_metrics_bar.png
+│   │   │   │   │   ├── 04_confusion_matrix.png
+│   │   │   │   │   ├── 05_per_class_recall.png
+│   │   │   │   │   ├── 07_cv_folds.png
+│   │   │   │   │   ├── 08_ssl_comparison_bar.png
+│   │   │   │   │   └── 08b_ssl_comparison_radar.png
+│   │   │   │   ├── metrics.json
+│   │   │   │   ├── mobilenetv2_finetune_report.pdf
+│   │   │   │   └── mobilenetv2_finetuned_final.pth
+│   │   │   ├── resnet50_finetune
+│   │   │   │   ├── architecture
+│   │   │   │   │   ├── ResNet50.html
+│   │   │   │   │   ├── ResNet50.onnx
+│   │   │   │   │   └── ResNet50_architecture_info.json
+│   │   │   │   ├── cv
+│   │   │   │   │   ├── fold_1
+│   │   │   │   │   │   └── resnet50_finetuned_best.pth
+│   │   │   │   │   ├── fold_2
+│   │   │   │   │   │   └── resnet50_finetuned_best.pth
+│   │   │   │   │   ├── fold_3
+│   │   │   │   │   │   └── resnet50_finetuned_best.pth
+│   │   │   │   │   ├── fold_4
+│   │   │   │   │   │   └── resnet50_finetuned_best.pth
+│   │   │   │   │   └── fold_5
+│   │   │   │   │       └── resnet50_finetuned_best.pth
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── gradcam.png
+│   │   │   │   │   ├── integrated_gradients.png
+│   │   │   │   │   ├── lime_explanation_label_0.png
+│   │   │   │   │   ├── lime_explanation_label_1.png
+│   │   │   │   │   ├── lime_explanation_label_2.png
+│   │   │   │   │   └── shap_summary.png
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── ci_bars.png
+│   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   ├── cv_box.png
+│   │   │   │   │   ├── cv_summary.png
+│   │   │   │   │   ├── loss_curves.png
+│   │   │   │   │   ├── lr_curves.png
+│   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   ├── pie_chart.png
+│   │   │   │   │   └── roc_curves.png
+│   │   │   │   └── ResNet50_Finetuned_from_simclr_Report.pdf
+│   │   │   ├── ssl_dual_comparison
+│   │   │   │   ├── interpretability
+│   │   │   │   │   ├── b0_byol
+│   │   │   │   │   │   └── lime_explanation_label_0.png
+│   │   │   │   │   ├── b0_mae
+│   │   │   │   │   ├── b0_simclr
+│   │   │   │   │   │   └── lime_explanation_label_0.png
+│   │   │   │   │   ├── resnet18_byol
+│   │   │   │   │   ├── resnet18_mae
+│   │   │   │   │   │   └── lime_explanation_label_0.png
+│   │   │   │   │   └── resnet18_simclr
+│   │   │   │   ├── plots
+│   │   │   │   │   ├── b0_byol
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── b0_mae
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── b0_simclr
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── resnet18_byol
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── resnet18_mae
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── resnet18_simclr
+│   │   │   │   │   │   ├── confusion_matrix.png
+│   │   │   │   │   │   ├── metrics_bar.png
+│   │   │   │   │   │   ├── per_class.png
+│   │   │   │   │   │   └── roc_curves.png
+│   │   │   │   │   ├── byol_comparison_bar.png
+│   │   │   │   │   ├── byol_comparison_radar.png
+│   │   │   │   │   ├── cross_method_heatmap.png
+│   │   │   │   │   ├── cross_method_summary.png
+│   │   │   │   │   ├── mae_comparison_bar.png
+│   │   │   │   │   ├── mae_comparison_radar.png
+│   │   │   │   │   ├── simclr_comparison_bar.png
+│   │   │   │   │   └── simclr_comparison_radar.png
+│   │   │   │   ├── ssl_dual_comparison_metrics.json
+│   │   │   │   └── SSL_Dual_Comparison_Report.pdf
+│   │   │   └── vgg16_finetune
+│   │   │       ├── architecture
+│   │   │       │   └── VGG16_architecture_info.json
+│   │   │       ├── cv
+│   │   │       ├── interpretability
+│   │   │       │   ├── gradcam.png
+│   │   │       │   ├── integrated_gradients.png
+│   │   │       │   ├── lime_explanation_label_0.png
+│   │   │       │   ├── lime_explanation_label_1.png
+│   │   │       │   ├── lime_explanation_label_2.png
+│   │   │       │   └── shap_summary.png
+│   │   │       ├── plots
+│   │   │       │   ├── 01_loss_history.png
+│   │   │       │   ├── 03_metrics_bar.png
+│   │   │       │   ├── 04_confusion_matrix.png
+│   │   │       │   ├── 05_per_class_recall.png
+│   │   │       │   ├── 07_cv_folds.png
+│   │   │       │   └── 08_ssl_comparison_bar.png
+│   │   │       ├── metrics.json
+│   │   │       ├── vgg16_finetune_report.pdf
+│   │   │       └── vgg16_finetuned_final.pth
+│   │   └── VGG16
+│   │       ├── vgg16
+│   │       │   └── SSL_checkpoints
+│   │       │       ├── architecture
+│   │       │       │   ├── byol
+│   │       │       │   │   ├── vgg16_best_update_byol.pth
+│   │       │       │   │   ├── vgg16_checkpoint_update_byol.pth
+│   │       │       │   │   ├── vgg16_final_update_byol.pth
+│   │       │       │   │   └── vgg16_last_update_byol.pth
+│   │       │       │   ├── mae
+│   │       │       │   │   ├── vgg16_best_update_mae.pth
+│   │       │       │   │   ├── vgg16_checkpoint_update_mae.pth
+│   │       │       │   │   ├── vgg16_final_update_mae.pth
+│   │       │       │   │   └── vgg16_last_update_mae.pth
+│   │       │       │   └── simclr
+│   │       │       │       ├── vgg16_best_update_simclr.pth
+│   │       │       │       ├── vgg16_checkpoint_update_simclr.pth
+│   │       │       │       ├── vgg16_final_update_simclr.pth
+│   │       │       │       └── vgg16_last_update_simclr.pth
+│   │       │       ├── early_stopping
+│   │       │       │   ├── model_byol_best_epoch_0_20261027_222205.pth
+│   │       │       │   ├── model_byol_best_epoch_1_20261027_223849.pth
+│   │       │       │   ├── model_byol_best_epoch_2_20261027_225459.pth
+│   │       │       │   ├── model_byol_best_epoch_3_20261027_231312.pth
+│   │       │       │   ├── model_byol_best_epoch_4_20261027_233134.pth
+│   │       │       │   ├── model_unknown_best_epoch_0_20261028_233540.pth
+│   │       │       │   ├── model_unknown_best_epoch_1_20261028_233625.pth
+│   │       │       │   ├── model_unknown_best_epoch_10_20261028_234329.pth
+│   │       │       │   ├── model_unknown_best_epoch_11_20261028_234420.pth
+│   │       │       │   ├── model_unknown_best_epoch_12_20261028_234512.pth
+│   │       │       │   ├── model_unknown_best_epoch_13_20261028_234605.pth
+│   │       │       │   ├── model_unknown_best_epoch_14_20261028_234655.pth
+│   │       │       │   ├── model_unknown_best_epoch_15_20261028_234741.pth
+│   │       │       │   ├── model_unknown_best_epoch_16_20261028_234826.pth
+│   │       │       │   ├── model_unknown_best_epoch_2_20261028_233708.pth
+│   │       │       │   ├── model_unknown_best_epoch_22_20261028_235324.pth
+│   │       │       │   ├── model_unknown_best_epoch_3_20261028_233751.pth
+│   │       │       │   ├── model_unknown_best_epoch_4_20261028_233834.pth
+│   │       │       │   ├── model_unknown_best_epoch_5_20261028_233918.pth
+│   │       │       │   ├── model_unknown_best_epoch_6_20261028_234003.pth
+│   │       │       │   ├── model_unknown_best_epoch_7_20261028_234047.pth
+│   │       │       │   ├── model_unknown_best_epoch_8_20261028_234143.pth
+│   │       │       │   ├── model_unknown_best_epoch_9_20261028_234239.pth
+│   │       │       │   ├── vgg16_simclr_best_epoch_0_20261028_222747.pth
+│   │       │       │   ├── vgg16_simclr_best_epoch_2_20261028_223500.pth
+│   │       │       │   ├── vgg16_simclr_best_epoch_3_20261028_223838.pth
+│   │       │       │   ├── vgg16_simclr_best_epoch_4_20261028_224213.pth
+│   │       │       │   └── vgg16_simclr_best_epoch_5_20261028_224556.pth
+│   │       │       ├── interpretability
+│   │       │       ├── optuna
+│   │       │       └── tensorboard
+│   │       │           ├── events.out.tfevents.1793163867.DESKTOP-K8C69RJ.14308.0
+│   │       │           ├── events.out.tfevents.1793164060.DESKTOP-K8C69RJ.6916.0
+│   │       │           ├── events.out.tfevents.1793164161.DESKTOP-K8C69RJ.20760.0
+│   │       │           ├── events.out.tfevents.1793251426.DESKTOP-K8C69RJ.10000.0
+│   │       │           ├── events.out.tfevents.1793253175.DESKTOP-K8C69RJ.10000.1
+│   │       │           ├── events.out.tfevents.1793255651.DESKTOP-K8C69RJ.11740.0
+│   │       │           ├── events.out.tfevents.1793256863.DESKTOP-K8C69RJ.11740.1
+│   │       │           ├── events.out.tfevents.1793256875.DESKTOP-K8C69RJ.11740.2
+│   │       │           └── events.out.tfevents.1793256886.DESKTOP-K8C69RJ.11740.3
+│   │       └── weightTransformer
+│   │           ├── best_method_summary.json
+│   │           └── vgg16_transferred_from_mae.pth
+│   ├── labels.csv
+│   ├── Liver_AI_Final_Report.pdf
+│   └── unknown.json
+├── gui
+│   ├── dialogs
+│   │   ├── audit_log_dialog.py
+│   │   ├── backdrop.py
+│   │   ├── update_dialog.py
+│   │   └── update_dialogs.py
+│   └── widgets
+│       ├── lock_screen.py
+│       ├── password_match_indicator.py
+│       ├── password_strength_meter.py
+│       ├── session_timeout.py
+│       └── update_badge.py
+├── logs
+│   ├── liver_ai_20260829.log
+│   ├── liver_ai_20260830.log
+│   ├── liver_ai_20260831.log
+│   ├── liver_ai_20260901.log
+│   ├── liver_ai_20260902.log
+│   ├── liver_ai_20260903.log
+│   ├── liver_ai_20260904.log
+│   ├── liver_ai_20260905.log
+│   ├── liver_ai_20260910.log
+│   ├── liver_ai_20260911.log
+│   ├── liver_ai_20260914.log
+│   ├── liver_ai_20260916.log
+│   ├── liver_ai_20260917.log
+│   ├── liver_ai_20260918.log
+│   ├── liver_ai_20260920.log
+│   ├── liver_ai_20260921.log
+│   ├── liver_ai_20260923.log
+│   ├── liver_ai_20260924.log
+│   ├── liver_ai_20260925.log
+│   ├── liver_ai_20260926.log
+│   ├── liver_ai_20260927.log
+│   ├── liver_ai_20261001.log
+│   ├── liver_ai_20261002.log
+│   ├── liver_ai_20261003.log
+│   ├── liver_ai_20261004.log
+│   ├── liver_ai_20261006.log
+│   ├── liver_ai_20261007.log
+│   ├── liver_ai_20261008.log
+│   ├── liver_ai_20261009.log
+│   ├── liver_ai_20261011.log
+│   ├── liver_ai_20261014.log
+│   ├── liver_ai_20261015.log
+│   ├── liver_ai_20261016.log
+│   ├── liver_ai_20261019.log
+│   ├── liver_ai_20261021.log
+│   ├── liver_ai_20261022.log
+│   ├── liver_ai_20261023.log
+│   ├── liver_ai_20261024.log
+│   ├── liver_ai_20261026.log
+│   ├── liver_ai_20261027.log
+│   ├── liver_ai_20261028.log
+│   ├── liver_ai_20261029.log
+│   ├── liver_ai_20261030.log
+│   ├── liver_ai_20261109.log
+│   ├── liver_ai_20261110.log
+│   ├── liver_ai_20261111.log
+│   ├── liver_ai_20261113.log
+│   ├── liver_ai_20261114.log
+│   ├── liver_ai_20261116.log
+│   └── liver_ai_20261117.log
+├── Output
+│   └── LiverAI_Setup_v6.0.0.exe
+├── scripts
+│   ├── inspect_convnext.py
+│   └── inspect_densenet.py
+├── src
+│   ├── AI
+│   │   ├── AlexNet
+│   │   │   ├── __init__.py
+│   │   │   ├── AlexNet.py
+│   │   │   ├── AlexNetReports.py
+│   │   │   └── utils.py
+│   │   ├── CNN
+│   │   │   ├── __init__.py
+│   │   │   ├── CNN.py
+│   │   │   ├── CNNReports.py
+│   │   │   └── utils.py
+│   │   ├── CNNLSTM
+│   │   │   ├── __init__.py
+│   │   │   ├── CNNLSTM.py
+│   │   │   ├── CNNLSTMReports.py
+│   │   │   └── utils.py
+│   │   ├── Comparisons
+│   │   │   ├── generate_comparison_with_literature.py
+│   │   │   ├── ISI.txt
+│   │   │   ├── ISIDetails.txt
+│   │   │   └── resnet_efficientNet_comparisons.py
+│   │   ├── ConvNext
+│   │   │   ├── backups
+│   │   │   │   ├── convNext.py
+│   │   │   │   └── convNextReports.py
+│   │   │   ├── __init__.py
+│   │   │   ├── balanced_report.py
+│   │   │   ├── convNext.py
+│   │   │   ├── convnext_balanced_finetune.py
+│   │   │   ├── convnext_boosted.py
+│   │   │   ├── convnext_boosted_report.py
+│   │   │   ├── convnext_boundary_refine.py
+│   │   │   ├── convnext_corrector_g1.py
+│   │   │   ├── convnext_g1_vs_nl_specialist.py
+│   │   │   ├── convnext_targeted_finetune.py
+│   │   │   ├── convNextReports.py
+│   │   │   └── utils.py
+│   │   ├── DensNet
+│   │   │   ├── __init__.py
+│   │   │   ├── DensNet.py
+│   │   │   ├── DensNetReports.py
+│   │   │   └── utils.py
+│   │   ├── EfficientNet
+│   │   │   ├── efficientNetB0.py
+│   │   │   ├── efficientNetB1.py
+│   │   │   ├── efficientNetReports.py
+│   │   │   └── utils.py
+│   │   ├── GoogleNet
+│   │   │   ├── __init__.py
+│   │   │   ├── GoogleNet.py
+│   │   │   ├── GoogleNetReports.py
+│   │   │   └── utils.py
+│   │   ├── LSTM
+│   │   │   ├── __init__.py
+│   │   │   ├── LSTM.py
+│   │   │   ├── LSTMReports.py
+│   │   │   └── utils.py
+│   │   ├── MobileNet_V2
+│   │   │   ├── __init__.py
+│   │   │   ├── mobilenetv2.py
+│   │   │   ├── mobilenetv2Reports.py
+│   │   │   └── utils.py
+│   │   ├── ResNet
+│   │   │   ├── resnet18.py
+│   │   │   ├── resnet50.py
+│   │   │   ├── resnetReports.py
+│   │   │   └── utils.py
+│   │   ├── Swin_Transformer
+│   │   │   ├── __init__.py
+│   │   │   ├── Swin_Transformer.py
+│   │   │   ├── Swin_TransformerReports.py
+│   │   │   └── utils.py
+│   │   ├── VGG16
+│   │   │   ├── __init__.py
+│   │   │   ├── utils.py
+│   │   │   ├── VGG16.py
+│   │   │   └── vgg16Reports.py
+│   │   └── visioTransformer
+│   │       ├── __init__.py
+│   │       ├── utils.py
+│   │       ├── visioTransformer.py
+│   │       └── visioTransformerReports.py
+│   ├── Augmentations
+│   │   ├── __init__.py
+│   │   ├── augmentationsAlgorithms.py
+│   │   ├── dicoms.py
+│   │   ├── dicoms_full.py
+│   │   ├── labelExtractions.py
+│   │   ├── merge_datasets.py
+│   │   ├── run_ga.py
+│   │   ├── run_gan.py
+│   │   ├── run_gan_optuna.py
+│   │   ├── run_gan_ultimate.py
+│   │   └── transportations.py
+│   ├── findDevice
+│   │   ├── deviceDetector.py
+│   │   └── hardwareDetector.py
+│   ├── FindImages
+│   │   └── finder.py
+│   ├── Inspectors
+│   │   ├── __init__.py
+│   │   └── inspect_all_models.py
+│   ├── liver_ai_pipeline.egg-info
+│   │   ├── dependency_links.txt
+│   │   ├── PKG-INFO
+│   │   ├── requires.txt
+│   │   ├── SOURCES.txt
+│   │   └── top_level.txt
+│   ├── MajorProcessing
+│   │   ├── detection.py
+│   │   ├── main_engine.py
+│   │   ├── pipeline.py
+│   │   ├── ultra.py
+│   │   └── ultra_ai.py
+│   ├── MassiveClasses
+│   │   ├── AI
+│   │   │   ├── artificialIntelligenceDLU.py
+│   │   │   └── deepAI.py
+│   │   ├── Audio
+│   │   │   └── music.py
+│   │   ├── cropping
+│   │   │   └── crop.py
+│   │   ├── Ending
+│   │   │   └── ender.py
+│   │   ├── FullDetection
+│   │   │   └── labelDetection.py
+│   │   ├── LoadFiles
+│   │   │   └── loader.py
+│   │   ├── Removing
+│   │   │   └── removerUF.py
+│   │   ├── Reporter
+│   │   │   ├── finalReport.py
+│   │   │   └── reportBeforeCrop.py
+│   │   ├── SavingData
+│   │   │   ├── saver.py
+│   │   │   └── saveUnknown.py
+│   │   └── Timer
+│   │       └── timer.py
+│   ├── medical
+│   │   └── image_io.py
+│   ├── models
+│   │   ├── AlexNet
+│   │   │   ├── __init__.py
+│   │   │   ├── alexnet.py
+│   │   │   ├── blocks.py
+│   │   │   └── utils.py
+│   │   ├── CNNLSTM
+│   │   │   ├── __init__.py
+│   │   │   ├── blocks.py
+│   │   │   └── cnnlstm.py
+│   │   ├── ConvNext
+│   │   │   ├── __init__.py
+│   │   │   ├── blocks.py
+│   │   │   ├── ConvNext.py
+│   │   │   └── utils.py
+│   │   ├── DenseNet
+│   │   │   ├── __init__.py
+│   │   │   ├── blocks.py
+│   │   │   ├── DenseNet.py
+│   │   │   └── utils.py
+│   │   ├── efficientNet
+│   │   │   ├── B0
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── blocks.py
+│   │   │   │   ├── efficientnet_b0.py
+│   │   │   │   └── utils.py
+│   │   │   └── B1
+│   │   │       ├── __init__.py
+│   │   │       ├── blocks.py
+│   │   │       ├── efficientnet_b1.py
+│   │   │       └── utils.py
+│   │   ├── MobileNetV2
+│   │   │   ├── __init__.py
+│   │   │   ├── blocks.py
+│   │   │   ├── mobilenetV2.py
+│   │   │   └── utils.py
+│   │   ├── resnet
+│   │   │   ├── resnet18
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── blocks.py
+│   │   │   │   ├── resnet18.py
+│   │   │   │   └── utils.py
+│   │   │   └── resnet50
+│   │   │       ├── __init__.py
+│   │   │       ├── blocks.py
+│   │   │       ├── resnet50.py
+│   │   │       └── utils.py
+│   │   ├── VGG16
+│   │   │   ├── __init__.py
+│   │   │   ├── blocks.py
+│   │   │   ├── utils.py
+│   │   │   └── vgg16.py
+│   │   └── ViT
+│   │       ├── __init__.py
+│   │       ├── blocks.py
+│   │       ├── utils.py
+│   │       └── vit.py
+│   ├── optimization
+│   │   ├── __init__.py
+│   │   ├── fitness_evaluator.py
+│   │   ├── ga_optimizer.py
+│   │   ├── ga_reporter.py
+│   │   ├── hardware_detector.py
+│   │   └── search_space.py
+│   ├── optimizers
+│   │   ├── __init__.py
+│   │   └── custom_optimizers.py
+│   ├── pipeLine
+│   │   ├── Architects
+│   │   │   ├── AlexnetFT
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── alexnetFineTune.py
+│   │   │   │   ├── alexnetReporter.py
+│   │   │   │   ├── alexnetSSL.py
+│   │   │   │   └── alexnetWithoutFineTuning.py
+│   │   │   ├── CNN
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── cnnlstmWithoutFineTuning.py
+│   │   │   ├── ConvNext
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── convnextWithoutFineTuning.py
+│   │   │   ├── DenseNet
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── densenetDirectFineTune.py
+│   │   │   │   ├── densenetFineTune.py
+│   │   │   │   ├── densenetReporter.py
+│   │   │   │   ├── densenetSSL.py
+│   │   │   │   └── densenetWithoutFineTuning.py
+│   │   │   ├── EfficientNet
+│   │   │   │   ├── B0
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── efficientNetB0SSL.py
+│   │   │   │   │   └── efficientNetB0WithoutFineTuning.py
+│   │   │   │   ├── B1
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── b1FineTune.py
+│   │   │   │   │   ├── b1Reporter.py
+│   │   │   │   │   └── efficientNetB1WithoutFineTuning.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── MobileNetV2
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── mobilenetv2FineTune.py
+│   │   │   │   ├── mobilenetv2Reporter.py
+│   │   │   │   ├── mobilenetv2SSL.py
+│   │   │   │   └── mobilenetv2WithoutFineTuning.py
+│   │   │   ├── Resnet
+│   │   │   │   ├── ResNet18
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── resNet18SSL.py
+│   │   │   │   │   └── resnet18WithoutFineTuning.py
+│   │   │   │   ├── ResNet50
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── resnet50FineTune.py
+│   │   │   │   │   └── resnet50WithoutFineTuning.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── SSL
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── SSLAlgorithms.py
+│   │   │   │   └── sslDualComparison.py
+│   │   │   ├── VGG16
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── vgg16FineTune.py
+│   │   │   │   ├── vgg16Reporter.py
+│   │   │   │   ├── vgg16SSL.py
+│   │   │   │   └── vgg16WithoutFineTuning.py
+│   │   │   ├── Vision_Transformer
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── vitWithoutFineTuning.py
+│   │   │   └── __init__.py
+│   │   ├── ConfigurationAlgorithms
+│   │   │   ├── __init__.py
+│   │   │   ├── findBestModels.py
+│   │   │   ├── preProcessoring.py
+│   │   │   ├── resNetEfficientNetModels.py
+│   │   │   ├── SelectBestModels.py
+│   │   │   └── withoutFineTuner.py
+│   │   ├── CV
+│   │   │   ├── __init__.py
+│   │   │   └── crossValidationRunner.py
+│   │   ├── KnowledgeDistillationEnsembleAlgorithms
+│   │   │   ├── __init__.py
+│   │   │   ├── advanced_eval.py
+│   │   │   ├── finalKDEalgorithms.py
+│   │   │   ├── kd_convnext_densenet.py
+│   │   │   ├── kd_convnext_swin.py
+│   │   │   ├── kd_reporter.py
+│   │   │   ├── kdFinal.py
+│   │   │   ├── knowledgeDistillationEnsemble.py
+│   │   │   ├── newModels.py
+│   │   │   └── regenerate_kd_report.py
+│   │   ├── Reporter
+│   │   │   ├── __init__.py
+│   │   │   └── dualModelReporter.py
+│   │   └── __init__.py
+│   ├── remove
+│   │   └── remover.py
+│   ├── reporter
+│   │   ├── captum_reporter.py
+│   │   ├── lime_reporter.py
+│   │   ├── netron_reporter.py
+│   │   ├── reportGenerator.py
+│   │   └── shap_reporter.py
+│   ├── requirements_packages
+│   │   ├── __init__.py
+│   │   └── checkReqPac.py
+│   ├── self_supervised
+│   │   ├── Facilities
+│   │   │   ├── __init__.py
+│   │   │   ├── crossValidation.py
+│   │   │   ├── early_stopping.py
+│   │   │   ├── trainer.py
+│   │   │   └── utils.py
+│   │   ├── OptimizationsAlgorithms
+│   │   │   ├── Augmentations
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── augmentations.py
+│   │   │   │   ├── fid_algorithms.txt
+│   │   │   │   ├── fid_score.py
+│   │   │   │   ├── gan.py
+│   │   │   │   ├── gan_trainer.py
+│   │   │   │   ├── gan_ultimate.py
+│   │   │   │   ├── GAN_Ultimate.txt
+│   │   │   │   ├── imgaug_pipeline.py
+│   │   │   │   └── kornia_augmentations.py
+│   │   │   ├── Optimizers
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── accelerate_trainer.py
+│   │   │   │   └── optuna_optimizer.py
+│   │   │   └── __init__.py
+│   │   ├── ProbabilityAlgorithms
+│   │   │   ├── __init__.py
+│   │   │   └── linear_probe.py
+│   │   ├── SSLModels
+│   │   │   ├── __init__.py
+│   │   │   ├── byol.py
+│   │   │   ├── mae.py
+│   │   │   └── simclr.py
+│   │   └── __init__.py
+│   ├── unknownChecker
+│   │   └── unknown.py
+│   ├── utils
+│   │   ├── memory_monitor.py
+│   │   ├── PowerShellTree.txt
+│   │   ├── profile_decorator.py
+│   │   ├── tree.txt
+│   │   └── wrapper_dump.txt
+│   └── __init__.py
+├── tools
+│   ├── build_liver_model.py
+│   ├── RenamePNG.py
+│   ├── test_guard.py
+│   ├── test_no_label_case.py
+│   └── test_preprocessor.py
+├── .cache.txt
+├── .gitignore
+├── ^
+├── _update_health.flag
+├── 2FA_config.txt
+├── audit_log.json
+├── ConvNextDetails.txt
+├── finalInstallers.txt
+├── GUI.py
+├── gui_details.txt
+├── GUI_update.py
+├── LICENSE
+├── LiverAI.spec
+├── LiverAI-test.exe
+├── main.py
+├── onboarding.json
+├── pyInstaller.txt
+├── README.md
+├── requirements_gpu_RTX_2050.txt
+├── settings.json
+├── smart_suggestions.json
+├── stats.json
+├── test_download.py
+├── test_image_guard.py
+├── test_new_images.py
+├── test_qr.png
+├── test_report.pdf
+├── tester.py
+├── tree_codes.txt
+├── update_GUI_data.txt
+├── users_db.json
+├── users_db.json.bak
+├── users_db.json.plain.bak
+├── users_db.machine_id
+├── users_db.salt
+├── windows_installer.iss
+└── windows_installer_update.iss

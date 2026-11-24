@@ -68,9 +68,17 @@ DEVICE = get_device()
 torch.set_num_threads(4)
 set_seed(42)
 
-# ✅ VGG16 output dir
-VGG16_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "..", "VGG16")
-VGG16_OUTPUT_DIR = os.path.abspath(VGG16_OUTPUT_DIR)
+# ✅ VGG16 output dir — باید دقیقاً برابر با:
+# finalReports/AI_Comparisons/VGG16/
+# باشه تا reports بره توی finalReports/AI_Comparisons/VGG16/reports/
+VGG16_OUTPUT_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(OUTPUT_DIR), "VGG16")
+)
+# اگر OUTPUT_DIR = .../AI_Comparisons/VGG16/vgg16 باشه،
+# اون‌وقت os.path.dirname(OUTPUT_DIR) = .../AI_Comparisons/VGG16/
+# و VGG16_OUTPUT_DIR = .../AI_Comparisons/VGG16/
+# و self.base_dir = .../AI_Comparisons/VGG16/
+# و reports_dir = .../AI_Comparisons/VGG16/reports/  ✅
 
 # =====================================================
 # EARLY STOPPING (with best weights restoration)
@@ -79,7 +87,7 @@ class EarlyStopping:
     """
     Early stopping with best weights restoration.
 
-    - patience=15: به مدل فرصت می‌ده تا epoch 50 به بهترین دقت برسه
+    - patience=15: به مدل فرصت می‌ده تا epoch ResNet50 به بهترین دقت برسه
     - min_delta=1e-4: فقط بهبودهای واقعی رو در نظر می‌گیره
     - restore_best_weights=True: وزن بهترین epoch رو ذخیره می‌کنه
     """
@@ -161,12 +169,12 @@ class VGG16Trainer:
         DEFAULT_HP = {
             "batch_size": 16,
             "lr": 1e-4,
-            "weight_decay": 5e-3,  # ← 5x بالاتر (VGG16 با 138M پارامتر نیاز داره)
-            "dropout": 0.4,  # ← 0.4 (استثنا برای VGG16)
-            "label_smoothing": 0.15,  # ← بالاتر
+            "weight_decay": 5e-4,  # ← از 1e-4 به 5e-4 (5x)
+            "dropout": 0.3,  # ← از 0.25 به 0.3
+            "label_smoothing": 0.12,
             "accumulation_steps": 2,
-            "warmup_epochs": 6,
-            "epochs_per_phase": [5, 35],
+            "warmup_epochs": 5,
+            "epochs_per_phase": [8, 30],
         }
         hp = DEFAULT_HP
 
@@ -266,6 +274,9 @@ class VGG16Trainer:
         self.y_prob = None
 
         # ✅ Storage paths
+        # self.base_dir = .../AI_Comparisons/VGG16/
+        # self.model_dir = .../AI_Comparisons/VGG16/vgg16/
+        # self.reports_dir = .../AI_Comparisons/VGG16/reports/  (در generate_report)
         self.base_dir = VGG16_OUTPUT_DIR
         self.model_dir = os.path.join(self.base_dir, "vgg16")
         os.makedirs(self.model_dir, exist_ok=True)
@@ -387,12 +398,12 @@ class VGG16Trainer:
             nn.Linear(num_features, 512),
             nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
-            nn.Dropout(self.dropout_rate),
+            nn.Dropout(self.dropout_rate),  # 0.3
 
             nn.Linear(512, 256),
             nn.BatchNorm1d(256),
             nn.ReLU(inplace=True),
-            nn.Dropout(self.dropout_rate * 0.4),
+            nn.Dropout(self.dropout_rate * 0.5),  # 0.15
 
             nn.Linear(256, len(CLASS_NAMES)),
         )
@@ -447,10 +458,9 @@ class VGG16Trainer:
 
             meta_path = os.path.join(self.model_dir, "training_meta_VGG16.json")
             meta = {
-                "best_acc": test_acc,                    # ← TEST ACC (نه best val)
-                "best_val_acc": best_val_acc,            # ← جداگانه برای مرجع
-                "best_epoch": int(self.best_epoch),
-                "test_accuracy": test_acc,               # ← TEST ACC
+                "best_val_acc": best_val_acc,
+                "best_val_epoch": int(self.best_epoch),
+                "test_accuracy": test_acc,
                 "test_auc": float(getattr(self, 'test_auc', 0.0)),
                 "test_loss": float(getattr(self, 'test_loss', 0.0)),
             }
@@ -500,6 +510,24 @@ class VGG16Trainer:
         total = sum(p.numel() for p in self.model.parameters())
         print(f"✅ Backbone FROZEN (classifier only)")
         print(f"   Trainable: {trainable:,} / {total:,} ({trainable/total*100:.2f}%)")
+
+    def unfreeze_last_blocks(self):
+        """Unfreeze only last 2 conv blocks (features.24-30) + classifier."""
+        # VGG16 features: 0-30 (31 layers), last 2 blocks = 24-30
+        unfreeze_prefixes = [f"features.{i}." for i in range(24, 31)]
+
+        for name, param in self.model.named_parameters():
+            if "classifier" in name:
+                param.requires_grad = True
+            elif any(name.startswith(p) for p in unfreeze_prefixes):
+                param.requires_grad = True
+            else:
+                param.requires_grad = False
+
+        trainable = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        total = sum(p.numel() for p in self.model.parameters())
+        print(f"✅ Partial UNFREEZE (features.24-30 + classifier)")
+        print(f"   Trainable: {trainable:,} / {total:,} ({trainable / total * 100:.2f}%)")
 
     def unfreeze_all(self):
         """Unfreeze all layers."""
@@ -582,11 +610,11 @@ class VGG16Trainer:
             val_loss, val_acc = self.evaluate(return_loss=True)
             current_lr = self.scheduler.step()
 
-            # ✅ Early Stopping Check (monitor val_loss)
+            # ✅ Early Stopping Check (monitor val_acc)
             if hasattr(self, 'early_stopping'):
-                if self.early_stopping(val_loss, epoch, self.model):
+                if self.early_stopping(val_acc, epoch, self.model):
                     print(f"\n🛑 Early Stopping at epoch {epoch + 1}")
-                    print(f"   Best Val Loss: {self.early_stopping.best_score:.4f}")
+                    print(f"   Best Val Acc: {self.early_stopping.best_score:.4f}")
                     print(f"   Best Epoch: {self.early_stopping.best_epoch + 1}")
                     break
 
@@ -643,7 +671,8 @@ class VGG16Trainer:
         print("=" * 70)
 
         phase_lrs = self.phase_lrs if self.phase_lrs else {
-            0: self.lr, 1: self.lr * 0.1
+            0: self.lr,         # Stage 1: lr=1e-4
+            1: self.lr * 0.2,   # Stage 2: lr=2e-5
         }
 
         # ---- Stage 1: Frozen backbone ----
@@ -653,18 +682,18 @@ class VGG16Trainer:
         self.freeze_backbone()
         self.train_epoch(epochs=self.epochs_per_phase[0], desc="Stage 1")
 
-        # ---- Stage 2: Full fine-tune ----
+        # ---- Stage 2: Partial fine-tune (only last 2 conv blocks + classifier) ----
         print(
-            f"\n📌 STAGE 2: Full fine-tune ({self.epochs_per_phase[1]} epochs) - LR: {phase_lrs.get(1, self.lr * 0.2)}")
+            f"\n📌 STAGE 2: Partial fine-tune ({self.epochs_per_phase[1]} epochs) - LR: {phase_lrs.get(1, self.lr * 0.2)}")
         print("-" * 40)
         self._set_phase_lr(phase_lrs.get(1, self.lr * 0.2))
-        self.unfreeze_all()
+        self.unfreeze_last_blocks()
 
         # ✅ Early Stopping Setup — patience=15 برای رسیدن به بهترین دقت
         self.early_stopping = EarlyStopping(
-            patience=15,
-            min_delta=1e-4,
-            mode='min',  # چون val_loss رو monitor می‌کنیم
+            patience=9,
+            min_delta=1e-4,  # ← پایین‌تر
+            mode='max',
             verbose=True,
         )
 
@@ -831,8 +860,12 @@ class VGG16Trainer:
             reports_dir = os.path.join(self.base_dir, "reports")
             os.makedirs(reports_dir, exist_ok=True)
             output_path = os.path.join(reports_dir, "VGG16_Report.pdf")
+        else:
+            reports_dir = os.path.dirname(output_path)
+            os.makedirs(reports_dir, exist_ok=True)
 
         print(f"\n📄 Generating VGG16 report: {output_path}")
+        print(f"📁 Reports dir: {reports_dir}")
 
         try:
             # ✅ از VGG16Reporter مستقل استفاده کن
@@ -875,7 +908,7 @@ class VGG16Trainer:
                 "training_time_sec": sum(self.history["epoch_times"]) if self.history["epoch_times"] else 0,
             })
 
-            reporter.generate_all(report_dir=os.path.dirname(output_path))
+            reporter.generate_all(report_dir=reports_dir)
             print(f"✅ PDF Report saved: {output_path}")
 
         except Exception as e:

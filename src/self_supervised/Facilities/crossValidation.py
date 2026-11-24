@@ -50,7 +50,7 @@ EFFICIENTNET_B0_SSL_DIR = os.path.join(
     "finalReports", "selfSupervisedLearning", "EfficientNet", "B0", "SSL_checkpoints"
 )
 RESNET18_SSL_DIR = os.path.join(
-    "finalReports", "selfSupervisedLearning", "ResNet", "18", "SSL_checkpoints"
+    "finalReports", "selfSupervisedLearning", "ResNet", "ResNet18", "SSL_checkpoints"
 )
 
 

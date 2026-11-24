@@ -41,6 +41,8 @@ import torch
 
 warnings.filterwarnings("ignore")
 
+from src.AI.ResNet.utils import CLASS_NAMES
+
 # =====================================================
 # ✅ SMART LEARNING RATE SCHEDULER 🔥
 # =====================================================
@@ -85,8 +87,8 @@ def get_learning_rate_schedule(model_type: str, phase: int) -> float:
             3: 1e-5,  # Phase 4: Final fine-tuning
         },
         "vgg16": {
-            0: 1e-3,  # Stage 1: Classifier only
-            1: 1e-4,  # Stage 2: Full fine-tune
+            0: 1e-3,
+            1: 3e-5,
         },
         "mobilenetv2": {
             0: 1e-3,  # Stage 1: Classifier only
@@ -97,16 +99,16 @@ def get_learning_rate_schedule(model_type: str, phase: int) -> float:
             1: 2e-4,  # Stage 2: Full fine-tune
         },
         "swin_transformer": {
-            0: 1e-3,  # Stage 1: Head only
-            1: 5e-5,  # Stage 2: Full fine-tune (lower for transformer)
+            0: 1e-3,
+            1: 2e-5,
         },
         "alexnet": {
             0: 1e-3,  # Stage 1: Classifier only (heavy model, needs higher LR for new layers)
             1: 5e-5,  # Stage 2: Full fine-tune (lower for 60M params)
         },
         "visio_transformer": {
-            0: 1e-3,  # Stage 1: Head only
-            1: 5e-5,  # Stage 2: Full fine-tune (lower for ViT)
+            0: 1e-3,
+            1: 2e-5,
         },
         "convnext": {
             0: 1e-3,  # Stage 1: Classifier only
@@ -206,17 +208,17 @@ HYPERPARAMS = {
     "vgg16": {
         "batch_size": 16,
         "base_lr": 1e-4,
-        "weight_decay": 5e-3,           # ← 10x بالاتر
-        "dropout": 0.4,                  # ← 0.15 → 0.4
-        "label_smoothing": 0.15,         # ← 0.1 → 0.15
+        "weight_decay": 5e-4,
+        "dropout": 0.3,
+        "label_smoothing": 0.12,
         "accumulation_steps": 2,
-        "warmup_epochs": 6,              # ← 5 → 6
-        "epochs_per_phase": [5, 35],     # ← 40 → 35
+        "warmup_epochs": 5,
+        "epochs_per_phase": [8, 30],
         "use_sampler": True,
         "use_mixed_precision": True,
         "target_size": 224,
         "use_smart_lr": True,
-        "early_stopping_patience": 30,
+        "early_stopping_patience": 9,
     },
     "mobilenetv2": {
         "batch_size": 64,
@@ -226,7 +228,7 @@ HYPERPARAMS = {
         "label_smoothing": 0.12,       # ← 0.1 → 0.12
         "accumulation_steps": 1,
         "warmup_epochs": 6,            # ← 5 → 6
-        "epochs_per_phase": [5, 45],   # ← 50 → 45
+        "epochs_per_phase": [5, 45],   # ← ResNet50 → 45
         "use_sampler": True,
         "use_mixed_precision": True,
         "target_size": 224,
@@ -234,13 +236,13 @@ HYPERPARAMS = {
         "early_stopping_patience": 40,
     },
     "googlenet": {
-        "batch_size": 64,
-        "base_lr": 5e-4,
-        "weight_decay": 1e-3,         # ← 2x بالاتر
-        "dropout": 0.15,               # ✅ نگه دار
-        "label_smoothing": 0.12,       # ← 0.1 → 0.12
-        "accumulation_steps": 1,
-        "warmup_epochs": 6,            # ← 5 → 6
+        "batch_size": 32,
+        "base_lr": 2e-4,
+        "weight_decay": 5e-3,         # ← 2x بالاتر
+        "dropout": 0.25,               # ✅ نگه دار
+        "label_smoothing": 0.10,       # ← 0.1 → 0.12
+        "accumulation_steps": 2,
+        "warmup_epochs": 8,            # ← 5 → 6
         "epochs_per_phase": [5, 40],   # ← 45 → 40
         "use_sampler": True,
         "use_mixed_precision": True,
@@ -251,12 +253,12 @@ HYPERPARAMS = {
     "swin_transformer": {
         "batch_size": 16,
         "base_lr": 1e-4,
-        "weight_decay": 0.01,          # ← 20x بالاتر (Transformer نیاز داره)
-        "dropout": 0.3,                # ← 0.15 → 0.3 (Transformer نیاز داره)
-        "label_smoothing": 0.12,       # ← 0.1 → 0.12
+        "weight_decay": 0.01,
+        "dropout": 0.2,
+        "label_smoothing": 0.12,
         "accumulation_steps": 2,
-        "warmup_epochs": 8,            # ← 5 → 8
-        "epochs_per_phase": [5, 35],   # ✅ نگه دار
+        "warmup_epochs": 5,
+        "epochs_per_phase": [5, 35],
         "use_sampler": True,
         "use_mixed_precision": True,
         "target_size": 224,
@@ -281,32 +283,32 @@ HYPERPARAMS = {
     "visio_transformer": {
         "batch_size": 16,
         "base_lr": 1e-4,
-        "weight_decay": 0.05,          # ✅ نگه دار
-        "dropout": 0.3,                # ← 0.1 → 0.3 (ViT نیاز داره)
-        "label_smoothing": 0.12,       # ← 0.1 → 0.12
+        "weight_decay": 0.02,
+        "dropout": 0.25,
+        "label_smoothing": 0.12,
         "accumulation_steps": 2,
-        "warmup_epochs": 10,           # ✅ نگه دار
-        "epochs_per_phase": [5, 35],   # ✅ نگه دار
+        "warmup_epochs": 8,
+        "epochs_per_phase": [5, 20],
         "use_sampler": True,
         "use_mixed_precision": True,
         "target_size": 224,
         "use_smart_lr": True,
-        "early_stopping_patience": 30,
+        "early_stopping_patience": 8,
     },
-     "convnext": {
+    "convnext": {
         "batch_size": 16,
         "base_lr": 1e-4,
-        "weight_decay": 0.05,            # ← 0.01 → 0.05
-        "dropout": 0.3,                  # ← 0.25 → 0.3
-        "label_smoothing": 0.15,         # ← 0.12 → 0.15
+        "weight_decay": 0.05,
+        "dropout": 0.3,
+        "label_smoothing": 0.15,
         "accumulation_steps": 2,
-        "warmup_epochs": 8,              # ✅
-        "epochs_per_phase": [5, 30],     # ← 35 → 30
+        "warmup_epochs": 8,
+        "epochs_per_phase": [5, 35],   # ← 30 → 35 (زمان بیشتر)
         "use_sampler": True,
         "use_mixed_precision": True,
         "target_size": 224,
         "use_smart_lr": True,
-        "early_stopping_patience": 30,
+        "early_stopping_patience": 99,  # ← 30 → 99 (طبق درخواست)
     },
     "densnet": {
         "batch_size": 32,
@@ -951,7 +953,113 @@ class AdvancedModelTrainer:
         # ✅ دریافت بهترین دقت Validation
         best_acc = self.results.get('best_accuracy', 0.0)  # از نتایج آموزش
 
-        if "resnet" in self.model_type:
+        # ✅ NEW: DenseNet → DensNetReporter
+        if self.model_type == "densnet":
+            from src.AI.DensNet.DensNetReports import DensNetReporter
+
+            output_path = os.path.join(
+                self.trainer.base_dir, "reports", "DensNetReport.pdf"
+            )
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+            # ✅ بارگذاری history
+            if not self.trainer.history.get("train_loss"):
+                self.trainer._load_history()
+
+            reporter = DensNetReporter({
+                "config": {
+                    "input_size": self.trainer.target_size,
+                    "batch_size": self.trainer.batch_size,
+                    "accumulation_steps": self.trainer.accumulation_steps,
+                    "effective_batch_size": self.trainer.batch_size * self.trainer.accumulation_steps,
+                    "epochs_stage1": self.trainer.epochs_per_phase[0],
+                    "epochs_stage2": self.trainer.epochs_per_phase[1],
+                    "lr_stage1": self.trainer.lr,
+                    "lr_backbone": self.trainer.lr * 0.2,
+                    "lr_head": self.trainer.lr,
+                    "weight_decay": self.trainer.weight_decay,
+                    "label_smoothing": self.trainer.label_smoothing,
+                    "grad_clip": 1.0,
+                    "dropout": self.trainer.dropout_rate,
+                    "hidden_dim": 512,
+                    "scheduler": "WarmupCosine",
+                    "use_amp": self.trainer.use_mixed_precision,
+                    "use_weighted_sampler": self.trainer.use_sampler,
+                    "seed": 42,
+                    "total_params": sum(p.numel() for p in self.trainer.model.parameters()),
+                    "trainable_params": sum(p.numel() for p in self.trainer.model.parameters() if p.requires_grad),
+                    "test_accuracy": getattr(self.trainer, 'test_accuracy', 0.0),
+                    "model_dir": self.trainer.model_dir,   # ← مهم: برای لود history
+                },
+                "history": self.trainer.history,
+                "best_metrics": self.trainer.metrics or {},
+                "test_metrics": getattr(self.trainer, 'test_metrics', None) or self.trainer.metrics,
+                "y_true": getattr(self.trainer, 'test_y_true', None) if getattr(self.trainer, 'test_y_true', None) is not None else self.trainer.y_true,
+                "y_pred": getattr(self.trainer, 'test_y_pred', None) if getattr(self.trainer, 'test_y_pred', None) is not None else self.trainer.y_pred,
+                "y_prob": getattr(self.trainer, 'test_y_prob', None) if getattr(self.trainer, 'test_y_prob', None) is not None else self.trainer.y_prob,
+                "class_names": CLASS_NAMES,
+                "best_epoch": self.trainer.best_epoch,
+                "training_time_sec": sum(self.trainer.history.get("epoch_times", [])) if self.trainer.history.get("epoch_times") else 0,
+            })
+
+            reporter.generate_all(report_dir=os.path.dirname(output_path))
+            self.logger.info(f"✅ DenseNet Report: {output_path}")
+            return output_path
+
+        # ✅ NEW: ConvNeXt → ConvNextReporter
+        elif self.model_type == "convnext":
+            from src.AI.ConvNext.convNextReports import ConvNextReporter
+
+            output_path = os.path.join(
+                self.trainer.base_dir, "reports", "ConvNextReport.pdf"
+            )
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+            if not self.trainer.history.get("train_loss"):
+                self.trainer._load_history()
+
+            reporter = ConvNextReporter({
+                "config": {
+                    "input_size": self.trainer.target_size,
+                    "batch_size": self.trainer.batch_size,
+                    "accumulation_steps": self.trainer.accumulation_steps,
+                    "effective_batch_size": self.trainer.batch_size * self.trainer.accumulation_steps,
+                    "epochs_stage1": self.trainer.epochs_per_phase[0],
+                    "epochs_stage2": self.trainer.epochs_per_phase[1],
+                    "lr_stage1": self.trainer.lr,
+                    "lr_backbone": self.trainer.lr * 0.2,
+                    "lr_head": self.trainer.lr,
+                    "weight_decay": self.trainer.weight_decay,
+                    "label_smoothing": self.trainer.label_smoothing,
+                    "grad_clip": 1.0,
+                    "dropout": self.trainer.dropout_rate,
+                    "hidden_dim": 256,
+                    "scheduler": "WarmupCosine",
+                    "use_amp": self.trainer.use_mixed_precision,
+                    "use_weighted_sampler": self.trainer.use_sampler,
+                    "seed": 42,
+                    "total_params": sum(p.numel() for p in self.trainer.model.parameters()),
+                    "trainable_params": sum(p.numel() for p in self.trainer.model.parameters() if p.requires_grad),
+                    "test_accuracy": getattr(self.trainer, 'test_accuracy', 0.0),
+                    "model_dir": self.trainer.model_dir,
+                },
+                "history": self.trainer.history,
+                "best_metrics": self.trainer.metrics or {},
+                "test_metrics": getattr(self.trainer, 'test_metrics', None) or self.trainer.metrics,
+                "y_true": getattr(self.trainer, 'test_y_true', None) if getattr(self.trainer, 'test_y_true', None) is not None else self.trainer.y_true,
+                "y_pred": getattr(self.trainer, 'test_y_pred', None) if getattr(self.trainer, 'test_y_pred', None) is not None else self.trainer.y_pred,
+                "y_prob": getattr(self.trainer, 'test_y_prob', None) if getattr(self.trainer, 'test_y_prob', None) is not None else self.trainer.y_prob,
+                "class_names": CLASS_NAMES,
+                "best_epoch": self.trainer.best_epoch,
+                "training_time_sec": sum(self.trainer.history.get("epoch_times", [])) if self.trainer.history.get("epoch_times") else 0,
+            })
+
+            reporter.generate_all(report_dir=os.path.dirname(output_path))
+            self.logger.info(f"✅ ConvNeXt Report: {output_path}")
+            return output_path
+
+        # ✅ ResNet
+        elif "resnet" in self.model_type:
             from src.AI.ResNet.resnetReports import generate_full_pdf
             from src.AI.ResNet.utils import OUTPUT_DIR as RESNET_OUTPUT_DIR
 
@@ -980,19 +1088,68 @@ class AdvancedModelTrainer:
                     history=self.trainer.get_history(),
                     config=self.hp,
                     cv_scores=self._cv_scores if self._cv_done else None,
-                    best_accuracy=best_acc,  # ✅ اضافه شد
+                    best_accuracy=best_acc,
                 )
             else:
                 self.logger.warning("⚠️ No sample image available for report")
-        else:
-            from src.AI.EfficientNet.efficientNetReports import generate_full_pdf
-            from src.AI.EfficientNet.utils import OUTPUT_DIR as EFFICIENTNET_OUTPUT_DIR
+            return output_path
+
+        # ✅ GoogleNet → GoogleNetReporter
+        elif self.model_type == "googlenet":
+            from src.AI.GoogleNet.GoogleNetReports import GoogleNetReporter
 
             output_path = os.path.join(
-                EFFICIENTNET_OUTPUT_DIR,
-                "reports",
-                f"{self.model_type.upper()}_Report.pdf",
+                self.trainer.base_dir, "reports", "GoogleNet_Report.pdf"
             )
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+            if not self.trainer.history.get("train_loss"):
+                self.trainer._load_history()
+
+            reporter = GoogleNetReporter({
+                "config": {
+                    "input_size": self.trainer.target_size,
+                    "batch_size": self.trainer.batch_size,
+                    "accumulation_steps": self.trainer.accumulation_steps,
+                    "effective_batch_size": self.trainer.batch_size * self.trainer.accumulation_steps,
+                    "epochs_stage1": self.trainer.epochs_per_phase[0],
+                    "epochs_stage2": self.trainer.epochs_per_phase[1],
+                    "lr_stage1": self.trainer.lr,
+                    "lr_backbone": self.trainer.lr * 0.2,
+                    "lr_head": self.trainer.lr,
+                    "weight_decay": self.trainer.weight_decay,
+                    "label_smoothing": self.trainer.label_smoothing,
+                    "grad_clip": 1.0,
+                    "dropout": self.trainer.dropout_rate,
+                    "hidden_dim": 512,
+                    "scheduler": "WarmupCosine",
+                    "use_amp": self.trainer.use_mixed_precision,
+                    "use_weighted_sampler": self.trainer.use_sampler,
+                    "seed": 42,
+                    "total_params": sum(p.numel() for p in self.trainer.model.parameters()),
+                    "trainable_params": sum(p.numel() for p in self.trainer.model.parameters() if p.requires_grad),
+                    "test_accuracy": getattr(self.trainer, 'test_accuracy', 0.0),
+                    "model_dir": self.trainer.model_dir,  # ← مهم: برای لود history
+                },
+                "history": self.trainer.history,
+                "best_metrics": self.trainer.metrics or {},
+                "test_metrics": getattr(self.trainer, 'test_metrics', None) if getattr(self.trainer, 'test_metrics',
+                                                                                       None) is not None else self.trainer.metrics,
+                "y_true": getattr(self.trainer, 'test_y_true', None) if getattr(self.trainer, 'test_y_true',
+                                                                                None) is not None else self.trainer.y_true,
+                "y_pred": getattr(self.trainer, 'test_y_pred', None) if getattr(self.trainer, 'test_y_pred',
+                                                                                None) is not None else self.trainer.y_pred,
+                "y_prob": getattr(self.trainer, 'test_y_prob', None) if getattr(self.trainer, 'test_y_prob',
+                                                                                None) is not None else self.trainer.y_prob,
+                "class_names": CLASS_NAMES,
+                "best_epoch": self.trainer.best_epoch,
+                "training_time_sec": sum(self.trainer.history.get("epoch_times", [])) if self.trainer.history.get(
+                    "epoch_times") else 0,
+            })
+
+            reporter.generate_all(report_dir=os.path.dirname(output_path))
+            self.logger.info(f"✅ GoogleNet Report: {output_path}")
+            return output_path
 
             sample_img = None
             for batch in self.trainer.val_loader:
@@ -1017,9 +1174,7 @@ class AdvancedModelTrainer:
                 )
             else:
                 self.logger.warning("⚠️ No sample image available for report")
-
-        self.logger.info(f"✅ Report generated: {output_path}")
-        return output_path
+            return output_path
 
 
 # =====================================================
@@ -1653,11 +1808,11 @@ def generate_report_vgg16() -> str:
         trainer = VGG16Trainer(
             batch_size=16,
             lr=1e-4,
-            weight_decay=1e-3,              # ← مطابق با DEFAULT_HP جدید
-            dropout_rate=0.15,               # ← مطابق با DEFAULT_HP جدید
-            label_smoothing=0.12,            # ← مطابق با DEFAULT_HP جدید
+            weight_decay=5e-4,
+            dropout_rate=0.3,
+            label_smoothing=0.12,
             accumulation_steps=2,
-            warmup_epochs=6,                 # ← مطابق با DEFAULT_HP جدید
+            warmup_epochs=5,
             num_workers=0,
             target_size=224,
         )
@@ -1670,28 +1825,25 @@ def generate_report_vgg16() -> str:
             LOGGER.error(f"❌ No saved VGG16 model found at {trainer.save_path}")
             return ""
 
-        # ✅✅✅ مهم: قبل از گزارش، روی test set ارزیابی کن ✅✅✅
+        # ✅ مهم: قبل از گزارش، روی test set ارزیابی کن
         LOGGER.info("📊 Evaluating on TEST set...")
         test_acc, test_report, test_cm, test_auc = trainer.evaluate_on_test()
 
-        # ✅✅✅ خیلی مهم: test_metrics رو ست کن تا generate_report ازش استفاده کنه
+        # ✅ خیلی مهم: test_metrics رو ست کن
         trainer.test_metrics = test_report
         trainer.test_cm = test_cm
         trainer.test_auc = test_auc
         trainer.test_accuracy = test_acc
+        trainer.best_acc = test_acc
 
         LOGGER.info(f"✅ Test Accuracy: {test_acc:.4f}")
 
-        # ✅✅✅ مهم: best_acc رو با test_accuracy جایگزین کن
-        trainer.best_acc = test_acc
-        LOGGER.info(f"✅ best_acc set to test_accuracy: {trainer.best_acc:.4f}")
-
-        # ✅✅✅ History رو از فایل لود کن (برای Gap plot)
+        # ✅ History رو از فایل لود کن
         if not trainer.history.get("train_loss"):
             LOGGER.info("📊 Loading history from saved file...")
             trainer._load_history()
 
-        # Generate report
+        # ✅ گزارش‌گیری
         output_path = trainer.generate_report()
         LOGGER.info(f"✅ VGG16 Report: {output_path}")
         return output_path
@@ -1817,11 +1969,11 @@ def generate_report_swin_transformer() -> str:
         trainer = SwinTransformerTrainer(
             batch_size=16,
             lr=1e-4,
-            weight_decay=0.01,               # ← مطابق با DEFAULT_HP جدید
-            dropout_rate=0.15,                 # ← مطابق
-            label_smoothing=0.12,             # ← مطابق
+            weight_decay=0.01,
+            dropout_rate=0.2,
+            label_smoothing=0.12,
             accumulation_steps=2,
-            warmup_epochs=8,                  # ← مطابق
+            warmup_epochs=5,
             num_workers=0,
             target_size=224,
         )
@@ -1923,11 +2075,11 @@ def generate_report_visio_transformer() -> str:
         trainer = VisioTransformerTrainer(
             batch_size=16,
             lr=1e-4,
-            weight_decay=0.05,               # ← مطابق با DEFAULT_HP جدید
-            dropout_rate=0.15,                # ← مطابق
-            label_smoothing=0.12,             # ← مطابق
+            weight_decay=0.02,
+            dropout_rate=0.25,
+            label_smoothing=0.12,
             accumulation_steps=2,
-            warmup_epochs=10,                 # ← مطابق
+            warmup_epochs=8,
             num_workers=0,
             target_size=224,
         )
@@ -2017,49 +2169,203 @@ def generate_report_convnext() -> str:
         traceback.print_exc()
         return ""
 
+
 def generate_report_densnet() -> str:
-    """Generate report for DenseNet from saved model (TEST metrics)."""
+    """
+    Regenerate DenseNet reports from existing artifacts (no retraining).
+
+    INPUT  → finalReports/AI_Comparisons/DensNet/DensNet/
+              - DensNet_best.pth
+              - history_DensNet.json
+              - training_meta_DensNet.json
+              - config_DensNet.json
+
+    OUTPUT → finalReports/AI_Comparisons/DensNet/reports/
+              - DensNetReport.pdf
+              - metrics.json, summary.txt, classification_report.txt, predictions.csv
+              - confusion_matrix.png, confusion_matrix_raw.png, roc_curves.png
+              - metrics_bar.png, per_class_metrics.png, performance_pie.png
+              - training_history.png, train_val_gap.png, learning_rate.png
+    """
     LOGGER.info("📄 Generating DenseNet report from saved model...")
+
     try:
-        from src.AI.DensNet.DensNet import DensNetTrainer
+        import json
+        import torch
+        import pandas as pd
+        from src.AI.DensNet.DensNet import DensNetTrainer, DENSENET_OUTPUT_DIR
+        from src.AI.DensNet.DensNetReports import DensNetReporter
+        from src.AI.ResNet.utils import CLASS_NAMES
 
-        trainer = DensNetTrainer(
-            batch_size=32,
-            lr=1e-4,
-            weight_decay=0.01,
-            dropout_rate=0.3,
-            label_smoothing=0.15,
-            accumulation_steps=1,
-            warmup_epochs=8,
-            num_workers=0,
-            target_size=224,
-        )
+        # ✅ مسیرها
+        base_dir = DENSENET_OUTPUT_DIR  # .../DensNet
+        model_dir = os.path.join(base_dir, "DensNet")  # .../DensNet/DensNet
+        reports_dir = os.path.join(base_dir, "reports")  # .../DensNet/reports
+        os.makedirs(reports_dir, exist_ok=True)
 
-        if os.path.exists(trainer.save_path):
-            trainer.load(trainer.save_path)
-            LOGGER.info(f"✅ Loaded: {trainer.save_path}")
-        else:
-            LOGGER.error(f"❌ No saved DenseNet model at {trainer.save_path}")
+        # ✅ چک فایل‌ها
+        history_path = os.path.join(model_dir, "history_DensNet.json")
+        meta_path = os.path.join(model_dir, "training_meta_DensNet.json")
+        config_path = os.path.join(model_dir, "config_DensNet.json")
+        best_model_path = os.path.join(model_dir, "DensNet_best.pth")
+
+        missing = [p for p in [history_path, meta_path, config_path, best_model_path]
+                   if not os.path.exists(p)]
+        if missing:
+            LOGGER.error("❌ Missing files:")
+            for p in missing:
+                LOGGER.error(f"   - {p}")
             return ""
 
-        LOGGER.info("📊 Evaluating on TEST set...")
-        test_acc, test_report, test_cm, test_auc = trainer.evaluate_on_test()
+        # ✅ لود history + meta + config
+        with open(history_path, "r", encoding="utf-8") as f:
+            history = json.load(f)
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+        with open(config_path, "r", encoding="utf-8") as f:
+            config_raw = json.load(f)
 
-        trainer.test_metrics = test_report
-        trainer.test_cm = test_cm
-        trainer.test_auc = test_auc
-        trainer.test_accuracy = test_acc
-        trainer.best_acc = test_acc
+        LOGGER.info(f"   History: {len(history.get('train_loss', []))} epochs")
+        LOGGER.info(f"   Meta best_val_acc: {meta.get('best_val_acc', 'N/A')}")
+        LOGGER.info(f"   Meta test_accuracy: {meta.get('test_accuracy', 'N/A')}")
 
-        LOGGER.info(f"✅ Test Accuracy: {test_acc:.4f}")
+        # ✅ ساخت trainer بدون اجرای __init__ (برای جلوگیری از آموزش مجدد)
+        trainer = DensNetTrainer.__new__(DensNetTrainer)
 
-        if not trainer.history.get("train_loss"):
-            LOGGER.info("📊 Loading history from saved file...")
-            trainer._load_history()
+        # --- Minimal attributes ---
+        trainer.csv_path = config_raw.get("csv_path")
+        trainer.img_dir = config_raw.get("img_dir")
+        trainer.target_size = config_raw.get("target_size", 224)
+        trainer.batch_size = config_raw.get("batch_size", 32)
+        trainer.num_workers = config_raw.get("num_workers", 0)
+        trainer.use_mixed_precision = config_raw.get("use_mixed_precision", True)
+        trainer.use_sampler = config_raw.get("use_sampler", True)
+        trainer.dropout_rate = config_raw.get("dropout_rate", 0.3)
+        trainer.lr = config_raw.get("lr", 1e-4)
+        trainer.weight_decay = config_raw.get("weight_decay", 0.01)
+        trainer.label_smoothing = config_raw.get("label_smoothing", 0.15)
+        trainer.accumulation_steps = config_raw.get("accumulation_steps", 1)
+        trainer.warmup_epochs = config_raw.get("warmup_epochs", 8)
+        trainer.epochs_per_phase = config_raw.get("epochs_per_phase", [5, 35])
+        trainer.phase_lrs = None
 
-        output_path = trainer.generate_report()
-        LOGGER.info(f"✅ DenseNet Report: {output_path}")
-        return output_path
+        trainer.base_dir = base_dir
+        trainer.model_dir = model_dir
+        trainer.save_path = best_model_path
+        trainer.checkpoint_path = os.path.join(model_dir, "DensNet_checkpoint.pth")
+        trainer.last_path = os.path.join(model_dir, "DensNet_last.pth")
+        trainer.config_path = config_path
+
+        trainer.history = history
+        trainer.best_acc = float(meta.get("best_val_acc", 0.0))
+        trainer.best_epoch = int(meta.get("best_epoch", 0))
+        trainer.test_accuracy = float(meta.get("test_accuracy", 0.0))
+        trainer.test_loss = float(meta.get("test_loss", 0.0))
+        trainer.test_auc = float(meta.get("test_auc", 0.0))
+
+        # ✅ ساخت مدل
+        from torchvision import models
+        from torchvision.models import DenseNet121_Weights
+        import torch.nn as nn
+
+        LOGGER.info("   Building DenseNet-121...")
+        model = models.densenet121(weights=None)
+        num_features = model.classifier.in_features
+        model.classifier = nn.Sequential(
+            nn.Dropout(trainer.dropout_rate),
+            nn.Linear(num_features, 512),
+            nn.LayerNorm(512),
+            nn.GELU(),
+            nn.Dropout(trainer.dropout_rate * 0.5),
+            nn.Linear(512, len(CLASS_NAMES)),
+        )
+        model = model.to(trainer.model_dir and "cuda" if torch.cuda.is_available() else "cpu")
+
+        # ✅ لود وزن‌ها
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        checkpoint = torch.load(best_model_path, map_location=device)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        model.eval()
+        trainer.model = model
+        LOGGER.info(f"   ✅ Model loaded: {best_model_path}")
+
+        # ✅ ساخت criterion
+        from src.AI.ResNet.utils import LabelSmoothingCrossEntropy
+        trainer.criterion = LabelSmoothingCrossEntropy(
+            smoothing=trainer.label_smoothing
+        )
+        LOGGER.info(f"   ✅ Criterion built (smoothing={trainer.label_smoothing})")
+
+        # ✅ لود داده test
+        LOGGER.info("   Loading test data...")
+        trainer.df = pd.read_csv(trainer.csv_path)
+        trainer.train_ds, trainer.val_ds = trainer._load_data()
+        trainer.train_loader, trainer.val_loader, trainer.test_loader = trainer._create_dataloaders()
+        LOGGER.info(f"   Test samples: {len(trainer.test_ds)}")
+
+        # ✅ ارزیابی روی test
+        LOGGER.info("   Evaluating on TEST set...")
+        trainer.evaluate_on_test()
+
+        # ✅ اضافه کردن metrics به trainer (برای generate_report)
+        trainer.metrics = trainer.test_metrics
+        trainer.cm = trainer.test_cm
+        trainer.auc_score = trainer.test_auc
+        trainer.y_true = trainer.test_y_true
+        trainer.y_pred = trainer.test_y_pred
+        trainer.y_prob = trainer.test_y_prob
+        LOGGER.info(f"   ✅ Metrics attached (accuracy={trainer.metrics.get('accuracy', 0):.4f})")
+
+        # ✅ تولید گزارش با DensNetReporter
+        LOGGER.info("📄 Generating DenseNet report...")
+        reporter = DensNetReporter({
+            "config": {
+                "input_size": trainer.target_size,
+                "batch_size": trainer.batch_size,
+                "accumulation_steps": trainer.accumulation_steps,
+                "effective_batch_size": trainer.batch_size * trainer.accumulation_steps,
+                "epochs_stage1": trainer.epochs_per_phase[0],
+                "epochs_stage2": trainer.epochs_per_phase[1],
+                "lr_stage1": trainer.lr,
+                "lr_backbone": trainer.lr * 0.2,
+                "lr_head": trainer.lr,
+                "weight_decay": trainer.weight_decay,
+                "label_smoothing": trainer.label_smoothing,
+                "grad_clip": 1.0,
+                "dropout": trainer.dropout_rate,
+                "hidden_dim": 512,
+                "scheduler": "WarmupCosine",
+                "use_amp": trainer.use_mixed_precision,
+                "use_weighted_sampler": trainer.use_sampler,
+                "seed": 42,
+                "total_params": sum(p.numel() for p in trainer.model.parameters()),
+                "trainable_params": sum(p.numel() for p in trainer.model.parameters() if p.requires_grad),
+                "test_accuracy": trainer.test_accuracy,
+                "model_dir": trainer.model_dir,  # ← مهم برای لود history
+            },
+            "history": trainer.history,
+            "best_metrics": trainer.metrics,
+            "test_metrics": trainer.test_metrics,
+            "y_true": trainer.test_y_true,
+            "y_pred": trainer.test_y_pred,
+            "y_prob": trainer.test_y_prob,
+            "class_names": CLASS_NAMES,
+            "best_epoch": trainer.best_epoch,
+            "training_time_sec": sum(history.get("epoch_times", [])) if history.get("epoch_times") else 0,
+        })
+
+        pdf_path = reporter.generate_all(report_dir=reports_dir)
+        LOGGER.info(f"✅ DenseNet Report: {pdf_path}")
+
+        # ✅ چک نهایی
+        LOGGER.info(f"📂 Reports dir: {reports_dir}")
+        for fname in sorted(os.listdir(reports_dir)):
+            fpath = os.path.join(reports_dir, fname)
+            if os.path.isfile(fpath):
+                size_kb = os.path.getsize(fpath) / 1024
+                LOGGER.info(f"   ✅ {fname} ({size_kb:.1f} KB)")
+
+        return pdf_path
 
     except Exception as e:
         LOGGER.error(f"❌ DenseNet report failed: {e}")
@@ -2282,7 +2588,7 @@ def runDeeply():
         print("16. 🚀 Train ALL Architects")
         print("")
         print("17. 🔬 Cross-Validate ResNet18 (using saved model)")
-        print("18. 🔬 Cross-Validate ResNet50 (using saved model)")
+        print("ResNet18. 🔬 Cross-Validate ResNet50 (using saved model)")
         print("19. 🔬 Cross-Validate EfficientNet-B0 (using saved model)")
         print("20. 🔬 Cross-Validate EfficientNet-B1 (using saved model)")
         print("21. 🔬 Cross-Validate VGG16 (using saved model)")
@@ -2315,7 +2621,7 @@ def runDeeply():
         print("47. 📄 Generate-Report for DenseNet")
         print("48. 📄 Generate-Report for Custom CNN")
         print("49. 📄 Generate-Report for LSTM")
-        print("50. 📄 Generate-Report for CNN+LSTM")                 # ← جدید
+        print("ResNet50. 📄 Generate-Report for CNN+LSTM")                 # ← جدید
         print("51. 📄 Generate-Report for ALL Architects")
         print("52. ❌ Exit")
         print("=" * 70)
@@ -2377,7 +2683,7 @@ def runDeeply():
         elif choice == "17":
             cross_validate_resnet18()
             input("\nPress Enter to continue...")
-        elif choice == "18":
+        elif choice == "ResNet18":
             cross_validate_resnet50()
             input("\nPress Enter to continue...")
         elif choice == "19":
@@ -2473,7 +2779,7 @@ def runDeeply():
         elif choice == "49":
             generate_report_lstm()
             input("\nPress Enter to continue...")
-        elif choice == "50":
+        elif choice == "ResNet50":
             generate_report_cnn_lstm()                  # ← جدید
             input("\nPress Enter to continue...")
         elif choice == "51":

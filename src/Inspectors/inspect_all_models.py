@@ -290,17 +290,17 @@ def get_checkpoint_paths() -> Dict[str, List[Tuple[str, str]]]:
     ssl_root_paths = {
         # ResNet18
         "resnet18_byol": (
-            os.path.join(ssl_root, "ResNet", "18", "SSL_checkpoints", "architecture", "byol",
+            os.path.join(ssl_root, "ResNet", "ResNet18", "SSL_checkpoints", "architecture", "byol",
                          "resnet18_best_update_byol.pth"),
             "resnet18",
         ),
         "resnet18_simclr": (
-            os.path.join(ssl_root, "ResNet", "18", "SSL_checkpoints", "architecture", "simclr",
+            os.path.join(ssl_root, "ResNet", "ResNet18", "SSL_checkpoints", "architecture", "simclr",
                          "resnet18_best_update_simclr.pth"),
             "resnet18",
         ),
         "resnet18_mae": (
-            os.path.join(ssl_root, "ResNet", "18", "SSL_checkpoints", "architecture", "mae",
+            os.path.join(ssl_root, "ResNet", "ResNet18", "SSL_checkpoints", "architecture", "mae",
                          "resnet18_best_update_mae.pth"),
             "resnet18",
         ),

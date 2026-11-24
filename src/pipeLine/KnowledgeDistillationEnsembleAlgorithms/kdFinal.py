@@ -2535,7 +2535,7 @@ def generate_kdfinal_pdf(
         story.append(PageBreak())
 
     # ============================================================
-    # PAGE 18 — Ensemble Analysis (per-seed table)
+    # PAGE ResNet18 — Ensemble Analysis (per-seed table)
     # ============================================================
     story.append(Paragraph("Ensemble Analysis", h1))
     story.append(Paragraph(

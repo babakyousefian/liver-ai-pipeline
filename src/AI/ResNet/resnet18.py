@@ -3,7 +3,7 @@
 """
 ResNet18 Trainer for Liver Disease Classification
 This module is designed to train ResNet18 model on liver image data
-ResNet18 is a lightweight and fast model with 18 layers, suitable for medium-sized data
+ResNet18 is a lightweight and fast model with ResNet18 layers, suitable for medium-sized data
 """
 
 import json

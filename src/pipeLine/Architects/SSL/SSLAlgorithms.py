@@ -192,8 +192,8 @@ os.environ["PYTHONWARNINGS"] = "ignore"
 # ✅ Import existing modules
 # ================================================================
 
-from src.pipeLine.resNet18SSL import FINAL_MODELS_DIR
-from withoutFineTuner import wFTAlgorithms, RESNET50_REPORTS_DIR
+from src.pipeLine.Architects.Resnet.ResNet18.resNet18SSL import FINAL_MODELS_DIR
+from src.pipeLine.ConfigurationAlgorithms.withoutFineTuner import wFTAlgorithms, RESNET50_REPORTS_DIR
 
 # ✅ Restore normal stdout
 sys.stdout = _ORIGINAL_STDOUT
@@ -325,7 +325,7 @@ EFFICIENTNET_WEIGHT_TRANSFORMER_DIR = os.path.join(
 )
 
 RESNET18_SSL_DIR = os.path.join(
-    "../../../../finalReports", "selfSupervisedLearning", "ResNet", "18", "SSL_checkpoints"
+    "../../../../finalReports", "selfSupervisedLearning", "ResNet", "ResNet18", "SSL_checkpoints"
 )
 
 EFFICIENTNET_B0_SSL_DIR = os.path.join(
@@ -343,7 +343,7 @@ RESNET_WEIGHT_TRANSFORMER_DIR = os.path.join(
     PROJECT_ROOT_MAIN, "../../../../finalReports", "selfSupervisedLearning", "ResNet", "weightTransformer"
 )
 RESNET18_SSL_DIR = os.path.join(
-    PROJECT_ROOT_MAIN, "../../../../finalReports", "selfSupervisedLearning", "ResNet", "18", "SSL_checkpoints"
+    PROJECT_ROOT_MAIN, "../../../../finalReports", "selfSupervisedLearning", "ResNet", "ResNet18", "SSL_checkpoints"
 )
 
 # EfficientNet
@@ -495,7 +495,7 @@ def print_menu():
         # ✅ AlexNet SSL (NEW)
         # ============================================================
         table.add_row(
-            "18",
+            "ResNet18",
             "🎯 AlexNet SSL Full (NEW)",
             "BYOL → SimCLR → MAE → Best on AlexNet",
         )
@@ -613,7 +613,7 @@ def print_menu():
         print(f"{Colors.YELLOW}16{Colors.ENDC}  💻 Depicts Your Own Hardware Device")
         print(f"{Colors.YELLOW}17{Colors.ENDC}  🔄 Recovery Mode (skip FT & CV)")
         print(f"{Colors.CYAN}{'-'*40}{Colors.ENDC}")
-        print(f"{Colors.YELLOW}18{Colors.ENDC}  🎯 AlexNet SSL Full (NEW)")
+        print(f"{Colors.YELLOW}ResNet18{Colors.ENDC}  🎯 AlexNet SSL Full (NEW)")
         print(f"{Colors.YELLOW}19{Colors.ENDC}  🎯 AlexNet within BYOL & Reports (NEW)")
         print(f"{Colors.YELLOW}20{Colors.ENDC}  🎯 AlexNet within SimCLR & Reports (NEW)")
         print(f"{Colors.YELLOW}21{Colors.ENDC}  🎯 AlexNet within MAE & Reports (NEW)")
@@ -672,7 +672,7 @@ def get_choice():
                 "15",
                 "16",
                 "17",
-                "18",
+                "ResNet18",
                 "19",
                 "20",
                 "21",
@@ -818,7 +818,7 @@ def run_resnet18_ssl():
             console.print("[dim]📌 This will take time. Please be patient...[/dim]")
 
         # Create pipeline
-        from src.pipeLine.resNet18SSL import create_resnet18_ssl_pipeline
+        from src.pipeLine.Architects.Resnet.ResNet18.resNet18SSL import create_resnet18_ssl_pipeline
 
         pipeline = create_resnet18_ssl_pipeline(
             batch_size=batch_size,
@@ -1583,7 +1583,7 @@ def run_resnet18_ssl_single(method: str = "byol"):
             return
 
     try:
-        from src.pipeLine.resNet18SSL import create_resnet18_ssl_pipeline
+        from src.pipeLine.Architects.Resnet.ResNet18.resNet18SSL import create_resnet18_ssl_pipeline
 
         image_paths = []
         for ext in [".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG", ".dcm"]:
@@ -1742,7 +1742,7 @@ def run_resnet18_best_transfer():
         print(f"{Colors.CYAN}{'='*60}{Colors.ENDC}")
 
     try:
-        from src.pipeLine.resNet18SSL import create_resnet18_ssl_pipeline
+        from src.pipeLine.Architects.Resnet.ResNet18.resNet18SSL import create_resnet18_ssl_pipeline
         from src.self_supervised.ProbabilityAlgorithms.linear_probe import (
             evaluate_with_linear_probe,
             build_labeled_eval_loader,
@@ -2092,7 +2092,7 @@ def run_recovery_mode():
 
     # ✅ Run recovery
     try:
-        from src.pipeLine.resnet50FineTune import run_finetune_recovery
+        from src.pipeLine.Architects.Resnet.ResNet50.resnet50FineTune import run_finetune_recovery
 
         results = run_finetune_recovery(
             model_path=model_path,
@@ -2341,7 +2341,7 @@ def run_resnet18_ensemble_finetune():
     if HAS_RICH:
         console.print("\n[bold cyan]⚙️  Fine-Tune Configuration[/bold cyan]")
 
-        total_epochs = int(Prompt.ask("⏳ Fine-Tune epochs", default="50"))
+        total_epochs = int(Prompt.ask("⏳ Fine-Tune epochs", default="ResNet50"))
         batch_size = int(Prompt.ask("📦 Batch size", default="32"))
         cv_folds = int(Prompt.ask("🔬 CV folds", default="5"))
         cv_epochs_per_fold = int(Prompt.ask("⏳ FT epochs per CV fold", default="10"))
@@ -2358,7 +2358,7 @@ def run_resnet18_ensemble_finetune():
             return
     else:
         print(f"\n{Colors.BOLD}⚙️  Fine-Tune Configuration{Colors.ENDC}")
-        total_epochs = int(input("⏳ Fine-Tune epochs (default=50): ") or "50")
+        total_epochs = int(input("⏳ Fine-Tune epochs (default=ResNet50): ") or "ResNet50")
         batch_size = int(input("📦 Batch size (default=32): ") or "32")
         cv_folds = int(input("🔬 CV folds (default=5): ") or "5")
         cv_epochs_per_fold = int(input("⏳ FT epochs per CV fold (default=10): ") or "10")
@@ -2377,7 +2377,7 @@ def run_resnet18_ensemble_finetune():
     # ✅ STEP 6: Run Fine-Tune Pipeline
     # ================================================================
     try:
-        from src.pipeLine.resnet50FineTune import run_finetune_only
+        from src.pipeLine.Architects.Resnet.ResNet50.resnet50FineTune import run_finetune_only
 
         results = run_finetune_only(
             model_path=selected_model,
@@ -3092,7 +3092,7 @@ def run_efficientnet_ensemble_finetune():
 
     if HAS_RICH:
         epochs_final = int(Prompt.ask("⏳ Fine-Tune epochs (final)", default="100"))
-        epochs_cv = int(Prompt.ask("⏳ Fine-Tune epochs per CV fold", default="50"))
+        epochs_cv = int(Prompt.ask("⏳ Fine-Tune epochs per CV fold", default="ResNet50"))
         lr_final = float(Prompt.ask("📊 Learning Rate (final)", default="0.000005"))  # ✅ 5e-6
         lr_cv = float(Prompt.ask("📊 Learning Rate (CV)", default="0.000005"))
         batch_size = int(Prompt.ask("📦 Batch size", default="32"))
@@ -3103,7 +3103,7 @@ def run_efficientnet_ensemble_finetune():
     else:
         print(f"\n{Colors.BOLD}Configuration (press Enter for defaults):{Colors.ENDC}")
         epochs_final = int(input("⏳ Fine-Tune epochs (final) [100]: ") or "100")
-        epochs_cv = int(input("⏳ Fine-Tune epochs per CV fold [50]: ") or "50")
+        epochs_cv = int(input("⏳ Fine-Tune epochs per CV fold [ResNet50]: ") or "ResNet50")
         lr_final = float(input("📊 Learning Rate (final) [1e-5]: ") or "1e-5")
         lr_cv = float(input("📊 Learning Rate (CV) [1e-5]: ") or "1e-5")
         batch_size = int(input("📦 Batch size [32]: ") or "32")
@@ -4085,7 +4085,7 @@ def run_alexnet_ensemble_finetune():
         lr_final = float(Prompt.ask("📊 Learning Rate (final)", default="0.0001"))
         lr_cv = float(Prompt.ask("📊 Learning Rate (CV)", default="0.0001"))
         batch_size = int(Prompt.ask("📦 Batch size", default="32"))
-        patience_final = int(Prompt.ask("🛑 Early stopping patience (final)", default="50"))
+        patience_final = int(Prompt.ask("🛑 Early stopping patience (final)", default="ResNet50"))
         patience_cv = int(Prompt.ask("🛑 Early stopping patience (CV)", default="20"))
         n_bootstrap = int(Prompt.ask("🎲 Bootstrap samples (CI 95%)", default="2000"))
         n_tta = int(Prompt.ask("🔄 TTA augmentations", default="32"))
@@ -4100,7 +4100,7 @@ def run_alexnet_ensemble_finetune():
         lr_final = float(input("📊 LR (final) [1e-4]: ") or "1e-4")
         lr_cv = float(input("📊 LR (CV) [1e-4]: ") or "15e-4")
         batch_size = int(input("📦 Batch size [32]: ") or "32")
-        patience_final = int(input("🛑 Patience (final) [50]: ") or "50")
+        patience_final = int(input("🛑 Patience (final) [ResNet50]: ") or "ResNet50")
         patience_cv = int(input("🛑 Patience (CV) [20]: ") or "20")
         n_bootstrap = int(input("🎲 Bootstrap [2000]: ") or "2000")
         n_tta = int(input("🔄 TTA augs [32]: ") or "32")
@@ -6750,7 +6750,7 @@ def main():
         # ✅ AlexNet SSL (NEW)
         # ============================================================
 
-        elif choice == "18":
+        elif choice == "ResNet18":
             # 🎯 AlexNet Full SSL Pipeline (BYOL → SimCLR → MAE → Best)
             musicPlayer = Music(MUSIC_PATH=MUSIC_PATH2)
             musicPlayer.play_music()

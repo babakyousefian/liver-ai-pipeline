@@ -4,7 +4,7 @@ Fast Fitness Evaluator for GA — FIXED VERSION.
 
 Fixes:
 1. Removed `num_workers` from create_simclr_trainer (unsupported).
-2. Loads pretrained weights from ResNet18/50 checkpoint directly.
+2. Loads pretrained weights from ResNet18/ResNet50 checkpoint directly.
 3. Handles model creation properly.
 """
 

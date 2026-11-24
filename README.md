@@ -520,7 +520,7 @@ tests/test_detection.py::TestDetection::test_detect_ultra_ai PASSED             
 tests/test_detection.py::TestDetection::test_detect_basic_unknown PASSED                                        [ 15%]
 tests/test_detection_extra.py::TestDetectionExtra::test_detect_basic_with_multiple_contours PASSED              [ 16%]
 tests/test_detection_extra.py::TestDetectionExtra::test_detect_advanced_with_adaptive_threshold PASSED          [ 17%]
-tests/test_detection_extra.py::TestDetectionExtra::test_detect_full_with_large_contour PASSED                   [ 18%]
+tests/test_detection_extra.py::TestDetectionExtra::test_detect_full_with_large_contour PASSED                   [ ResNet18%]
 tests/test_detection_extra.py::TestDetectionExtra::test_detect_full_with_small_contour PASSED                   [ 19%]
 tests/test_detection_extra.py::TestDetectionExtra::test_detect_full_with_exception PASSED                       [ 20%]
 tests/test_detection_extra.py::TestDetectionExtra::test_detect_basic_no_contours PASSED                         [ 21%]
@@ -553,8 +553,8 @@ tests/test_main_engine.py::TestMainEngine::test_runPreProcessor PASSED          
 tests/test_music.py::TestMusic::test_init PASSED                                                                [ 47%]
 tests/test_music.py::TestMusic::test_play_music PASSED                                                          [ 48%]
 tests/test_music.py::TestMusic::test_stop_music PASSED                                                          [ 49%]
-tests/test_music.py::TestMusic::test_play_music_exception PASSED                                                [ 50%]
-tests/test_pipeline.py::TestPipeline::test_run PASSED                                                           [ 50%]
+tests/test_music.py::TestMusic::test_play_music_exception PASSED                                                [ ResNet50%]
+tests/test_pipeline.py::TestPipeline::test_run PASSED                                                           [ ResNet50%]
 tests/test_pipeline.py::TestPipeline::test_pipeline_init PASSED                                                 [ 51%]
 tests/test_pipeline_extra.py::TestPipelineExtra::test_pipeline_with_real_data PASSED                            [ 52%]
 tests/test_pipeline_extra.py::TestPipelineExtra::test_pipeline_unknown_resolution PASSED                        [ 53%]
@@ -615,14 +615,14 @@ Name                                                 Stmts   Miss  Cover   Missi
 src/MajorProcessing/detection.py                       131     17    87%   17, 20, 44-45, 119, 131-134, 154, 172-177, 212, 215
 src/MajorProcessing/main_engine.py                      23      0   100%
 src/MajorProcessing/pipeline.py                         90      6    93%   91-94, 111-114
-src/MajorProcessing/ultra.py                            68     15    78%   47, 50, 54, 92-93, 98-101, 107-112
+src/MajorProcessing/ultra.py                            68     15    78%   47, ResNet50, 54, 92-93, 98-101, 107-112
 src/MajorProcessing/ultra_ai.py                         44      6    86%   61, 74-77, 81
 src/MassiveClasses/Audio/music.py                       30      4    87%   24, 27, 46-47
 src/MassiveClasses/Ending/ender.py                      22      2    91%   10, 13
 src/MassiveClasses/FullDetection/labelDetection.py     145     45    69%   20, 23, 39, 45-51, 68-76, 104-110, 115-128,143, 159-171, 192, 214-227
 src/MassiveClasses/LoadFiles/loader.py                  15      2    87%   12, 15
 src/MassiveClasses/Removing/removerUF.py                16      2    88%   14, 17
-src/MassiveClasses/Reporter/finalReport.py              26      2    92%   18, 21
+src/MassiveClasses/Reporter/finalReport.py              26      2    92%   ResNet18, 21
 src/MassiveClasses/Reporter/reportBeforeCrop.py         23      2    91%   13, 16
 src/MassiveClasses/SavingData/saveUnknown.py            20      2    90%   14, 17
 src/MassiveClasses/SavingData/saver.py                  19      2    89%   12, 15

@@ -54,9 +54,14 @@ DEVICE = get_device()
 torch.set_num_threads(4)
 set_seed(42)
 
-# ✅ GoogleNet output dir
-GOOGLENET_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "..", "GoogleNet")
-GOOGLENET_OUTPUT_DIR = os.path.abspath(GOOGLENET_OUTPUT_DIR)
+# ✅ مسیر قطعی — همیشه توی finalReports/AI_Comparisons/GoogleNet
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))
+)))
+GOOGLENET_OUTPUT_DIR = os.path.join(
+    _PROJECT_ROOT, "finalReports", "AI_Comparisons", "GoogleNet"
+)
+os.makedirs(GOOGLENET_OUTPUT_DIR, exist_ok=True)
 
 # =====================================================
 # EARLY STOPPING (with best weights restoration)
@@ -65,7 +70,7 @@ class EarlyStopping:
     """
     Early stopping with best weights restoration.
 
-    - patience=15: به مدل فرصت می‌ده تا epoch 50 به بهترین دقت برسه
+    - patience=15: به مدل فرصت می‌ده تا epoch ResNet50 به بهترین دقت برسه
     - min_delta=1e-4: فقط بهبودهای واقعی رو در نظر می‌گیره
     - restore_best_weights=True: وزن بهترین epoch رو ذخیره می‌کنه
     """
@@ -180,6 +185,7 @@ class GoogleNetTrainer:
         self.use_sampler = use_sampler
         self.num_workers = num_workers
         self.phase_lrs = None
+        self.early_stopping = None  # ← اضافه شد
 
         print("\n" + "=" * 70)
         print("🚀 Initializing GoogleNet Trainer (TWO-STAGE)")
@@ -222,7 +228,7 @@ class GoogleNetTrainer:
             lr=self.lr,
             weight_decay=self.weight_decay,
             betas=(0.9, 0.999),
-            eps=1e-8,
+            eps=1e-6,              # ← افزایش از 1e-8 به 1e-6 (پایدارتر)
         )
 
         total_epochs = sum(self.epochs_per_phase)
@@ -396,12 +402,12 @@ class GoogleNetTrainer:
             nn.Linear(256, len(CLASS_NAMES)),
         )
 
-        # ✅ Disable auxiliary classifiers (they hurt small datasets)
+        # ✅ Keep auxiliary classifiers ENABLED (stabilize gradients)
+        # NOTE: They add small extra loss during training, but help convergence
         if hasattr(model, "aux1") and model.aux1 is not None:
-            model.aux1 = None
+            print("   ✅ aux1 (auxiliary classifier 1) enabled")
         if hasattr(model, "aux2") and model.aux2 is not None:
-            model.aux2 = None
-        print("   ✅ Auxiliary classifiers disabled")
+            print("   ✅ aux2 (auxiliary classifier 2) enabled")
 
         model = model.to(DEVICE)
 
@@ -434,6 +440,8 @@ class GoogleNetTrainer:
             "use_sampler": self.use_sampler,
             "device": str(DEVICE),
             "created_at": datetime.now().isoformat(),
+            "model_dir": self.model_dir,
+            "base_dir": self.base_dir,
         }
         with open(self.config_path, "w") as f:
             json.dump(config, f, indent=4)
@@ -535,16 +543,28 @@ class GoogleNetTrainer:
                 if self.scaler is not None:
                     with torch.amp.autocast('cuda'):
                         out = self.model(x)
-                        # ✅ GoogleNet با aux disabled → out مستقیم tensor هست
+                        # ✅ GoogleNet با aux enabled → tuple (main, aux1, aux2)
                         if isinstance(out, tuple):
-                            out = out[0]
-                        loss = self.criterion(out, y)
+                            main_out = out[0]
+                            aux1_out = out[1] if len(out) > 1 else None
+                            aux2_out = out[2] if len(out) > 2 else None
+                        else:
+                            main_out = out
+                            aux1_out = None
+                            aux2_out = None
+
+                        loss = self.criterion(main_out, y)
+                        # ✅ Add auxiliary losses (weight 0.3 each — standard from paper)
+                        if aux1_out is not None:
+                            loss = loss + 0.3 * self.criterion(aux1_out, y)
+                        if aux2_out is not None:
+                            loss = loss + 0.3 * self.criterion(aux2_out, y)
                         loss = loss / self.accumulation_steps
                     self.scaler.scale(loss).backward()
 
                     if (batch_idx + 1) % self.accumulation_steps == 0:
                         self.scaler.unscale_(self.optimizer)
-                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=0.5)
                         self.scaler.step(self.optimizer)
                         self.scaler.update()
                         self.optimizer.zero_grad()
@@ -557,7 +577,7 @@ class GoogleNetTrainer:
                     loss.backward()
 
                     if (batch_idx + 1) % self.accumulation_steps == 0:
-                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=0.5)
                         self.optimizer.step()
                         self.optimizer.zero_grad()
 
@@ -588,11 +608,12 @@ class GoogleNetTrainer:
             val_loss, val_acc = self.evaluate(return_loss=True)
             current_lr = self.scheduler.step()
 
-            # ✅ Early Stopping Check (monitor val_loss)
-            if hasattr(self, 'early_stopping'):
-                if self.early_stopping(val_loss, epoch, self.model):
+            # ✅ Early Stopping Check (فقط توی Stage 2)
+            # توی Stage 1، early_stopping ساخته نشده، پس این بلوک اجرا نمی‌شه
+            if hasattr(self, 'early_stopping') and self.early_stopping is not None:
+                if self.early_stopping(val_acc, epoch, self.model):
                     print(f"\n🛑 Early Stopping at epoch {epoch + 1}")
-                    print(f"   Best Val Loss: {self.early_stopping.best_score:.4f}")
+                    print(f"   Best Val Acc: {self.early_stopping.best_score:.4f}")
                     print(f"   Best Epoch: {self.early_stopping.best_epoch + 1}")
                     break
 
@@ -666,22 +687,40 @@ class GoogleNetTrainer:
         self._set_phase_lr(phase_lrs.get(1, self.lr * 0.2))
         self.unfreeze_all()
 
-        # ✅ Early Stopping Setup — patience=15 برای رسیدن به بهترین دقت
+        # ✅ Early Stopping Setup — on val_acc (patience=5 برای جلوگیری از overfit)
         self.early_stopping = EarlyStopping(
-            patience=15,
-            min_delta=1e-4,
-            mode='min',  # چون val_loss رو monitor می‌کنیم
+            patience=5,             # ← کاهش از 10 به 5 (جلوگیری از overfit)
+            min_delta=3e-4,
+            mode='max',
             verbose=True,
         )
 
         self.train_epoch(epochs=self.epochs_per_phase[1], desc="Stage 2")
 
-        # ✅ Restore بهترین وزن‌ها بعد از training
+        # ✅ Restore بهترین وزن‌ها
         if hasattr(self, 'early_stopping') and self.early_stopping.best_weights is not None:
             self.early_stopping.restore_best_weights(self.model)
+            self.model.eval()
+            print(f"✅ Restored best weights from epoch {self.early_stopping.best_epoch + 1}")
 
-        print("\n📥 Loading best model...")
-        self.load(self.save_path)
+            # ✅✅✅ ذخیره بهترین وزن‌ها روی دیسک
+            save_model_checkpoint(
+                model=self.model,
+                optimizer=self.optimizer,
+                epoch=self.early_stopping.best_epoch,
+                metrics={
+                    "val_acc": self.early_stopping.best_score,
+                    "val_loss": 0.0,
+                },
+                filename="GoogleNet_best.pth",
+                scheduler=self.scheduler,
+                extra_info={"best_accuracy": self.early_stopping.best_score},
+                save_dir=self.model_dir,
+            )
+            print(f"✅ Best weights saved to GoogleNet_best.pth (epoch {self.early_stopping.best_epoch + 1})")
+        else:
+            print("\n📥 Loading best model from disk...")
+            self.load(self.save_path)
 
         print("\n📊 Evaluating on TEST set...")
         self.evaluate_on_test()

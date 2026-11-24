@@ -15,6 +15,7 @@ Author: Babak Yousefian
 Version: 1.1.0
 """
 
+import os
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -76,8 +77,8 @@ except ImportError as e:
 # ✅ NEW — KD Ensemble new Models (DenseNet → AlexNet/MobileNetV2/VGG16)
 try:
     from src.pipeLine.KnowledgeDistillationEnsembleAlgorithms.newModels import (
-        run_new_models_pipeline,
-    )
+        run_new_models_pipeline, regenerate_pdf_for_student,
+)
     HAS_KD_NEW = True
 except ImportError as e:
     HAS_KD_NEW = False
@@ -93,6 +94,109 @@ except ImportError as e:
     run_check_requirements = None
     print(f"⚠️ checkReqPac not available: {e}")
 
+# ✅ NEW — Swin Transformer Report Regeneration
+try:
+    from src.pipeLine.ConfigurationAlgorithms.resNetEfficientNetModels import (
+        generate_report_swin_transformer,
+    )
+    HAS_SWIN_REPORT = True
+except ImportError as e:
+    HAS_SWIN_REPORT = False
+    generate_report_swin_transformer = None
+    print(f"⚠️ Swin report regeneration not available: {e}")
+
+# ✅ NEW — ViT Report Regeneration
+try:
+    from src.pipeLine.ConfigurationAlgorithms.resNetEfficientNetModels import (
+        generate_report_visio_transformer,
+    )
+    HAS_VIT_REPORT = True
+except ImportError as e:
+    HAS_VIT_REPORT = False
+    generate_report_visio_transformer = None
+    print(f"⚠️ ViT report regeneration not available: {e}")
+
+# ✅ NEW — Select Best Models (Pretrained vs Scratch)
+try:
+    from src.pipeLine.ConfigurationAlgorithms.SelectBestModels import select_best_models
+    HAS_SELECT_BEST = True
+except ImportError as e:
+    HAS_SELECT_BEST = False
+    select_best_models = None
+    print(f"⚠️ Select Best Models not available: {e}")
+
+# ✅ NEW — Final KDE Algorithms (Best Model Selector)
+try:
+    from src.pipeLine.KnowledgeDistillationEnsembleAlgorithms.finalKDEalgorithms import (
+        run_menu_loop as run_final_kde_menu,
+    )
+    HAS_FINAL_KDE = True
+except ImportError as e:
+    HAS_FINAL_KDE = False
+    run_final_kde_menu = None
+    print(f"⚠️ Final KDE algorithms not available: {e}")
+
+# ✅ NEW — ConvNeXt Boosted Ensemble
+try:
+    from src.AI.ConvNext.convnext_boosted import run_convnext_boosted
+    HAS_CONVNEXT_BOOSTED = True
+except ImportError as e:
+    HAS_CONVNEXT_BOOSTED = False
+    run_convnext_boosted = None
+    print(f"⚠️ ConvNeXt Boosted Ensemble not available: {e}")
+# ✅ NEW — ConvNeXt Boundary Refinement (G1/G2 targeted)
+try:
+    from src.AI.ConvNext.convnext_boundary_refine import (
+        run_convnext_boosted as run_convnext_boundary_refine,
+    )
+    HAS_CONVNEXT_BOUNDARY = True
+except ImportError as e:
+    HAS_CONVNEXT_BOUNDARY = False
+    run_convnext_boundary_refine = None
+    print(f"⚠️ ConvNeXt Boundary Refinement not available: {e}")
+
+# ✅ NEW — ConvNeXt Balanced Fine-Tune (replaces boundary refine)
+try:
+    from src.AI.ConvNext.convnext_balanced_finetune import (
+        run_convnext_boosted as run_convnext_balanced_finetune,
+    )
+    HAS_CONVNEXT_BOUNDARY = True
+except ImportError as e:
+    HAS_CONVNEXT_BOUNDARY = False
+    run_convnext_balanced_finetune = None
+    print(f"⚠️ ConvNeXt Balanced Fine-Tune not available: {e}")
+
+# ✅ NEW — ConvNeXt Corrector G1
+try:
+    from src.AI.ConvNext.convnext_corrector_g1 import (
+        run_convnext_boosted as run_convnext_corrector_g1,
+    )
+    HAS_CONVNEXT_CORRECTOR_G1 = True
+except ImportError as e:
+    HAS_CONVNEXT_CORRECTOR_G1 = False
+    run_convnext_corrector_g1 = None
+    print(f"⚠️ ConvNeXt Corrector G1 not available: {e}")
+
+try:
+    from src.AI.ConvNext.convnext_g1_vs_nl_specialist import (
+        run_convnext_boosted as run_convnext_g1_specialist,
+    )
+    HAS_G1_SPECIALIST = True
+except ImportError as e:
+    HAS_G1_SPECIALIST = False
+    print(f"⚠️ G1 Specialist not available: {e}")
+
+# ✅ NEW — ConvNeXt Targeted Fine-Tune (G1/G2)
+try:
+    from src.AI.ConvNext.convnext_targeted_finetune import (
+        run_convnext_boosted as run_convnext_targeted_finetune,
+    )
+    HAS_TARGETED_FT = True
+except ImportError as e:
+    HAS_TARGETED_FT = False
+    run_convnext_targeted_finetune = None
+    print(f"⚠️ ConvNeXt Targeted Fine-Tune not available: {e}")
+
 
 # ================================================================
 # ✅ ASCII Art / Logo
@@ -107,10 +211,63 @@ LOGO = r"""
     ╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝
 """
 
+DEVELOPER = r"""
+ ██████╗ ███████╗██╗   ██╗███████╗██╗      ██████╗ ██████╗ ███████╗██████╗
+ ██╔══██╗██╔════╝██║   ██║██╔════╝██║     ██╔═══██╗██╔══██╗██╔════╝██╔══██╗
+ ██║  ██║█████╗  ██║   ██║█████╗  ██║     ██║   ██║██████╔╝█████╗  ██║  ██║
+ ██║  ██║██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║     ██║   ██║██╔═══╝ ██╔══╝  ██║  ██║
+ ██████╔╝███████╗ ╚████╔╝ ███████╗███████╗╚██████╔╝██║     ███████╗██████╔╝
+ ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝╚══════╝ ╚═════╝ ╚═╝     ╚══════╝╚═════╝
+
+                ██████╗  █████╗ ██████╗  █████╗ ██╗  ██╗
+                ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝
+                ██████╔╝███████║██████╔╝███████║█████╔╝
+                ██╔══██╗██╔══██║██╔══██╗██╔══██║██╔═██╗
+                ██████╔╝██║  ██║██████╔╝██║  ██║██║  ██╗
+                ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+"""
 
 # ================================================================
 # ✅ Header
 # ================================================================
+
+import shutil
+import time
+
+def printLogo():
+    if HAS_RICH:
+        console.clear()
+        console.print()
+
+        terminal_width = shutil.get_terminal_size().columns
+
+        logo_lines = LOGO.strip("\n").splitlines()
+        developer_lines = DEVELOPER.strip("\n").splitlines()
+
+        # Calculate total design width
+        design_width = max(
+            max(len(line) for line in logo_lines),
+            max(len(line) for line in developer_lines)
+        )
+
+        # Center the complete design
+        for line in logo_lines:
+            console.print(line.center(terminal_width))
+
+        for line in developer_lines:
+            console.print(line.center(terminal_width))
+
+        # Center footer relative to the complete design
+        footer = "developed by Babak"
+        console.print(
+            footer.center(terminal_width),
+            style="bold green"
+        )
+
+        time.sleep(9)
+
+    else:
+        pass
 
 def print_header():
     """Print the main header with Rich."""
@@ -183,11 +340,48 @@ def print_menu():
         table.add_row("1", "📦 Check Requirements Package", "Verify all packages are installed")
         table.add_row("2", "🧠 Run SSL Algorithms", "Self-Supervised Learning pipeline")
         table.add_row("3", "🎯 KD Ensemble", "Knowledge Distillation → single .pth")
-        # ✅ NEW
         table.add_row(
             "4",
             "🎯 KD Ensemble new Models",
             "DenseNet → AlexNet / MobileNetV2 / VGG16 (3 seeds)",
+        )
+        table.add_row(
+            "5",
+            "📄 Regenerate ConvNeXt Reports",
+            "Rebuild PDF + plots + JSON from existing .pth (no retraining)",
+        )
+        table.add_row(
+            "6",
+            "📄 Regenerate DenseNet Reports",
+            "Rebuild PDF + plots + JSON from existing .pth (no retraining)",
+        )
+        table.add_row(
+            "7",
+            "📄 Regenerate Swin Transformer Reports",
+            "Rebuild PDF + plots + JSON + CSV from existing history/config (no retraining)",
+        )
+        table.add_row(
+            "8",
+            "📄 Regenerate VGG16 Reports",
+            "Rebuild PDF + plots + JSON + CSV from existing history/config (no retraining)",
+        )
+        # ✅ NEW: Option 9
+        table.add_row(
+            "9",
+            "📄 Regenerate Vision Transformer Reports",
+            "Rebuild PDF + plots + JSON + CSV from existing history/config (no retraining)",
+        )
+        # ✅ NEW: Option 10
+        table.add_row(
+            "10",
+            "🏆 Select Best Models (Pretrained vs Scratch)",
+            "Compare 7 pairs → copy winners to bestModels/<Model>/<name>BEST.pth",
+        )
+        # ✅ NEW: Option 11
+        table.add_row(
+            "11",
+            "🧠 Final KDE Algorithms",
+            "Best-Model Selector for Knowledge Distillation Ensemble (Typer + Rich)",
         )
 
         console.print(table)
@@ -199,7 +393,14 @@ def print_menu():
         print("  1) 📦 Check Requirements Package")
         print("  2) 🧠 Run SSL Algorithms")
         print("  3) 🎯 KD Ensemble")
-        print("  4) 🎯 KD Ensemble new Models")  # ✅ NEW
+        print("  4) 🎯 KD Ensemble new Models")
+        print("  5) 📄 Regenerate ConvNeXt Reports")
+        print("  6) 📄 Regenerate DenseNet Reports")
+        print("  7) 📄 Regenerate Swin Transformer Reports")
+        print("  8) 📄 Regenerate VGG16 Reports")
+        print("  9) 📄 Regenerate Vision Transformer Reports")
+        print(" 10) 🏆 Select Best Models (Pretrained vs Scratch)")
+        print(" 11) 🧠 Final KDE Algorithms")
         print("=" * 80)
 
 
@@ -326,7 +527,7 @@ def handle_kd_ensemble():
         config_table.add_column("Value", style="bold white")
 
         config_table.add_row("KD Epochs", "100")
-        config_table.add_row("Polish Epochs", "50")
+        config_table.add_row("Polish Epochs", "ResNet50")
         config_table.add_row("Batch Size", "16")
         config_table.add_row("Backbone LR", "1e-5")
         config_table.add_row("Head LR", "1e-3")
@@ -510,12 +711,942 @@ def get_choice():
     if HAS_RICH:
         return Prompt.ask(
             "\n[bold cyan]👉 Enter your choice[/bold cyan]",
-            choices=["0", "1", "2", "3", "4"],  # ✅ "4" اضافه شد
+            choices=["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
             default="0",
         )
     else:
-        return input("\n👉 Enter your choice (0-4): ").strip()  # ✅ (0-4)
+        return input("\n👉 Enter your choice (0-11): ").strip()
 
+def handle_regenerate_convnext_reports():
+    """Handle ConvNeXt report regeneration (no retraining)."""
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]📄 Regenerate ConvNeXt Reports[/bold cyan]\n"
+            "[dim]Reads .pth + history + config → rebuilds PDF + plots + JSON[/dim]\n"
+            "[dim]Output: finalReports/AI_Comparisons/ConvNext/reports/[/dim]\n"
+            "[dim]No retraining. ~2-3 minutes.[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Regenerate ConvNeXt reports?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Regenerate ConvNeXt reports? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        from src.AI.ConvNext.convNext import regenerate_convnext_reports
+        result = regenerate_convnext_reports()
+
+        if result:
+            if HAS_RICH:
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ ConvNeXt Reports Regenerated![/bold green]\n"
+                    f"[cyan]📄 PDF:[/cyan] {result}\n"
+                    f"[cyan]📁 Reports dir:[/cyan] "
+                    f"{os.path.dirname(result)}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Report regeneration failed.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_regenerate_densnet_reports():
+    """Handle DenseNet report regeneration (no retraining)."""
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]📄 Regenerate DenseNet Reports[/bold cyan]\n"
+            "[dim]Reads .pth + history + config → rebuilds PDF + plots + JSON[/dim]\n"
+            "[dim]Output: finalReports/AI_Comparisons/DensNet/reports/[/dim]\n"
+            "[dim]No retraining. ~2-3 minutes.[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Regenerate DenseNet reports?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Regenerate DenseNet reports? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        # ✅ استفاده از تابع generate_report_densnet از resNetEfficientNetModels
+        from src.pipeLine.ConfigurationAlgorithms.resNetEfficientNetModels import generate_report_densnet
+        result = generate_report_densnet()
+
+        if result:
+            if HAS_RICH:
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ DenseNet Reports Regenerated![/bold green]\n"
+                    f"[cyan]📄 PDF:[/cyan] {result}\n"
+                    f"[cyan]📁 Reports dir:[/cyan] "
+                    f"{os.path.dirname(result)}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Report regeneration failed.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_regenerate_swin_reports():
+    """Handle Swin Transformer report regeneration (no retraining)."""
+    if not HAS_SWIN_REPORT:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ Swin report regeneration not available![/bold red]\n"
+                "[yellow]Make sure "
+                "src/pipeLine/ConfigurationAlgorithms/resNetEfficientNetModels.py "
+                "exists and has generate_report_swin_transformer().[/yellow]",
+                border_style="red",
+            ))
+        else:
+            print("❌ Swin report regeneration not available")
+        return
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]📄 Regenerate Swin Transformer Reports[/bold cyan]\n"
+            "[dim]Reads history + config + meta → rebuilds PDF + plots + JSON + CSV[/dim]\n"
+            "[dim]Input:  finalReports/AI_Comparisons/Swin_Transformer/Swin_Transformer/[/dim]\n"
+            "[dim]Output: finalReports/AI_Comparisons/Swin_Transformer/reports/[/dim]\n"
+            "[dim]No retraining. ~2-3 minutes.[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Regenerate Swin Transformer reports?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Regenerate Swin Transformer reports? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        result = generate_report_swin_transformer()
+
+        if result:
+            if HAS_RICH:
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ Swin Transformer Reports Regenerated![/bold green]\n"
+                    f"[cyan]📄 PDF:[/cyan] {result}\n"
+                    f"[cyan]📁 Reports dir:[/cyan] "
+                    f"{os.path.dirname(result)}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Report regeneration failed.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_regenerate_vgg16_reports():
+    """Handle VGG16 report regeneration (no retraining)."""
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]📄 Regenerate VGG16 Reports[/bold cyan]\n"
+            "[dim]Reads history + config + meta → rebuilds PDF + plots + JSON + CSV[/dim]\n"
+            "[dim]Input:  finalReports/AI_Comparisons/VGG16/vgg16/[/dim]\n"
+            "[dim]Output: finalReports/AI_Comparisons/VGG16/reports/[/dim]\n"
+            "[dim]No retraining. ~2-3 minutes.[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Regenerate VGG16 reports?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Regenerate VGG16 reports? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        from src.pipeLine.ConfigurationAlgorithms.resNetEfficientNetModels import (
+            generate_report_vgg16,
+        )
+        result = generate_report_vgg16()
+
+        if result:
+            if HAS_RICH:
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ VGG16 Reports Regenerated![/bold green]\n"
+                    f"[cyan]📄 PDF:[/cyan] {result}\n"
+                    f"[cyan]📁 Reports dir:[/cyan] "
+                    f"{os.path.dirname(result)}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Report regeneration failed.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_regenerate_vit_reports():
+    """Handle Vision Transformer report regeneration (no retraining)."""
+    if not HAS_VIT_REPORT:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ ViT report regeneration not available![/bold red]\n"
+                "[yellow]Make sure "
+                "src/pipeLine/ConfigurationAlgorithms/resNetEfficientNetModels.py "
+                "exists and has generate_report_visio_transformer().[/yellow]",
+                border_style="red",
+            ))
+        else:
+            print("❌ ViT report regeneration not available")
+        return
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]📄 Regenerate Vision Transformer Reports[/bold cyan]\n"
+            "[dim]Reads history + config + meta → rebuilds PDF + plots + JSON + CSV[/dim]\n"
+            "[dim]Input:  finalReports/AI_Comparisons/visioTransformer/visioTransformer/[/dim]\n"
+            "[dim]Output: finalReports/AI_Comparisons/visioTransformer/reports/[/dim]\n"
+            "[dim]No retraining. ~2-3 minutes.[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Regenerate Vision Transformer reports?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Regenerate Vision Transformer reports? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        result = generate_report_visio_transformer()
+
+        if result:
+            if HAS_RICH:
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ Vision Transformer Reports Regenerated![/bold green]\n"
+                    f"[cyan]📄 PDF:[/cyan] {result}\n"
+                    f"[cyan]📁 Reports dir:[/cyan] "
+                    f"{os.path.dirname(result)}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Report regeneration failed.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_select_best_models():
+    """Handle selecting best models between pretrained and scratch."""
+    if not HAS_SELECT_BEST:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ Select Best Models module not available![/bold red]\n"
+                "[yellow]Make sure "
+                "src/pipeLine/SelectBestModels.py exists and has select_best_models().[/yellow]",
+                border_style="red",
+            ))
+        else:
+            print("❌ Select Best Models not available")
+        return
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]🏆 Select Best Models (Pretrained vs Scratch)[/bold cyan]\n"
+            "[dim]Compares 7 architectures:</dim]\n"
+            "[dim]  ConvNext · DenseNet · VGG16 · VisionTransformer[/dim]\n"
+            "[dim]  AlexNet · CNNLSTM · MobileNetV2[/dim]\n\n"
+            "[dim]Winner → bestModels/<Model>/<name>BEST.pth[/dim]\n"
+            "[dim]Output: finalReports/bestModels/[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Run best-model selection?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Run best-model selection? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        result = select_best_models()
+
+        if result and result.get("pairs"):
+            n_ok = sum(
+                1 for info in result["pairs"].values()
+                if info.get("status") == "copied"
+            )
+            n_total = len(result["pairs"])
+            if HAS_RICH:
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ Best-Model Selection Complete![/bold green]\n"
+                    f"[cyan]📊 Copied:[/cyan] {n_ok}/{n_total} models\n"
+                    f"[cyan]📁 Output:[/cyan] {result['best_models_dir']}\n"
+                    f"[cyan]📄 Summary:[/cyan] summary.json + summary.txt",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Selection returned no results.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_final_kde():
+    """Handle Final KDE Algorithms (best-model selector)."""
+    if not HAS_FINAL_KDE:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ Final KDE module not available![/bold red]\n"
+                "[yellow]Make sure "
+                "src/pipeLine/KnowledgeDistillationEnsembleAlgorithms/finalKDEalgorithms.py "
+                "exists and exports run_menu_loop().[/yellow]",
+                border_style="red",
+            ))
+        else:
+            print("❌ Final KDE module not available")
+        return
+
+    try:
+        run_final_kde_menu()
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_convnext_boosted():
+    """Handle ConvNeXt Boosted Ensemble (AdaBoost.SAMME)."""
+    if not HAS_CONVNEXT_BOOSTED:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ ConvNeXt Boosted Ensemble not available![/bold red]\n"
+                "[yellow]Make sure src/AI/ConvNext/convnext_boosted.py exists.[/yellow]",
+                border_style="red",
+            ))
+        else:
+            print("❌ ConvNeXt Boosted Ensemble not available")
+        return
+
+    convnext_ckpt = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNext\convnextBEST.pth"
+    )
+    output_dir = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNextBoosted"
+    )
+
+    if not os.path.exists(convnext_ckpt):
+        if HAS_RICH:
+            console.print(Panel.fit(
+                f"[bold red]❌ ConvNeXt checkpoint not found:[/bold red]\n"
+                f"[yellow]{convnext_ckpt}[/yellow]\n\n"
+                f"[dim]Run option 10 (Select Best Models) first.[/dim]",
+                border_style="red",
+            ))
+        else:
+            print(f"❌ Checkpoint not found: {convnext_ckpt}")
+        return
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]🚀 ConvNeXt Boosted Ensemble[/bold cyan]\n\n"
+            f"[cyan]ConvNeXt checkpoint:[/cyan]\n"
+            f"[dim]{convnext_ckpt}[/dim]\n\n"
+            f"[cyan]Output dir:[/cyan]\n"
+            f"[dim]{output_dir}[/dim]\n\n"
+            f"[dim]Pipeline:[/dim]\n"
+            f"[dim]  1. Extract deep features (768-dim) from ConvNeXt[/dim]\n"
+            f"[dim]  2. Train AdaBoost.SAMME (300 trees, depth=10)[/dim]\n"
+            f"[dim]  3. Tune class-specific thresholds for <3% error[/dim]\n"
+            f"[dim]  4. Evaluate on test set[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Run ConvNeXt Boosted Ensemble?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Run ConvNeXt Boosted Ensemble? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        result = run_convnext_boosted(
+            convnext_checkpoint=convnext_ckpt,
+            output_dir=output_dir,
+        )
+
+        if result:
+            if HAS_RICH:
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ Boosted Ensemble Complete![/bold green]\n\n"
+                    f"[cyan]Baseline Acc:[/cyan] {result.get('baseline_acc', 0):.4f}\n"
+                    f"[cyan]Boosted Acc:[/cyan]  "
+                    f"[bold green]{result.get('boosted_acc', 0):.4f}[/bold green]\n\n"
+                    f"[cyan]Per-class error rates:[/cyan]\n" +
+                    "\n".join([
+                        f"  {name}: {err*100:.2f}%"
+                        for name, err in zip(
+                            ["NL", "G1", "G2", "G3"],
+                            result.get("per_class_error", [0, 0, 0, 0]),
+                        )
+                    ]) +
+                    f"\n\n[cyan]Saved to:[/cyan] {output_dir}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Boosted Ensemble returned no results.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_convnext_boundary_refine():
+    """Handle ConvNeXt Boundary Refinement (G1/G2 targeted)."""
+    if not HAS_CONVNEXT_BOUNDARY:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ ConvNeXt Boundary Refinement not available![/bold red]\n"
+                "[yellow]Make sure src/AI/ConvNext/convnext_boundary_refine.py exists.[/yellow]",
+                border_style="red",
+            ))
+        else:
+            print("❌ ConvNeXt Boundary Refinement not available")
+        return
+
+    convnext_ckpt = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNext\convnextBEST.pth"
+    )
+    output_dir = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNextBoundaryRefined"
+    )
+
+    if not os.path.exists(convnext_ckpt):
+        if HAS_RICH:
+            console.print(Panel.fit(
+                f"[bold red]❌ ConvNeXt checkpoint not found:[/bold red]\n"
+                f"[yellow]{convnext_ckpt}[/yellow]\n\n"
+                f"[dim]Run option 10 (Select Best Models) first.[/dim]",
+                border_style="red",
+            ))
+        else:
+            print(f"❌ Checkpoint not found: {convnext_ckpt}")
+        return
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]🎯 ConvNeXt Boundary Refinement[/bold cyan]\n"
+            "[dim]Targeted G1/G2 error reduction — NL untouched[/dim]\n\n"
+            f"[cyan]ConvNeXt checkpoint:[/cyan]\n"
+            f"[dim]{convnext_ckpt}[/dim]\n\n"
+            f"[cyan]Output dir:[/cyan]\n"
+            f"[dim]{output_dir}[/dim]\n\n"
+            f"[dim]Pipeline:[/dim]\n"
+            f"[dim]  1. ConvNeXt (91.32%) = PRIMARY classifier[/dim]\n"
+            f"[dim]  2. NL protected (never touched if confident)[/dim]\n"
+            f"[dim]  3. Advisor 1: XGBoost G1 vs NL  → fixes G1→NL errors[/dim]\n"
+            f"[dim]  4. Advisor 2: XGBoost G1 vs G2  → fixes G1→G2 errors[/dim]\n"
+            f"[dim]  5. Advisor 3: kNN G2 detector   → fixes G2 errors[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Run ConvNeXt Boundary Refinement?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Run ConvNeXt Boundary Refinement? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        result = run_convnext_boundary_refine(
+            convnext_checkpoint=convnext_ckpt,
+            output_dir=output_dir,
+        )
+
+        if result:
+            if HAS_RICH:
+                baseline = result.get("convnext_acc", 0)
+                refined = result.get("refined_acc", 0)
+                delta = refined - baseline
+                delta_str = f"+{delta*100:.2f}%" if delta >= 0 else f"{delta*100:.2f}%"
+
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ Boundary Refinement Complete![/bold green]\n\n"
+                    f"[cyan]ConvNeXt baseline:[/cyan] {baseline:.4f}\n"
+                    f"[cyan]Refined:[/cyan]          "
+                    f"[bold green]{refined:.4f}[/bold green]  ({delta_str})\n\n"
+                    f"[cyan]Per-class error rates:[/cyan]\n" +
+                    "\n".join([
+                        f"  {name}: {err*100:.2f}%"
+                        for name, err in zip(
+                            ["NL", "G1", "G2", "G3"],
+                            result.get("per_class_error_refined", [0, 0, 0, 0]),
+                        )
+                    ]) +
+                    f"\n\n[cyan]Saved to:[/cyan] {output_dir}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+        else:
+            if HAS_RICH:
+                console.print(Panel.fit(
+                    "[bold red]❌ Boundary Refinement returned no results.[/bold red]\n"
+                    "[yellow]Check the log above for details.[/yellow]",
+                    border_style="red",
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        else:
+            print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def handle_convnext_boundary_refine():
+    """Handle ConvNeXt Balanced Fine-Tune."""
+    if not HAS_CONVNEXT_BOUNDARY:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ ConvNeXt Balanced Fine-Tune not available![/bold red]\n"
+                "[yellow]Make sure src/AI/ConvNext/convnext_balanced_finetune.py exists.[/yellow]",
+                border_style="red",
+            ))
+        return
+
+    convnext_ckpt = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNext\convnextBEST.pth"
+    )
+    output_dir = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNextBalanced"
+    )
+
+    if not os.path.exists(convnext_ckpt):
+        if HAS_RICH:
+            console.print(Panel.fit(
+                f"[bold red]❌ ConvNeXt checkpoint not found:[/bold red]\n"
+                f"[yellow]{convnext_ckpt}[/yellow]\n\n"
+                f"[dim]Run option 10 (Select Best Models) first.[/dim]",
+                border_style="red",
+            ))
+        return
+
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]🎯 ConvNeXt Balanced Fine-Tune[/bold cyan]\n"
+            "[dim]Class-Balanced Weighted Loss · PDF Report · GPU Accelerated[/dim]\n\n"
+            f"[cyan]Checkpoint:[/cyan]\n[dim]{convnext_ckpt}[/dim]\n\n"
+            f"[cyan]Output:[/cyan]\n[dim]{output_dir}[/dim]\n\n"
+            f"[cyan]Device:[/cyan] [bold yellow]{device.upper()}[/bold yellow]\n" +
+            (f"[dim]GPU: {torch.cuda.get_device_name(0)}[/dim]\n" if device == "cuda"
+             else "[bold red]⚠️ CUDA not available — CPU mode (very slow!)[/bold red]\n") +
+            f"\n[dim]Pipeline:[/dim]\n"
+            f"[dim]  1. Load ConvNeXt checkpoint (91.32%)[/dim]\n"
+            f"[dim]  2. Compute Class-Balanced weights (β=0.999)[/dim]\n"
+            f"[dim]  3. Fine-tune with Weighted CE + Mixup + CutMix[/dim]\n"
+            f"[dim]  4. Early stop on balanced accuracy[/dim]\n"
+            f"[dim]  5. Generate PDF report with all plots[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if device == "cpu":
+            console.print(
+                "\n[bold red]⚠️ CPU mode will take 1-2 HOURS. GPU strongly recommended.[/bold red]"
+            )
+            if not Confirm.ask("\n[bold yellow]Continue on CPU?[/bold yellow]", default=False):
+                return
+
+        if not Confirm.ask("\n[bold yellow]🚀 Run ConvNeXt Balanced Fine-Tune?[/bold yellow]", default=True):
+            return
+    else:
+        confirm = input("\n🚀 Run ConvNeXt Balanced Fine-Tune? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        result = run_convnext_balanced_finetune(
+            convnext_checkpoint=convnext_ckpt,
+            output_dir=output_dir,
+            device=device,
+        )
+
+        if result:
+            if HAS_RICH:
+                base_acc = result.get("baseline_acc", 0)
+                ft_acc = result.get("finetuned_acc", 0)
+                delta = ft_acc - base_acc
+                delta_str = f"+{delta*100:.2f}%" if delta >= 0 else f"{delta*100:.2f}%"
+
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ Balanced Fine-Tune Complete![/bold green]\n\n"
+                    f"[cyan]Baseline acc:[/cyan]   {base_acc:.4f}\n"
+                    f"[cyan]Fine-tuned acc:[/cyan] [bold green]{ft_acc:.4f}[/bold green]  ({delta_str})\n\n"
+                    f"[cyan]Per-class error rates (fine-tuned):[/cyan]\n" +
+                    "\n".join([
+                        f"  {name}: {err*100:.2f}%"
+                        for name, err in zip(
+                            ["NL", "G1", "G2", "G3"],
+                            result.get("per_class_error_finetuned", [0, 0, 0, 0]),
+                        )
+                    ]) +
+                    f"\n\n[cyan]📄 PDF:[/cyan] {output_dir}\\ConvNext_Balanced_Report.pdf\n"
+                    f"[cyan]📁 Output:[/cyan] {output_dir}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        import traceback
+        traceback.print_exc()
+
+def handle_convnext_corrector_g1():
+    """Handle ConvNeXt Corrector G1."""
+    if not HAS_CONVNEXT_CORRECTOR_G1:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ ConvNeXt Corrector G1 not available![/bold red]\n"
+                "[yellow]Make sure src/AI/ConvNext/convnext_corrector_g1.py exists.[/yellow]",
+                border_style="red",
+            ))
+        return
+
+    convnext_ckpt = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNext\convnextBEST.pth"
+    )
+    output_dir = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNextCorrectorG1"
+    )
+
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]🎯 ConvNeXt Corrector G1[/bold cyan]\n"
+            "[dim]Zero impact on NL/G2/G3 — only fixes G1[/dim]\n\n"
+            f"[cyan]Checkpoint:[/cyan]\n[dim]{convnext_ckpt}[/dim]\n\n"
+            f"[cyan]Output:[/cyan]\n[dim]{output_dir}[/dim]\n\n"
+            f"[cyan]Device:[/cyan] [bold yellow]{device.upper()}[/bold yellow]\n\n"
+            f"[dim]Pipeline:[/dim]\n"
+            f"[dim]  1. Load ConvNeXt baseline (FROZEN)[/dim]\n"
+            f"[dim]  2. Extract 768-d features + probs[/dim]\n"
+            f"[dim]  3. Train binary classifier: G1 vs {{NL, G2}} (G3 EXCLUDED)[/dim]\n"
+            f"[dim]  4. Apply with 3 safety rules (NL/G2 protected)[/dim]\n"
+            f"[dim]  5. Rollback if NL worsens[/dim]\n"
+            f"[dim]  6. Save as convnext_corrector_g1.pkl[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Run ConvNeXt Corrector G1?[/bold yellow]",
+            default=True,
+        ):
+            return
+    else:
+        confirm = input("\n🚀 Run ConvNeXt Corrector G1? (y/n): ")
+        if confirm.lower() != "y":
+            return
+
+    try:
+        result = run_convnext_corrector_g1(
+            convnext_checkpoint=convnext_ckpt,
+            output_dir=output_dir,
+            device=device,
+        )
+
+        if result:
+            if HAS_RICH:
+                base_acc = result.get("baseline_acc", 0)
+                corr_acc = result.get("corrected_acc", 0)
+                delta = corr_acc - base_acc
+                delta_str = f"+{delta*100:.2f}%" if delta >= 0 else f"{delta*100:.2f}%"
+
+                console.print()
+                console.print(Panel.fit(
+                    f"[bold green]✅ Corrector G1 Complete![/bold green]\n\n"
+                    f"[cyan]Baseline acc:[/cyan]   {base_acc:.4f}\n"
+                    f"[cyan]Corrected acc:[/cyan] [bold green]{corr_acc:.4f}[/bold green] "
+                    f"({delta_str})\n\n"
+                    f"[cyan]Per-class error rates (corrected):[/cyan]\n" +
+                    "\n".join([
+                        f"  {name}: {err*100:.2f}%"
+                        for name, err in zip(
+                            ["NL", "G1", "G2", "G3"],
+                            result.get("per_class_error_corrected", [0, 0, 0, 0]),
+                        )
+                    ]) +
+                    f"\n\n[cyan]Stats:[/cyan] {result.get('corrector_stats', {})}\n"
+                    f"[cyan]Rollback:[/cyan] {result.get('rollback_triggered', False)}\n\n"
+                    f"[cyan]📁 Output:[/cyan] {output_dir}",
+                    border_style="green",
+                    padding=(1, 4),
+                ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        import traceback
+        traceback.print_exc()
+
+def handle_g1_specialist():
+    convnext_ckpt = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNext\convnextBEST.pth"
+    )
+    output_dir = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNextG1Specialist"
+    )
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    if HAS_RICH:
+        console.print(Panel.fit(
+            "[bold cyan]🎯 ConvNeXt G1 vs NL Specialist[/bold cyan]\n"
+            "[dim]Train SEPARATE ConvNeXt ONLY on NL vs G1[/dim]\n\n"
+            f"[cyan]Baseline:[/cyan]\n[dim]{convnext_ckpt}[/dim]\n\n"
+            f"[cyan]Output:[/cyan]\n[dim]{output_dir}[/dim]\n\n"
+            f"[cyan]Device:[/cyan] [bold yellow]{device.upper()}[/bold yellow]",
+            border_style="cyan",
+        ))
+        if not Confirm.ask("\n[bold yellow]🚀 Run?[/bold yellow]", default=True):
+            return
+
+    try:
+        result = run_convnext_g1_specialist(
+            convnext_checkpoint=convnext_ckpt,
+            output_dir=output_dir,
+            device=device,
+        )
+        if HAS_RICH and result:
+            console.print(Panel.fit(
+                f"[bold green]✅ Specialist Complete![/bold green]\n\n"
+                f"[cyan]Baseline:[/cyan]   {result['baseline_acc']:.4f}\n"
+                f"[cyan]Final:[/cyan]     {result['final_acc']:.4f}\n"
+                f"[cyan]Specialist val_acc:[/cyan] {result['specialist_val_acc']:.4f}",
+                border_style="green",
+            ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"[red]❌ Error: {e}[/red]")
+        import traceback
+        traceback.print_exc()
+
+def handle_convnext_targeted_finetune():
+    """Handle ConvNeXt Targeted Fine-Tune (G1/G2 only)."""
+    if not HAS_TARGETED_FT:
+        if HAS_RICH:
+            console.print(Panel.fit(
+                "[bold red]❌ ConvNeXt Targeted Fine-Tune not available![/bold red]\n"
+                "[yellow]Make sure src/AI/ConvNext/convnext_targeted_finetune.py exists.[/yellow]",
+                border_style="red",
+            ))
+        return
+
+    convnext_ckpt = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNext\convnextBEST.pth"
+    )
+    output_dir = (
+        r"C:\Users\liana\Documents\pythonProjects\FinalTasks"
+        r"\finalReports\bestModels\ConvNextTargeted"
+    )
+
+    if not os.path.exists(convnext_ckpt):
+        if HAS_RICH:
+            console.print(f"[bold red]❌ Checkpoint not found: {convnext_ckpt}[/bold red]")
+        return
+
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    if HAS_RICH:
+        console.print()
+        console.print(Panel.fit(
+            "[bold cyan]🎯 ConvNeXt Targeted Fine-Tune[/bold cyan]\n"
+            "[dim]G1/G2 only — head fine-tune, backbone frozen[/dim]\n\n"
+            f"[cyan]Baseline:[/cyan]\n[dim]{convnext_ckpt}[/dim]\n\n"
+            f"[cyan]Output:[/cyan]\n[dim]{output_dir}[/dim]\n\n"
+            f"[cyan]Device:[/cyan] [bold yellow]{device.upper()}[/bold yellow]\n\n"
+            f"[dim]Pipeline:[/dim]\n"
+            f"[dim]  1. Load ConvNeXt baseline (FROZEN)[/dim]\n"
+            f"[dim]  2. Weights: NL=1.0, G1=2.5, G2=1.5, G3=1.0[/dim]\n"
+            f"[dim]  3. Fine-tune HEAD only (no Mixup/CutMix)[/dim]\n"
+            f"[dim]  4. Early stop on balanced_acc - 0.5*max_err[/dim]\n"
+            f"[dim]  5. Save as convnext_targeted.pth[/dim]",
+            border_style="cyan",
+            padding=(1, 4),
+        ))
+
+        if not Confirm.ask(
+            "\n[bold yellow]🚀 Run ConvNeXt Targeted Fine-Tune?[/bold yellow]",
+            default=True,
+        ):
+            return
+
+    try:
+        result = run_convnext_targeted_finetune(
+            baseline_ckpt=convnext_ckpt,
+            output_dir=output_dir,
+            device=device,
+        )
+
+        if result and HAS_RICH:
+            base_acc = result["baseline_acc"]
+            ft_acc = result["finetuned_acc"]
+            delta = ft_acc - base_acc
+            delta_str = f"+{delta*100:.2f}%" if delta >= 0 else f"{delta*100:.2f}%"
+
+            console.print()
+            console.print(Panel.fit(
+                f"[bold green]✅ Targeted Fine-Tune Complete![/bold green]\n\n"
+                f"[cyan]Baseline:[/cyan]   {base_acc:.4f}\n"
+                f"[cyan]Fine-tuned:[/cyan] [bold green]{ft_acc:.4f}[/bold green]  ({delta_str})\n\n"
+                f"[cyan]Per-class error (fine-tuned):[/cyan]\n" +
+                "\n".join([
+                    f"  {name}: {err*100:.2f}%"
+                    for name, err in zip(
+                        ["NL", "G1", "G2", "G3"],
+                        result["per_class_error_finetuned"],
+                    )
+                ]) +
+                f"\n\n[cyan]📁 Output:[/cyan] {output_dir}",
+                border_style="green",
+                padding=(1, 4),
+            ))
+    except Exception as e:
+        if HAS_RICH:
+            console.print(f"\n[red]❌ Error: {e}[/red]")
+        import traceback
+        traceback.print_exc()
 
 # ================================================================
 # ✅ Main Loop
@@ -524,6 +1655,7 @@ def get_choice():
 def main():
     """Main entry point."""
     while True:
+        printLogo()
         print_header()
         print_menu()
 
@@ -535,23 +1667,31 @@ def main():
         if choice == "0":
             handle_exit()
             break
-
         elif choice == "1":
             handle_check_requirements()
-
         elif choice == "2":
             handle_run_ssl()
-
         elif choice == "3":
             handle_kd_ensemble()
-
         elif choice == "4":
-            handle_kd_new_models()  # ✅ NEW
-
+            handle_kd_new_models()
+        elif choice == "5":
+            handle_regenerate_convnext_reports()
+        elif choice == "6":
+            handle_regenerate_densnet_reports()
+        elif choice == "7":
+            handle_regenerate_swin_reports()
+        elif choice == "8":
+            handle_regenerate_vgg16_reports()
+        elif choice == "9":
+            handle_regenerate_vit_reports()
+        elif choice == "10":
+            handle_select_best_models()
+        elif choice == "11":
+            handle_final_kde()
         else:
             if HAS_RICH:
                 console.print(f"[red]❌ Invalid choice: {choice}[/red]")
-
             else:
                 print(f"❌ Invalid choice: {choice}")
 

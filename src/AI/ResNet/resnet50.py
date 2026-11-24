@@ -3,7 +3,7 @@
 """
 ResNet50 Trainer for Liver Disease Classification
 This module is designed to train the ResNet50 model on liver image data
-ResNet50 has 50 layers and is suitable for more complex and larger data
+ResNet50 has ResNet50 layers and is suitable for more complex and larger data
 """
 
 import json

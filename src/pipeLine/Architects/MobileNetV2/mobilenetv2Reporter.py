@@ -24,7 +24,7 @@ Pages:
   15. 5-Fold CV — Best Fold
   16. Bootstrap 95% CI
   17. TTA Analysis
-  18. SSL Methods Comparison (BYOL / SimCLR / MAE)
+  ResNet18. SSL Methods Comparison (BYOL / SimCLR / MAE)
   19. Captum Interpretability
   20. LIME Explanations
   21. SHAP Summary
@@ -992,7 +992,7 @@ def _build_pdf(
     story.append(PageBreak())
 
     # ─────────────────────────────────────────────
-    # PAGE 18: SSL METHODS COMPARISON
+    # PAGE ResNet18: SSL METHODS COMPARISON
     # ─────────────────────────────────────────────
     story.append(Paragraph("17. SSL Methods Comparison", S["h1"]))
     story.append(Paragraph(
@@ -1060,9 +1060,9 @@ def _build_pdf(
     # ─────────────────────────────────────────────
     # PAGE 19: CAPTUM
     # ─────────────────────────────────────────────
-    story.append(Paragraph("18. Captum Interpretability", S["h1"]))
-    safe_img(interp_paths.get("gradcam_path"), "18.1 Grad-CAM")
-    safe_img(interp_paths.get("ig_path"), "18.2 Integrated Gradients")
+    story.append(Paragraph("ResNet18. Captum Interpretability", S["h1"]))
+    safe_img(interp_paths.get("gradcam_path"), "ResNet18.1 Grad-CAM")
+    safe_img(interp_paths.get("ig_path"), "ResNet18.2 Integrated Gradients")
     story.append(PageBreak())
 
     # ─────────────────────────────────────────────

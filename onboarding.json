@@ -17,6 +17,12 @@
             "completed_at": "2026-11-06T07:28:16.419705",
             "version": "1.0",
             "skipped": false
+        },
+        "username": {
+            "tour_completed": true,
+            "completed_at": "2026-11-07T07:10:21.784288",
+            "version": "1.0",
+            "skipped": false
         }
     }
 }

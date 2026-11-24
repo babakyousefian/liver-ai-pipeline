@@ -113,7 +113,12 @@ class SwinTransformerReporter:
         print("=" * 70)
 
         print("\n[1/6] Generating plots...")
-        self._generate_plots(report_dir)
+        try:
+            self._generate_plots(report_dir)
+        except Exception as e:
+            print(f"  ❌ Plot generation failed: {e}")
+            import traceback
+            traceback.print_exc()
 
         print("[2/6] Saving metrics JSON...")
         self._save_metrics_json(report_dir)
@@ -128,7 +133,13 @@ class SwinTransformerReporter:
         self._save_predictions_csv(report_dir)
 
         print("[6/6] Generating PDF report...")
-        pdf_path = self._generate_pdf(report_dir)
+        try:
+            pdf_path = self._generate_pdf(report_dir)
+        except Exception as e:
+            print(f"  ❌ PDF generation failed: {e}")
+            import traceback
+            traceback.print_exc()
+            pdf_path = None
 
         print("\n" + "=" * 70)
         print(f"  ✅ ALL REPORTS SAVED TO: {report_dir}")
@@ -142,6 +153,8 @@ class SwinTransformerReporter:
     def _generate_plots(self, report_dir):
         # ✅ FIX: از test metrics استفاده کن (نه primary)
         m = self.test_metrics if self.test_metrics else self.primary_metrics
+        if not isinstance(m, dict):
+            m = {}
         self.primary_metrics = m  # ← sync کن
 
         # ✅ FIX: confusion matrix از test
@@ -291,12 +304,14 @@ class SwinTransformerReporter:
         n = len(class_names)
         p, r, f1 = [], [], []
         for cname in class_names:
-            if cname in m:
+            if isinstance(m, dict) and cname in m and isinstance(m[cname], dict):
                 p.append(m[cname].get("precision", 0) or 0)
                 r.append(m[cname].get("recall", 0) or 0)
                 f1.append(m[cname].get("f1-score", 0) or 0)
             else:
-                p.append(0); r.append(0); f1.append(0)
+                p.append(0)
+                r.append(0)
+                f1.append(0)
         if sum(p) == 0 and sum(r) == 0 and sum(f1) == 0:
             return
         x = np.arange(n); w = 0.26
@@ -337,6 +352,7 @@ class SwinTransformerReporter:
             acc = m.get("accuracy", 0) or 0
             p = r = f1 = acc
         if p == 0 and r == 0 and f1 == 0:
+            print(f"  ⚠️ Skipping pie chart (no metrics)")
             return
         values = [p, r, f1]
         labels = [f"Precision\n({p:.3f})",
@@ -415,8 +431,20 @@ class SwinTransformerReporter:
 
         axes[0].set_xlabel("Epoch", fontsize=12, fontweight="bold")
         axes[0].set_ylabel("Loss", fontsize=12, fontweight="bold")
-        axes[0].set_title("Train vs Validation Loss with Gap",
-                          fontsize=14, fontweight="bold", pad=12)
+        val_acc_history = history.get("val_acc", [])
+        best_epoch_num = n
+        if val_acc_history and len(val_acc_history) == n:
+            best_epoch_idx = int(np.argmax(val_acc_history))
+            best_epoch_num = best_epoch_idx + 1
+        else:
+            best_epoch_idx = int(np.argmin(val_loss))
+            best_epoch_num = best_epoch_idx + 1
+
+        title_str = (
+            "Train vs Validation Loss with Gap "
+            f"({n} epochs, best @ epoch {best_epoch_num})"
+        )
+        axes[0].set_title(title_str, fontsize=14, fontweight="bold", pad=12)
         axes[0].legend(loc="upper right", fontsize=11)
         axes[0].grid(alpha=0.3, linestyle="--")
 
@@ -440,13 +468,14 @@ class SwinTransformerReporter:
                                facecolor="#fff9e6", edgecolor="#f39c12",
                                alpha=0.9, linewidth=1.5))
 
-        # ✅ نمایش بهترین epoch
-        if val_loss:
-            best_epoch_idx = int(np.argmin(val_loss))
-            axes[0].axvline(x=epochs[best_epoch_idx], color="#2ecc71",
-                            linestyle="--", linewidth=2, alpha=0.7,
-                            label=f"Best Epoch ({epochs[best_epoch_idx]})")
-            axes[0].legend(loc="upper right", fontsize=10)
+        axes[0].axvline(x=best_epoch_num, color="#2ecc71",
+                        linestyle="--", linewidth=2, alpha=0.7,
+                        label=f"Best Epoch ({best_epoch_num})")
+
+        axes[0].axvline(x=best_epoch_num, color="#2ecc71",
+                        linestyle="--", linewidth=2, alpha=0.7,
+                        label="Best Epoch ({}).format(best_epoch_num)")
+        axes[0].legend(loc="upper right", fontsize=10)
 
         # =====================================================
         #  نمودار پایین: Gap به تنهایی
@@ -633,22 +662,36 @@ class SwinTransformerReporter:
 
         # Page 1: Cover
         page = doc.new_page(width=595, height=842)
-        self._page_cover(page, m)
+        try:
+            self._page_cover(page, m)
+        except Exception as e:
+            print(f"  ⚠️ Cover page failed: {e}")
+            page.insert_text((50, 50), "Swin Transformer Report",
+                             fontsize=24, fontname="helvetica-bold")
         self._page_footer(page, 1)
 
         # Page 2: Executive Summary
         page = doc.new_page(width=595, height=842)
-        self._page_executive_summary(page, m)
+        try:
+            self._page_executive_summary(page, m)
+        except Exception as e:
+            print(f"  ⚠️ Executive summary failed: {e}")
         self._page_footer(page, 2)
 
         # Page 3: Configuration
         page = doc.new_page(width=595, height=842)
-        self._page_configuration(page)
+        try:
+            self._page_configuration(page)
+        except Exception as e:
+            print(f"  ⚠️ Configuration page failed: {e}")
         self._page_footer(page, 3)
 
         # Page 4: Per-Class
         page = doc.new_page(width=595, height=842)
-        self._page_per_class(page, m)
+        try:
+            self._page_per_class(page, m)
+        except Exception as e:
+            print(f"  ⚠️ Per-class page failed: {e}")
         self._page_footer(page, 4)
 
         # Pages 5+: Charts

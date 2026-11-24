@@ -15,8 +15,8 @@ Features:
 Interpretation:
 - FID < 10: excellent
 - FID 10-30: good
-- FID 30-50: acceptable
-- FID 50-100: poor
+- FID 30-ResNet50: acceptable
+- FID ResNet50-100: poor
 - FID > 100: bad
 
 Author: Babak Yousefian
@@ -214,7 +214,7 @@ def _compute_fid(
 
     # ✅ Compute sqrt of product of covariances
     # Use scipy.linalg.sqrtm for numerical stability
-    # ✅ FIX: scipy 1.18+ removed `disp` argument from sqrtm()
+    # ✅ FIX: scipy 1.ResNet18+ removed `disp` argument from sqrtm()
     try:
         covmean, _ = linalg.sqrtm(sigma_real.dot(sigma_fake), disp=False)
     except TypeError:

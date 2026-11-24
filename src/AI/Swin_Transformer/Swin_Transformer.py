@@ -69,7 +69,7 @@ class EarlyStopping:
     """
     Early stopping with best weights restoration.
 
-    - patience=15: به مدل فرصت می‌ده تا epoch 50 به بهترین دقت برسه
+    - patience=15: به مدل فرصت می‌ده تا epoch ResNet50 به بهترین دقت برسه
     - min_delta=1e-4: فقط بهبودهای واقعی رو در نظر می‌گیره
     - restore_best_weights=True: وزن بهترین epoch رو ذخیره می‌کنه
     """
@@ -156,12 +156,12 @@ class SwinTransformerTrainer:
         DEFAULT_HP = {
             "batch_size": 16,
             "lr": 1e-4,
-            "weight_decay": 0.01,           # ✅ نگه دار (استاندارد Swin)
-            "dropout": 0.3,                  # ← 0.15 → 0.3 (Transformer)
-            "label_smoothing": 0.12,         # ← 0.15 → 0.12
+            "weight_decay": 0.01,
+            "dropout": 0.2,
+            "label_smoothing": 0.12,
             "accumulation_steps": 2,
-            "warmup_epochs": 8,              # ← 10 → 8
-            "epochs_per_phase": [5, 35],     # ← 30 → 35
+            "warmup_epochs": 5,
+            "epochs_per_phase": [5, 35],
         }
         hp = DEFAULT_HP
 
@@ -505,6 +505,21 @@ class SwinTransformerTrainer:
         print(f"✅ Backbone FROZEN (head only)")
         print(f"   Trainable: {trainable:,} / {total:,} ({trainable/total*100:.2f}%)")
 
+    def unfreeze_last_stages(self):
+        """Unfreeze last 2 stages of Swin (layers.2,3) + norm + head."""
+        for name, param in self.model.named_parameters():
+            if "head" in name:
+                param.requires_grad = True
+            elif "layers.2." in name or "layers.3." in name or name.startswith("norm."):
+                param.requires_grad = True
+            else:
+                param.requires_grad = False
+
+        trainable = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        total = sum(p.numel() for p in self.model.parameters())
+        print(f"✅ Partial UNFREEZE (layers.2,3 + norm + head)")
+        print(f"   Trainable: {trainable:,} / {total:,} ({trainable/total*100:.2f}%)")
+
     def unfreeze_all(self):
         """Unfreeze all layers."""
         for param in self.model.parameters():
@@ -586,11 +601,11 @@ class SwinTransformerTrainer:
             val_loss, val_acc = self.evaluate(return_loss=True)
             current_lr = self.scheduler.step()
 
-            # ✅ Early Stopping Check (monitor val_loss)
-            if hasattr(self, 'early_stopping'):
-                if self.early_stopping(val_loss, epoch, self.model):
+            # ✅ Early Stopping Check (monitor val_acc)
+            if hasattr(self, 'early_stopping') and self.early_stopping is not None:
+                if self.early_stopping(val_acc, epoch, self.model):
                     print(f"\n🛑 Early Stopping at epoch {epoch + 1}")
-                    print(f"   Best Val Loss: {self.early_stopping.best_score:.4f}")
+                    print(f"   Best Val Acc: {self.early_stopping.best_score:.4f}")
                     print(f"   Best Epoch: {self.early_stopping.best_epoch + 1}")
                     break
 
@@ -657,29 +672,46 @@ class SwinTransformerTrainer:
         self.freeze_backbone()
         self.train_epoch(epochs=self.epochs_per_phase[0], desc="Stage 1")
 
-        # ---- Stage 2: Full fine-tune ----
+        # ---- Stage 2: Full fine-tune (all layers) ----
         print(
             f"\n📌 STAGE 2: Full fine-tune ({self.epochs_per_phase[1]} epochs) - LR: {phase_lrs.get(1, self.lr * 0.2)}")
         print("-" * 40)
         self._set_phase_lr(phase_lrs.get(1, self.lr * 0.2))
         self.unfreeze_all()
 
-        # ✅ Early Stopping Setup — patience=15 برای رسیدن به بهترین دقت
         self.early_stopping = EarlyStopping(
-            patience=15,
+            patience=10,
             min_delta=1e-4,
-            mode='min',  # چون val_loss رو monitor می‌کنیم
+            mode='max',
             verbose=True,
         )
 
         self.train_epoch(epochs=self.epochs_per_phase[1], desc="Stage 2")
 
-        # ✅ Restore بهترین وزن‌ها بعد از training
+        # ✅ Restore بهترین وزن‌ها
         if hasattr(self, 'early_stopping') and self.early_stopping.best_weights is not None:
             self.early_stopping.restore_best_weights(self.model)
+            self.model.eval()
+            print(f"✅ Restored best weights from epoch {self.early_stopping.best_epoch + 1}")
 
-        print("\n📥 Loading best model...")
-        self.load(self.save_path)
+            # ✅✅✅ ذخیره بهترین وزن‌ها روی دیسک
+            save_model_checkpoint(
+                model=self.model,
+                optimizer=self.optimizer,
+                epoch=self.early_stopping.best_epoch,
+                metrics={
+                    "val_acc": self.early_stopping.best_score,
+                    "val_loss": 0.0,
+                },
+                filename="Swin_Transformer_best.pth",
+                scheduler=self.scheduler,
+                extra_info={"best_accuracy": self.early_stopping.best_score},
+                save_dir=self.model_dir,
+            )
+            print(f"✅ Best weights saved to Swin_Transformer_best.pth (epoch {self.early_stopping.best_epoch + 1})")
+        else:
+            print("\n📥 Loading best model from disk...")
+            self.load(self.save_path)
 
         print("\n📊 Evaluating on TEST set...")
         self.evaluate_on_test()
@@ -829,8 +861,12 @@ class SwinTransformerTrainer:
             reports_dir = os.path.join(self.base_dir, "reports")
             os.makedirs(reports_dir, exist_ok=True)
             output_path = os.path.join(reports_dir, "Swin_Transformer_Report.pdf")
+        else:
+            reports_dir = os.path.dirname(output_path)
+            os.makedirs(reports_dir, exist_ok=True)
 
         print(f"\n📄 Generating Swin Transformer report: {output_path}")
+        print(f"📁 Reports dir: {reports_dir}")
 
         # ✅ مهم: اگر test_metrics نداریم، روی test ارزیابی کن
         if self.test_metrics is None:
@@ -891,7 +927,7 @@ class SwinTransformerTrainer:
                 "best_epoch": self.best_epoch,
                 "training_time_sec": sum(self.history["epoch_times"]) if self.history["epoch_times"] else 0,
             })
-            reporter.generate_all(report_dir=os.path.dirname(output_path))
+            reporter.generate_all(report_dir=reports_dir)
             print(f"✅ PDF Report saved: {output_path}")
 
         except Exception as e:

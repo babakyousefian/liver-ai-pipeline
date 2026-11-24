@@ -721,8 +721,8 @@ except ImportError as e:
 
 # Advanced Mode - Without Fine-Tuning
 try:
-    from src.pipeLine.resnet18WithoutFineTuning import create_resnet18_wrapper
-    from src.pipeLine.resnet18WithoutFineTuning import ensure_directories as ensure_directories18
+    from src.pipeLine.Architects.Resnet.ResNet18.resnet18WithoutFineTuning import create_resnet18_wrapper
+    from src.pipeLine.Architects.Resnet.ResNet18.resnet18WithoutFineTuning import ensure_directories as ensure_directories18
 
     WFT_RESNET18_AVAILABLE = True
 except ImportError as e:
@@ -730,8 +730,8 @@ except ImportError as e:
     print(f"⚠️ ResNet18 Without Fine-Tuning module not available: {e}")
 
 try:
-    from src.pipeLine.resnet50WithoutFineTuning import create_resnet50_wrapper
-    from src.pipeLine.resnet50WithoutFineTuning import ensure_directories as ensure_directories50
+    from src.pipeLine.Architects.Resnet.ResNet50.resnet50WithoutFineTuning import create_resnet50_wrapper
+    from src.pipeLine.Architects.Resnet.ResNet50.resnet50WithoutFineTuning import ensure_directories as ensure_directories50
 
     WFT_RESNET50_AVAILABLE = True
 except ImportError as e:
@@ -3807,12 +3807,12 @@ def show_main_menu() -> None:
     print("   [11] 🚀 ViT")
     print("   [12] 🚀 DenseNet (NEW)")
     print("")
-    print("   [13] 🚀 Run Both ResNet Architects (18 & 50)")
-    print("   [14] 🚀 Run All Architects (18 & 50 & B0)")
+    print("   [13] 🚀 Run Both ResNet Architects (ResNet18 & ResNet50)")
+    print("   [14] 🚀 Run All Architects (ResNet18 & ResNet50 & B0)")
     print("   [15] 🚀 Run All Architects with B1")
     print("   [16] 🚀 Run All Architects with VGG16")
     print("   [17] 🚀 Run All Architects with CNNLSTM")
-    print("   [18] 🚀 Run All Architects with ConvNext")
+    print("   [ResNet18] 🚀 Run All Architects with ConvNext")
     print("   [19] 🚀 Run All Architects with MobileNetV2")
     print("   [20] 🚀 Run All Architects with AlexNet")
     print("   [21] 🚀 Run All Architects with ViT")
@@ -3836,8 +3836,8 @@ def show_main_menu() -> None:
     print("   [33] 📄 ViT Report")
     print("   [34] 📄 DenseNet Report (NEW)")
     print("")
-    print("   [35] 📄 Reports for ResNet Architects (18 & 50)")
-    print("   [36] 📄 Reports for All Architects (18 & 50 & B0)")
+    print("   [35] 📄 Reports for ResNet Architects (ResNet18 & ResNet50)")
+    print("   [36] 📄 Reports for All Architects (ResNet18 & ResNet50 & B0)")
     print("   [37] 📄 Reports for All Architects with B1")
     print("   [38] 📄 Reports for All Architects with VGG16")
     print("   [39] 📄 Reports for All Architects with CNNLSTM")
@@ -3856,7 +3856,7 @@ def show_main_menu() -> None:
     print("   [48] 📄 Traditional EfficientNet-B1 Report")
     print("")
     print("   [49] 📄 Traditional Reports for Both ResNet Architects")
-    print("   [50] 📄 Traditional Reports for All Architects (18 & 50 & B0)")
+    print("   [ResNet50] 📄 Traditional Reports for All Architects (ResNet18 & ResNet50 & B0)")
     print("   [51] 📄 Traditional Reports for All Architects with B1")
     print("")
     print("   " + "-" * 40)
@@ -3874,8 +3874,8 @@ def show_main_menu() -> None:
     print("   [61] 🔬 ViT CV")
     print("   [62] 🔬 DenseNet CV (NEW)")
     print("")
-    print("   [63] 🔬 ResNet Architects CV (18 & 50)")
-    print("   [64] 🔬 All Architects CV (18 & 50 & B0)")
+    print("   [63] 🔬 ResNet Architects CV (ResNet18 & ResNet50)")
+    print("   [64] 🔬 All Architects CV (ResNet18 & ResNet50 & B0)")
     print("   [65] 🔬 All Architects CV with B1")
     print("")
     print("   " + "-" * 40)
@@ -3991,7 +3991,7 @@ def wFTAlgorithms() -> None:
                 run_all_models_with_cnnlstm()
                 input("\nPress Enter to continue...")
 
-            elif choice == "18":
+            elif choice == "ResNet18":
                 run_all_models_with_convnext()
                 input("\nPress Enter to continue...")
 
@@ -4131,7 +4131,7 @@ def wFTAlgorithms() -> None:
                 run_traditional_report_both()
                 input("\nPress Enter to continue...")
 
-            elif choice == "50":
+            elif choice == "ResNet50":
                 run_traditional_report_all()
                 input("\nPress Enter to continue...")
 

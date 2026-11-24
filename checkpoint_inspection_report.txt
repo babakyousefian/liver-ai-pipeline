@@ -1,0 +1,1701 @@
+==========================================================================================
+FULL CHECKPOINT INSPECTION REPORT
+ConvNeXt + KD Final Ensemble
+==========================================================================================
+==========================================================================================
+CHECKPOINT: ConvNeXt_Tiny
+==========================================================================================
+Path: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\ConvNext\convnext\ConvNext_best.pth
+File size: 320.866 MB
+SHA256: fe0aebd7f9e9927b515a8efa5bef030ea87df362773030576d8b183641ca96c6
+
+[OBJECT INFORMATION]
+Type: <class 'dict'>
+
+[TOP LEVEL KEYS]
+epoch: 7
+model_state_dict: dict (186 keys)
+optimizer_state_dict: dict (2 keys)
+metrics: dict (2 keys)
+timestamp: 2026-11-09T12:36:15.760230
+class_names: list, len=4
+num_classes: 4
+model_architecture: ResNet18
+version: 3.0.0
+scheduler_state_dict: dict (2 keys)
+extra_info: dict (1 keys)
+
+[METADATA]
+
+epoch:
+7
+
+class_names:
+[
+  "NL",
+  "G1",
+  "G2",
+  "G3"
+]
+
+num_classes:
+4
+
+[STATE DICT]
+Detected key: model_state_dict
+Number of entries: 186
+Total tensor elements: 28,018,532
+Floating tensor elements: 28,018,532
+
+[ALL STATE DICT PARAMETERS]
+features.0.0.weight                                                         (96, 3, 4, 4)             torch.float32
+features.0.0.bias                                                           (96,)                     torch.float32
+features.0.1.weight                                                         (96,)                     torch.float32
+features.0.1.bias                                                           (96,)                     torch.float32
+features.1.0.layer_scale                                                    (96, 1, 1)                torch.float32
+features.1.0.block.0.weight                                                 (96, 1, 7, 7)             torch.float32
+features.1.0.block.0.bias                                                   (96,)                     torch.float32
+features.1.0.block.2.weight                                                 (96,)                     torch.float32
+features.1.0.block.2.bias                                                   (96,)                     torch.float32
+features.1.0.block.3.weight                                                 (384, 96)                 torch.float32
+features.1.0.block.3.bias                                                   (384,)                    torch.float32
+features.1.0.block.5.weight                                                 (96, 384)                 torch.float32
+features.1.0.block.5.bias                                                   (96,)                     torch.float32
+features.1.1.layer_scale                                                    (96, 1, 1)                torch.float32
+features.1.1.block.0.weight                                                 (96, 1, 7, 7)             torch.float32
+features.1.1.block.0.bias                                                   (96,)                     torch.float32
+features.1.1.block.2.weight                                                 (96,)                     torch.float32
+features.1.1.block.2.bias                                                   (96,)                     torch.float32
+features.1.1.block.3.weight                                                 (384, 96)                 torch.float32
+features.1.1.block.3.bias                                                   (384,)                    torch.float32
+features.1.1.block.5.weight                                                 (96, 384)                 torch.float32
+features.1.1.block.5.bias                                                   (96,)                     torch.float32
+features.1.2.layer_scale                                                    (96, 1, 1)                torch.float32
+features.1.2.block.0.weight                                                 (96, 1, 7, 7)             torch.float32
+features.1.2.block.0.bias                                                   (96,)                     torch.float32
+features.1.2.block.2.weight                                                 (96,)                     torch.float32
+features.1.2.block.2.bias                                                   (96,)                     torch.float32
+features.1.2.block.3.weight                                                 (384, 96)                 torch.float32
+features.1.2.block.3.bias                                                   (384,)                    torch.float32
+features.1.2.block.5.weight                                                 (96, 384)                 torch.float32
+features.1.2.block.5.bias                                                   (96,)                     torch.float32
+features.2.0.weight                                                         (96,)                     torch.float32
+features.2.0.bias                                                           (96,)                     torch.float32
+features.2.1.weight                                                         (192, 96, 2, 2)           torch.float32
+features.2.1.bias                                                           (192,)                    torch.float32
+features.3.0.layer_scale                                                    (192, 1, 1)               torch.float32
+features.3.0.block.0.weight                                                 (192, 1, 7, 7)            torch.float32
+features.3.0.block.0.bias                                                   (192,)                    torch.float32
+features.3.0.block.2.weight                                                 (192,)                    torch.float32
+features.3.0.block.2.bias                                                   (192,)                    torch.float32
+features.3.0.block.3.weight                                                 (768, 192)                torch.float32
+features.3.0.block.3.bias                                                   (768,)                    torch.float32
+features.3.0.block.5.weight                                                 (192, 768)                torch.float32
+features.3.0.block.5.bias                                                   (192,)                    torch.float32
+features.3.1.layer_scale                                                    (192, 1, 1)               torch.float32
+features.3.1.block.0.weight                                                 (192, 1, 7, 7)            torch.float32
+features.3.1.block.0.bias                                                   (192,)                    torch.float32
+features.3.1.block.2.weight                                                 (192,)                    torch.float32
+features.3.1.block.2.bias                                                   (192,)                    torch.float32
+features.3.1.block.3.weight                                                 (768, 192)                torch.float32
+features.3.1.block.3.bias                                                   (768,)                    torch.float32
+features.3.1.block.5.weight                                                 (192, 768)                torch.float32
+features.3.1.block.5.bias                                                   (192,)                    torch.float32
+features.3.2.layer_scale                                                    (192, 1, 1)               torch.float32
+features.3.2.block.0.weight                                                 (192, 1, 7, 7)            torch.float32
+features.3.2.block.0.bias                                                   (192,)                    torch.float32
+features.3.2.block.2.weight                                                 (192,)                    torch.float32
+features.3.2.block.2.bias                                                   (192,)                    torch.float32
+features.3.2.block.3.weight                                                 (768, 192)                torch.float32
+features.3.2.block.3.bias                                                   (768,)                    torch.float32
+features.3.2.block.5.weight                                                 (192, 768)                torch.float32
+features.3.2.block.5.bias                                                   (192,)                    torch.float32
+features.4.0.weight                                                         (192,)                    torch.float32
+features.4.0.bias                                                           (192,)                    torch.float32
+features.4.1.weight                                                         (384, 192, 2, 2)          torch.float32
+features.4.1.bias                                                           (384,)                    torch.float32
+features.5.0.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.0.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.0.block.0.bias                                                   (384,)                    torch.float32
+features.5.0.block.2.weight                                                 (384,)                    torch.float32
+features.5.0.block.2.bias                                                   (384,)                    torch.float32
+features.5.0.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.0.block.3.bias                                                   (1536,)                   torch.float32
+features.5.0.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.0.block.5.bias                                                   (384,)                    torch.float32
+features.5.1.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.1.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.1.block.0.bias                                                   (384,)                    torch.float32
+features.5.1.block.2.weight                                                 (384,)                    torch.float32
+features.5.1.block.2.bias                                                   (384,)                    torch.float32
+features.5.1.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.1.block.3.bias                                                   (1536,)                   torch.float32
+features.5.1.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.1.block.5.bias                                                   (384,)                    torch.float32
+features.5.2.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.2.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.2.block.0.bias                                                   (384,)                    torch.float32
+features.5.2.block.2.weight                                                 (384,)                    torch.float32
+features.5.2.block.2.bias                                                   (384,)                    torch.float32
+features.5.2.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.2.block.3.bias                                                   (1536,)                   torch.float32
+features.5.2.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.2.block.5.bias                                                   (384,)                    torch.float32
+features.5.3.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.3.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.3.block.0.bias                                                   (384,)                    torch.float32
+features.5.3.block.2.weight                                                 (384,)                    torch.float32
+features.5.3.block.2.bias                                                   (384,)                    torch.float32
+features.5.3.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.3.block.3.bias                                                   (1536,)                   torch.float32
+features.5.3.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.3.block.5.bias                                                   (384,)                    torch.float32
+features.5.4.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.4.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.4.block.0.bias                                                   (384,)                    torch.float32
+features.5.4.block.2.weight                                                 (384,)                    torch.float32
+features.5.4.block.2.bias                                                   (384,)                    torch.float32
+features.5.4.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.4.block.3.bias                                                   (1536,)                   torch.float32
+features.5.4.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.4.block.5.bias                                                   (384,)                    torch.float32
+features.5.5.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.5.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.5.block.0.bias                                                   (384,)                    torch.float32
+features.5.5.block.2.weight                                                 (384,)                    torch.float32
+features.5.5.block.2.bias                                                   (384,)                    torch.float32
+features.5.5.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.5.block.3.bias                                                   (1536,)                   torch.float32
+features.5.5.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.5.block.5.bias                                                   (384,)                    torch.float32
+features.5.6.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.6.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.6.block.0.bias                                                   (384,)                    torch.float32
+features.5.6.block.2.weight                                                 (384,)                    torch.float32
+features.5.6.block.2.bias                                                   (384,)                    torch.float32
+features.5.6.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.6.block.3.bias                                                   (1536,)                   torch.float32
+features.5.6.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.6.block.5.bias                                                   (384,)                    torch.float32
+features.5.7.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.7.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.7.block.0.bias                                                   (384,)                    torch.float32
+features.5.7.block.2.weight                                                 (384,)                    torch.float32
+features.5.7.block.2.bias                                                   (384,)                    torch.float32
+features.5.7.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.7.block.3.bias                                                   (1536,)                   torch.float32
+features.5.7.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.7.block.5.bias                                                   (384,)                    torch.float32
+features.5.8.layer_scale                                                    (384, 1, 1)               torch.float32
+features.5.8.block.0.weight                                                 (384, 1, 7, 7)            torch.float32
+features.5.8.block.0.bias                                                   (384,)                    torch.float32
+features.5.8.block.2.weight                                                 (384,)                    torch.float32
+features.5.8.block.2.bias                                                   (384,)                    torch.float32
+features.5.8.block.3.weight                                                 (1536, 384)               torch.float32
+features.5.8.block.3.bias                                                   (1536,)                   torch.float32
+features.5.8.block.5.weight                                                 (384, 1536)               torch.float32
+features.5.8.block.5.bias                                                   (384,)                    torch.float32
+features.6.0.weight                                                         (384,)                    torch.float32
+features.6.0.bias                                                           (384,)                    torch.float32
+features.6.1.weight                                                         (768, 384, 2, 2)          torch.float32
+features.6.1.bias                                                           (768,)                    torch.float32
+features.7.0.layer_scale                                                    (768, 1, 1)               torch.float32
+features.7.0.block.0.weight                                                 (768, 1, 7, 7)            torch.float32
+features.7.0.block.0.bias                                                   (768,)                    torch.float32
+features.7.0.block.2.weight                                                 (768,)                    torch.float32
+features.7.0.block.2.bias                                                   (768,)                    torch.float32
+features.7.0.block.3.weight                                                 (3072, 768)               torch.float32
+features.7.0.block.3.bias                                                   (3072,)                   torch.float32
+features.7.0.block.5.weight                                                 (768, 3072)               torch.float32
+features.7.0.block.5.bias                                                   (768,)                    torch.float32
+features.7.1.layer_scale                                                    (768, 1, 1)               torch.float32
+features.7.1.block.0.weight                                                 (768, 1, 7, 7)            torch.float32
+features.7.1.block.0.bias                                                   (768,)                    torch.float32
+features.7.1.block.2.weight                                                 (768,)                    torch.float32
+features.7.1.block.2.bias                                                   (768,)                    torch.float32
+features.7.1.block.3.weight                                                 (3072, 768)               torch.float32
+features.7.1.block.3.bias                                                   (3072,)                   torch.float32
+features.7.1.block.5.weight                                                 (768, 3072)               torch.float32
+features.7.1.block.5.bias                                                   (768,)                    torch.float32
+features.7.2.layer_scale                                                    (768, 1, 1)               torch.float32
+features.7.2.block.0.weight                                                 (768, 1, 7, 7)            torch.float32
+features.7.2.block.0.bias                                                   (768,)                    torch.float32
+features.7.2.block.2.weight                                                 (768,)                    torch.float32
+features.7.2.block.2.bias                                                   (768,)                    torch.float32
+features.7.2.block.3.weight                                                 (3072, 768)               torch.float32
+features.7.2.block.3.bias                                                   (3072,)                   torch.float32
+features.7.2.block.5.weight                                                 (768, 3072)               torch.float32
+features.7.2.block.5.bias                                                   (768,)                    torch.float32
+classifier.0.weight                                                         (768,)                    torch.float32
+classifier.0.bias                                                           (768,)                    torch.float32
+classifier.2.1.weight                                                       (256, 768)                torch.float32
+classifier.2.1.bias                                                         (256,)                    torch.float32
+classifier.2.2.weight                                                       (256,)                    torch.float32
+classifier.2.2.bias                                                         (256,)                    torch.float32
+classifier.2.5.weight                                                       (4, 256)                  torch.float32
+classifier.2.5.bias                                                         (4,)                      torch.float32
+
+[CLASSIFIER / FINAL LAYER CANDIDATES]
+classifier.0.weight (768,)
+classifier.0.bias (768,)
+classifier.2.1.weight (256, 768)
+classifier.2.1.bias (256,)
+classifier.2.2.weight (256,)
+classifier.2.2.bias (256,)
+classifier.2.5.weight (4, 256)
+classifier.2.5.bias (4,)
+
+[OUTPUT DIMENSION CANDIDATES]
+classifier.2.1.weight: possible output dimension = 256
+classifier.2.5.weight: possible output dimension = 4
+
+[OTHER NESTED CHECKPOINT INFORMATION]
+
+Nested item: optimizer_state_dict
+    state: dict
+        178: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        179: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        180: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(256, 768), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(256, 768), dtype=torch.float32)
+        181: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(256,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(256,), dtype=torch.float32)
+        182: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(256,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(256,), dtype=torch.float32)
+        183: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(256,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(256,), dtype=torch.float32)
+        184: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(4, 256), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(4, 256), dtype=torch.float32)
+        185: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(4,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(4,), dtype=torch.float32)
+        0: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 3, 4, 4), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 3, 4, 4), dtype=torch.float32)
+        1: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        2: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        3: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        4: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 1, 1), dtype=torch.float32)
+        5: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 1, 7, 7), dtype=torch.float32)
+        6: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        7: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        8: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        9: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 96), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 96), dtype=torch.float32)
+        10: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        11: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 384), dtype=torch.float32)
+        12: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        13: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 1, 1), dtype=torch.float32)
+        14: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 1, 7, 7), dtype=torch.float32)
+        15: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        16: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        17: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        18: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 96), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 96), dtype=torch.float32)
+        19: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        20: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 384), dtype=torch.float32)
+        21: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        22: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 1, 1), dtype=torch.float32)
+        23: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 1, 7, 7), dtype=torch.float32)
+        24: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        25: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        26: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        27: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 96), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 96), dtype=torch.float32)
+        28: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        29: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96, 384), dtype=torch.float32)
+        30: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        31: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        32: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(96,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(96,), dtype=torch.float32)
+        33: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 96, 2, 2), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 96, 2, 2), dtype=torch.float32)
+        34: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        35: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 1, 1), dtype=torch.float32)
+        36: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 1, 7, 7), dtype=torch.float32)
+        37: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        38: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        39: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        40: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 192), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 192), dtype=torch.float32)
+        41: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        42: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 768), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 768), dtype=torch.float32)
+        43: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        44: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 1, 1), dtype=torch.float32)
+        45: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 1, 7, 7), dtype=torch.float32)
+        46: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        47: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        48: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        49: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 192), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 192), dtype=torch.float32)
+        50: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        51: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 768), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 768), dtype=torch.float32)
+        52: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        53: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 1, 1), dtype=torch.float32)
+        54: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 1, 7, 7), dtype=torch.float32)
+        55: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        56: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        57: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        58: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 192), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 192), dtype=torch.float32)
+        59: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        60: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192, 768), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192, 768), dtype=torch.float32)
+        61: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        62: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        63: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(192,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(192,), dtype=torch.float32)
+        64: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 192, 2, 2), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 192, 2, 2), dtype=torch.float32)
+        65: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        66: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        67: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        68: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        69: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        70: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        71: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        72: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        73: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        74: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        75: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        76: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        77: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        78: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        79: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        80: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        81: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        82: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        83: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        84: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        85: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        86: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        87: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        88: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        89: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        90: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        91: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        92: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        93: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        94: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        95: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        96: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        97: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        98: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        99: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        100: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        101: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        102: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        103: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        104: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        105: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        106: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        107: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        108: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        109: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        110: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        111: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        112: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        113: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        114: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        115: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        116: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        117: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        118: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        119: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        120: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        121: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        122: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        123: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        124: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        125: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        126: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        127: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        128: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        129: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        130: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        131: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        132: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        133: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        134: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        135: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        136: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        137: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        138: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 1), dtype=torch.float32)
+        139: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1, 7, 7), dtype=torch.float32)
+        140: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        141: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        142: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        143: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536, 384), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536, 384), dtype=torch.float32)
+        144: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(1536,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(1536,), dtype=torch.float32)
+        145: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384, 1536), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384, 1536), dtype=torch.float32)
+        146: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        147: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        148: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(384,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(384,), dtype=torch.float32)
+        149: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 384, 2, 2), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 384, 2, 2), dtype=torch.float32)
+        150: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        151: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 1, 1), dtype=torch.float32)
+        152: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 1, 7, 7), dtype=torch.float32)
+        153: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        154: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        155: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        156: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(3072, 768), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(3072, 768), dtype=torch.float32)
+        157: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(3072,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(3072,), dtype=torch.float32)
+        158: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 3072), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 3072), dtype=torch.float32)
+        159: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        160: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 1, 1), dtype=torch.float32)
+        161: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 1, 7, 7), dtype=torch.float32)
+        162: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        163: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        164: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        165: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(3072, 768), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(3072, 768), dtype=torch.float32)
+        166: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(3072,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(3072,), dtype=torch.float32)
+        167: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 3072), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 3072), dtype=torch.float32)
+        168: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        169: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 1, 1), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 1, 1), dtype=torch.float32)
+        170: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 1, 7, 7), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 1, 7, 7), dtype=torch.float32)
+        171: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        172: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        173: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+        174: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(3072, 768), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(3072, 768), dtype=torch.float32)
+        175: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(3072,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(3072,), dtype=torch.float32)
+        176: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768, 3072), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768, 3072), dtype=torch.float32)
+        177: dict
+            step: Tensor(shape=(), dtype=torch.float32)
+            exp_avg: Tensor(shape=(768,), dtype=torch.float32)
+            exp_avg_sq: Tensor(shape=(768,), dtype=torch.float32)
+    param_groups: list
+        Length: 1
+        [0]
+            lr: 4.0130385496718264e-05
+            betas: tuple
+                ... (maximum depth reached)
+            eps: 1e-08
+            weight_decay: 0.05
+            amsgrad: False
+            maximize: False
+            foreach: None
+            capturable: False
+            differentiable: False
+            fused: None
+            decoupled_weight_decay: True
+            params: list
+                ... (maximum depth reached)
+
+Nested item: metrics
+    val_acc: 0.8415094339622642
+    val_loss: 0.8415094339622642
+
+Nested item: class_names
+    Length: 4
+    [0]
+    [1]
+    [2]
+    [3]
+
+Nested item: scheduler_state_dict
+    current_epoch: 16
+    current_lr: 4.0130385496718264e-05
+
+Nested item: extra_info
+    best_accuracy: 0.8415094339622642
+==========================================================================================
+CHECKPOINT: KD_Base_Model
+==========================================================================================
+Path: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\selfSupervisedLearning\final_models\final_model.pth
+File size: 90.023 MB
+SHA256: a35c6d5b56c9a8b268db9db327524f298f1591eb44474be5a2bc88ba5d60f1f4
+
+[OBJECT INFORMATION]
+Type: <class 'dict'>
+
+[TOP LEVEL KEYS]
+model_state_dict: dict (320 keys)
+architecture: resnet50
+pipeline: knowledge_distillation_ensemble
+teacher_ensemble: dict (4 keys)
+kd_config: dict (4 keys)
+test_metrics_tta: dict (9 keys)
+test_confusion_matrix: list, len=4
+test_classification_report: dict (7 keys)
+cv_summary: dict (7 keys)
+ci95: dict (4 keys)
+kd_history: dict (9 keys)
+polish_history: dict (5 keys)
+kd_best_epoch: 36
+polish_best_epoch: 50
+timestamp: 2026-10-11T04:27:12.464542
+
+[METADATA]
+
+test_metrics_tta:
+{
+  "accuracy": 0.7735849056603774,
+  "precision": 0.8107035904219082,
+  "recall": 0.7735849056603774,
+  "f1_score": 0.7841371925574434,
+  "f1_macro": 0.7149477005843465,
+  "balanced_accuracy": 0.7647619360948638,
+  "roc_auc": {
+    "0": 0.9634508128634153,
+    "1": 0.8877324010805656,
+    "2": 0.9511616880037933,
+    "3": 0.9778516057585825
+  },
+  "roc_auc_mean": 0.9450491269265893,
+  "num_samples": 265
+}
+
+architecture:
+"resnet50"
+
+[STATE DICT]
+Detected key: model_state_dict
+Number of entries: 320
+Total tensor elements: 23,569,401
+Floating tensor elements: 23,569,348
+
+[ALL STATE DICT PARAMETERS]
+conv1.weight                                                                (64, 3, 7, 7)             torch.float32
+bn1.weight                                                                  (64,)                     torch.float32
+bn1.bias                                                                    (64,)                     torch.float32
+bn1.running_mean                                                            (64,)                     torch.float32
+bn1.running_var                                                             (64,)                     torch.float32
+bn1.num_batches_tracked                                                     ()                        torch.int64
+layer1.0.downsample.0.weight                                                (256, 64, 1, 1)           torch.float32
+layer1.0.downsample.1.weight                                                (256,)                    torch.float32
+layer1.0.downsample.1.bias                                                  (256,)                    torch.float32
+layer1.0.downsample.1.running_mean                                          (256,)                    torch.float32
+layer1.0.downsample.1.running_var                                           (256,)                    torch.float32
+layer1.0.downsample.1.num_batches_tracked                                   ()                        torch.int64
+layer1.0.conv1.weight                                                       (64, 64, 1, 1)            torch.float32
+layer1.0.bn1.weight                                                         (64,)                     torch.float32
+layer1.0.bn1.bias                                                           (64,)                     torch.float32
+layer1.0.bn1.running_mean                                                   (64,)                     torch.float32
+layer1.0.bn1.running_var                                                    (64,)                     torch.float32
+layer1.0.bn1.num_batches_tracked                                            ()                        torch.int64
+layer1.0.conv2.weight                                                       (64, 64, 3, 3)            torch.float32
+layer1.0.bn2.weight                                                         (64,)                     torch.float32
+layer1.0.bn2.bias                                                           (64,)                     torch.float32
+layer1.0.bn2.running_mean                                                   (64,)                     torch.float32
+layer1.0.bn2.running_var                                                    (64,)                     torch.float32
+layer1.0.bn2.num_batches_tracked                                            ()                        torch.int64
+layer1.0.conv3.weight                                                       (256, 64, 1, 1)           torch.float32
+layer1.0.bn3.weight                                                         (256,)                    torch.float32
+layer1.0.bn3.bias                                                           (256,)                    torch.float32
+layer1.0.bn3.running_mean                                                   (256,)                    torch.float32
+layer1.0.bn3.running_var                                                    (256,)                    torch.float32
+layer1.0.bn3.num_batches_tracked                                            ()                        torch.int64
+layer1.1.conv1.weight                                                       (64, 256, 1, 1)           torch.float32
+layer1.1.bn1.weight                                                         (64,)                     torch.float32
+layer1.1.bn1.bias                                                           (64,)                     torch.float32
+layer1.1.bn1.running_mean                                                   (64,)                     torch.float32
+layer1.1.bn1.running_var                                                    (64,)                     torch.float32
+layer1.1.bn1.num_batches_tracked                                            ()                        torch.int64
+layer1.1.conv2.weight                                                       (64, 64, 3, 3)            torch.float32
+layer1.1.bn2.weight                                                         (64,)                     torch.float32
+layer1.1.bn2.bias                                                           (64,)                     torch.float32
+layer1.1.bn2.running_mean                                                   (64,)                     torch.float32
+layer1.1.bn2.running_var                                                    (64,)                     torch.float32
+layer1.1.bn2.num_batches_tracked                                            ()                        torch.int64
+layer1.1.conv3.weight                                                       (256, 64, 1, 1)           torch.float32
+layer1.1.bn3.weight                                                         (256,)                    torch.float32
+layer1.1.bn3.bias                                                           (256,)                    torch.float32
+layer1.1.bn3.running_mean                                                   (256,)                    torch.float32
+layer1.1.bn3.running_var                                                    (256,)                    torch.float32
+layer1.1.bn3.num_batches_tracked                                            ()                        torch.int64
+layer1.2.conv1.weight                                                       (64, 256, 1, 1)           torch.float32
+layer1.2.bn1.weight                                                         (64,)                     torch.float32
+layer1.2.bn1.bias                                                           (64,)                     torch.float32
+layer1.2.bn1.running_mean                                                   (64,)                     torch.float32
+layer1.2.bn1.running_var                                                    (64,)                     torch.float32
+layer1.2.bn1.num_batches_tracked                                            ()                        torch.int64
+layer1.2.conv2.weight                                                       (64, 64, 3, 3)            torch.float32
+layer1.2.bn2.weight                                                         (64,)                     torch.float32
+layer1.2.bn2.bias                                                           (64,)                     torch.float32
+layer1.2.bn2.running_mean                                                   (64,)                     torch.float32
+layer1.2.bn2.running_var                                                    (64,)                     torch.float32
+layer1.2.bn2.num_batches_tracked                                            ()                        torch.int64
+layer1.2.conv3.weight                                                       (256, 64, 1, 1)           torch.float32
+layer1.2.bn3.weight                                                         (256,)                    torch.float32
+layer1.2.bn3.bias                                                           (256,)                    torch.float32
+layer1.2.bn3.running_mean                                                   (256,)                    torch.float32
+layer1.2.bn3.running_var                                                    (256,)                    torch.float32
+layer1.2.bn3.num_batches_tracked                                            ()                        torch.int64
+layer2.0.downsample.0.weight                                                (512, 256, 1, 1)          torch.float32
+layer2.0.downsample.1.weight                                                (512,)                    torch.float32
+layer2.0.downsample.1.bias                                                  (512,)                    torch.float32
+layer2.0.downsample.1.running_mean                                          (512,)                    torch.float32
+layer2.0.downsample.1.running_var                                           (512,)                    torch.float32
+layer2.0.downsample.1.num_batches_tracked                                   ()                        torch.int64
+layer2.0.conv1.weight                                                       (128, 256, 1, 1)          torch.float32
+layer2.0.bn1.weight                                                         (128,)                    torch.float32
+layer2.0.bn1.bias                                                           (128,)                    torch.float32
+layer2.0.bn1.running_mean                                                   (128,)                    torch.float32
+layer2.0.bn1.running_var                                                    (128,)                    torch.float32
+layer2.0.bn1.num_batches_tracked                                            ()                        torch.int64
+layer2.0.conv2.weight                                                       (128, 128, 3, 3)          torch.float32
+layer2.0.bn2.weight                                                         (128,)                    torch.float32
+layer2.0.bn2.bias                                                           (128,)                    torch.float32
+layer2.0.bn2.running_mean                                                   (128,)                    torch.float32
+layer2.0.bn2.running_var                                                    (128,)                    torch.float32
+layer2.0.bn2.num_batches_tracked                                            ()                        torch.int64
+layer2.0.conv3.weight                                                       (512, 128, 1, 1)          torch.float32
+layer2.0.bn3.weight                                                         (512,)                    torch.float32
+layer2.0.bn3.bias                                                           (512,)                    torch.float32
+layer2.0.bn3.running_mean                                                   (512,)                    torch.float32
+layer2.0.bn3.running_var                                                    (512,)                    torch.float32
+layer2.0.bn3.num_batches_tracked                                            ()                        torch.int64
+layer2.1.conv1.weight                                                       (128, 512, 1, 1)          torch.float32
+layer2.1.bn1.weight                                                         (128,)                    torch.float32
+layer2.1.bn1.bias                                                           (128,)                    torch.float32
+layer2.1.bn1.running_mean                                                   (128,)                    torch.float32
+layer2.1.bn1.running_var                                                    (128,)                    torch.float32
+layer2.1.bn1.num_batches_tracked                                            ()                        torch.int64
+layer2.1.conv2.weight                                                       (128, 128, 3, 3)          torch.float32
+layer2.1.bn2.weight                                                         (128,)                    torch.float32
+layer2.1.bn2.bias                                                           (128,)                    torch.float32
+layer2.1.bn2.running_mean                                                   (128,)                    torch.float32
+layer2.1.bn2.running_var                                                    (128,)                    torch.float32
+layer2.1.bn2.num_batches_tracked                                            ()                        torch.int64
+layer2.1.conv3.weight                                                       (512, 128, 1, 1)          torch.float32
+layer2.1.bn3.weight                                                         (512,)                    torch.float32
+layer2.1.bn3.bias                                                           (512,)                    torch.float32
+layer2.1.bn3.running_mean                                                   (512,)                    torch.float32
+layer2.1.bn3.running_var                                                    (512,)                    torch.float32
+layer2.1.bn3.num_batches_tracked                                            ()                        torch.int64
+layer2.2.conv1.weight                                                       (128, 512, 1, 1)          torch.float32
+layer2.2.bn1.weight                                                         (128,)                    torch.float32
+layer2.2.bn1.bias                                                           (128,)                    torch.float32
+layer2.2.bn1.running_mean                                                   (128,)                    torch.float32
+layer2.2.bn1.running_var                                                    (128,)                    torch.float32
+layer2.2.bn1.num_batches_tracked                                            ()                        torch.int64
+layer2.2.conv2.weight                                                       (128, 128, 3, 3)          torch.float32
+layer2.2.bn2.weight                                                         (128,)                    torch.float32
+layer2.2.bn2.bias                                                           (128,)                    torch.float32
+layer2.2.bn2.running_mean                                                   (128,)                    torch.float32
+layer2.2.bn2.running_var                                                    (128,)                    torch.float32
+layer2.2.bn2.num_batches_tracked                                            ()                        torch.int64
+layer2.2.conv3.weight                                                       (512, 128, 1, 1)          torch.float32
+layer2.2.bn3.weight                                                         (512,)                    torch.float32
+layer2.2.bn3.bias                                                           (512,)                    torch.float32
+layer2.2.bn3.running_mean                                                   (512,)                    torch.float32
+layer2.2.bn3.running_var                                                    (512,)                    torch.float32
+layer2.2.bn3.num_batches_tracked                                            ()                        torch.int64
+layer2.3.conv1.weight                                                       (128, 512, 1, 1)          torch.float32
+layer2.3.bn1.weight                                                         (128,)                    torch.float32
+layer2.3.bn1.bias                                                           (128,)                    torch.float32
+layer2.3.bn1.running_mean                                                   (128,)                    torch.float32
+layer2.3.bn1.running_var                                                    (128,)                    torch.float32
+layer2.3.bn1.num_batches_tracked                                            ()                        torch.int64
+layer2.3.conv2.weight                                                       (128, 128, 3, 3)          torch.float32
+layer2.3.bn2.weight                                                         (128,)                    torch.float32
+layer2.3.bn2.bias                                                           (128,)                    torch.float32
+layer2.3.bn2.running_mean                                                   (128,)                    torch.float32
+layer2.3.bn2.running_var                                                    (128,)                    torch.float32
+layer2.3.bn2.num_batches_tracked                                            ()                        torch.int64
+layer2.3.conv3.weight                                                       (512, 128, 1, 1)          torch.float32
+layer2.3.bn3.weight                                                         (512,)                    torch.float32
+layer2.3.bn3.bias                                                           (512,)                    torch.float32
+layer2.3.bn3.running_mean                                                   (512,)                    torch.float32
+layer2.3.bn3.running_var                                                    (512,)                    torch.float32
+layer2.3.bn3.num_batches_tracked                                            ()                        torch.int64
+layer3.0.downsample.0.weight                                                (1024, 512, 1, 1)         torch.float32
+layer3.0.downsample.1.weight                                                (1024,)                   torch.float32
+layer3.0.downsample.1.bias                                                  (1024,)                   torch.float32
+layer3.0.downsample.1.running_mean                                          (1024,)                   torch.float32
+layer3.0.downsample.1.running_var                                           (1024,)                   torch.float32
+layer3.0.downsample.1.num_batches_tracked                                   ()                        torch.int64
+layer3.0.conv1.weight                                                       (256, 512, 1, 1)          torch.float32
+layer3.0.bn1.weight                                                         (256,)                    torch.float32
+layer3.0.bn1.bias                                                           (256,)                    torch.float32
+layer3.0.bn1.running_mean                                                   (256,)                    torch.float32
+layer3.0.bn1.running_var                                                    (256,)                    torch.float32
+layer3.0.bn1.num_batches_tracked                                            ()                        torch.int64
+layer3.0.conv2.weight                                                       (256, 256, 3, 3)          torch.float32
+layer3.0.bn2.weight                                                         (256,)                    torch.float32
+layer3.0.bn2.bias                                                           (256,)                    torch.float32
+layer3.0.bn2.running_mean                                                   (256,)                    torch.float32
+layer3.0.bn2.running_var                                                    (256,)                    torch.float32
+layer3.0.bn2.num_batches_tracked                                            ()                        torch.int64
+layer3.0.conv3.weight                                                       (1024, 256, 1, 1)         torch.float32
+layer3.0.bn3.weight                                                         (1024,)                   torch.float32
+layer3.0.bn3.bias                                                           (1024,)                   torch.float32
+layer3.0.bn3.running_mean                                                   (1024,)                   torch.float32
+layer3.0.bn3.running_var                                                    (1024,)                   torch.float32
+layer3.0.bn3.num_batches_tracked                                            ()                        torch.int64
+layer3.1.conv1.weight                                                       (256, 1024, 1, 1)         torch.float32
+layer3.1.bn1.weight                                                         (256,)                    torch.float32
+layer3.1.bn1.bias                                                           (256,)                    torch.float32
+layer3.1.bn1.running_mean                                                   (256,)                    torch.float32
+layer3.1.bn1.running_var                                                    (256,)                    torch.float32
+layer3.1.bn1.num_batches_tracked                                            ()                        torch.int64
+layer3.1.conv2.weight                                                       (256, 256, 3, 3)          torch.float32
+layer3.1.bn2.weight                                                         (256,)                    torch.float32
+layer3.1.bn2.bias                                                           (256,)                    torch.float32
+layer3.1.bn2.running_mean                                                   (256,)                    torch.float32
+layer3.1.bn2.running_var                                                    (256,)                    torch.float32
+layer3.1.bn2.num_batches_tracked                                            ()                        torch.int64
+layer3.1.conv3.weight                                                       (1024, 256, 1, 1)         torch.float32
+layer3.1.bn3.weight                                                         (1024,)                   torch.float32
+layer3.1.bn3.bias                                                           (1024,)                   torch.float32
+layer3.1.bn3.running_mean                                                   (1024,)                   torch.float32
+layer3.1.bn3.running_var                                                    (1024,)                   torch.float32
+layer3.1.bn3.num_batches_tracked                                            ()                        torch.int64
+layer3.2.conv1.weight                                                       (256, 1024, 1, 1)         torch.float32
+layer3.2.bn1.weight                                                         (256,)                    torch.float32
+layer3.2.bn1.bias                                                           (256,)                    torch.float32
+layer3.2.bn1.running_mean                                                   (256,)                    torch.float32
+layer3.2.bn1.running_var                                                    (256,)                    torch.float32
+layer3.2.bn1.num_batches_tracked                                            ()                        torch.int64
+layer3.2.conv2.weight                                                       (256, 256, 3, 3)          torch.float32
+layer3.2.bn2.weight                                                         (256,)                    torch.float32
+layer3.2.bn2.bias                                                           (256,)                    torch.float32
+layer3.2.bn2.running_mean                                                   (256,)                    torch.float32
+layer3.2.bn2.running_var                                                    (256,)                    torch.float32
+layer3.2.bn2.num_batches_tracked                                            ()                        torch.int64
+layer3.2.conv3.weight                                                       (1024, 256, 1, 1)         torch.float32
+layer3.2.bn3.weight                                                         (1024,)                   torch.float32
+layer3.2.bn3.bias                                                           (1024,)                   torch.float32
+layer3.2.bn3.running_mean                                                   (1024,)                   torch.float32
+layer3.2.bn3.running_var                                                    (1024,)                   torch.float32
+layer3.2.bn3.num_batches_tracked                                            ()                        torch.int64
+layer3.3.conv1.weight                                                       (256, 1024, 1, 1)         torch.float32
+layer3.3.bn1.weight                                                         (256,)                    torch.float32
+layer3.3.bn1.bias                                                           (256,)                    torch.float32
+layer3.3.bn1.running_mean                                                   (256,)                    torch.float32
+layer3.3.bn1.running_var                                                    (256,)                    torch.float32
+layer3.3.bn1.num_batches_tracked                                            ()                        torch.int64
+layer3.3.conv2.weight                                                       (256, 256, 3, 3)          torch.float32
+layer3.3.bn2.weight                                                         (256,)                    torch.float32
+layer3.3.bn2.bias                                                           (256,)                    torch.float32
+layer3.3.bn2.running_mean                                                   (256,)                    torch.float32
+layer3.3.bn2.running_var                                                    (256,)                    torch.float32
+layer3.3.bn2.num_batches_tracked                                            ()                        torch.int64
+layer3.3.conv3.weight                                                       (1024, 256, 1, 1)         torch.float32
+layer3.3.bn3.weight                                                         (1024,)                   torch.float32
+layer3.3.bn3.bias                                                           (1024,)                   torch.float32
+layer3.3.bn3.running_mean                                                   (1024,)                   torch.float32
+layer3.3.bn3.running_var                                                    (1024,)                   torch.float32
+layer3.3.bn3.num_batches_tracked                                            ()                        torch.int64
+layer3.4.conv1.weight                                                       (256, 1024, 1, 1)         torch.float32
+layer3.4.bn1.weight                                                         (256,)                    torch.float32
+layer3.4.bn1.bias                                                           (256,)                    torch.float32
+layer3.4.bn1.running_mean                                                   (256,)                    torch.float32
+layer3.4.bn1.running_var                                                    (256,)                    torch.float32
+layer3.4.bn1.num_batches_tracked                                            ()                        torch.int64
+layer3.4.conv2.weight                                                       (256, 256, 3, 3)          torch.float32
+layer3.4.bn2.weight                                                         (256,)                    torch.float32
+layer3.4.bn2.bias                                                           (256,)                    torch.float32
+layer3.4.bn2.running_mean                                                   (256,)                    torch.float32
+layer3.4.bn2.running_var                                                    (256,)                    torch.float32
+layer3.4.bn2.num_batches_tracked                                            ()                        torch.int64
+layer3.4.conv3.weight                                                       (1024, 256, 1, 1)         torch.float32
+layer3.4.bn3.weight                                                         (1024,)                   torch.float32
+layer3.4.bn3.bias                                                           (1024,)                   torch.float32
+layer3.4.bn3.running_mean                                                   (1024,)                   torch.float32
+layer3.4.bn3.running_var                                                    (1024,)                   torch.float32
+layer3.4.bn3.num_batches_tracked                                            ()                        torch.int64
+layer3.5.conv1.weight                                                       (256, 1024, 1, 1)         torch.float32
+layer3.5.bn1.weight                                                         (256,)                    torch.float32
+layer3.5.bn1.bias                                                           (256,)                    torch.float32
+layer3.5.bn1.running_mean                                                   (256,)                    torch.float32
+layer3.5.bn1.running_var                                                    (256,)                    torch.float32
+layer3.5.bn1.num_batches_tracked                                            ()                        torch.int64
+layer3.5.conv2.weight                                                       (256, 256, 3, 3)          torch.float32
+layer3.5.bn2.weight                                                         (256,)                    torch.float32
+layer3.5.bn2.bias                                                           (256,)                    torch.float32
+layer3.5.bn2.running_mean                                                   (256,)                    torch.float32
+layer3.5.bn2.running_var                                                    (256,)                    torch.float32
+layer3.5.bn2.num_batches_tracked                                            ()                        torch.int64
+layer3.5.conv3.weight                                                       (1024, 256, 1, 1)         torch.float32
+layer3.5.bn3.weight                                                         (1024,)                   torch.float32
+layer3.5.bn3.bias                                                           (1024,)                   torch.float32
+layer3.5.bn3.running_mean                                                   (1024,)                   torch.float32
+layer3.5.bn3.running_var                                                    (1024,)                   torch.float32
+layer3.5.bn3.num_batches_tracked                                            ()                        torch.int64
+layer4.0.downsample.0.weight                                                (2048, 1024, 1, 1)        torch.float32
+layer4.0.downsample.1.weight                                                (2048,)                   torch.float32
+layer4.0.downsample.1.bias                                                  (2048,)                   torch.float32
+layer4.0.downsample.1.running_mean                                          (2048,)                   torch.float32
+layer4.0.downsample.1.running_var                                           (2048,)                   torch.float32
+layer4.0.downsample.1.num_batches_tracked                                   ()                        torch.int64
+layer4.0.conv1.weight                                                       (512, 1024, 1, 1)         torch.float32
+layer4.0.bn1.weight                                                         (512,)                    torch.float32
+layer4.0.bn1.bias                                                           (512,)                    torch.float32
+layer4.0.bn1.running_mean                                                   (512,)                    torch.float32
+layer4.0.bn1.running_var                                                    (512,)                    torch.float32
+layer4.0.bn1.num_batches_tracked                                            ()                        torch.int64
+layer4.0.conv2.weight                                                       (512, 512, 3, 3)          torch.float32
+layer4.0.bn2.weight                                                         (512,)                    torch.float32
+layer4.0.bn2.bias                                                           (512,)                    torch.float32
+layer4.0.bn2.running_mean                                                   (512,)                    torch.float32
+layer4.0.bn2.running_var                                                    (512,)                    torch.float32
+layer4.0.bn2.num_batches_tracked                                            ()                        torch.int64
+layer4.0.conv3.weight                                                       (2048, 512, 1, 1)         torch.float32
+layer4.0.bn3.weight                                                         (2048,)                   torch.float32
+layer4.0.bn3.bias                                                           (2048,)                   torch.float32
+layer4.0.bn3.running_mean                                                   (2048,)                   torch.float32
+layer4.0.bn3.running_var                                                    (2048,)                   torch.float32
+layer4.0.bn3.num_batches_tracked                                            ()                        torch.int64
+layer4.1.conv1.weight                                                       (512, 2048, 1, 1)         torch.float32
+layer4.1.bn1.weight                                                         (512,)                    torch.float32
+layer4.1.bn1.bias                                                           (512,)                    torch.float32
+layer4.1.bn1.running_mean                                                   (512,)                    torch.float32
+layer4.1.bn1.running_var                                                    (512,)                    torch.float32
+layer4.1.bn1.num_batches_tracked                                            ()                        torch.int64
+layer4.1.conv2.weight                                                       (512, 512, 3, 3)          torch.float32
+layer4.1.bn2.weight                                                         (512,)                    torch.float32
+layer4.1.bn2.bias                                                           (512,)                    torch.float32
+layer4.1.bn2.running_mean                                                   (512,)                    torch.float32
+layer4.1.bn2.running_var                                                    (512,)                    torch.float32
+layer4.1.bn2.num_batches_tracked                                            ()                        torch.int64
+layer4.1.conv3.weight                                                       (2048, 512, 1, 1)         torch.float32
+layer4.1.bn3.weight                                                         (2048,)                   torch.float32
+layer4.1.bn3.bias                                                           (2048,)                   torch.float32
+layer4.1.bn3.running_mean                                                   (2048,)                   torch.float32
+layer4.1.bn3.running_var                                                    (2048,)                   torch.float32
+layer4.1.bn3.num_batches_tracked                                            ()                        torch.int64
+layer4.2.conv1.weight                                                       (512, 2048, 1, 1)         torch.float32
+layer4.2.bn1.weight                                                         (512,)                    torch.float32
+layer4.2.bn1.bias                                                           (512,)                    torch.float32
+layer4.2.bn1.running_mean                                                   (512,)                    torch.float32
+layer4.2.bn1.running_var                                                    (512,)                    torch.float32
+layer4.2.bn1.num_batches_tracked                                            ()                        torch.int64
+layer4.2.conv2.weight                                                       (512, 512, 3, 3)          torch.float32
+layer4.2.bn2.weight                                                         (512,)                    torch.float32
+layer4.2.bn2.bias                                                           (512,)                    torch.float32
+layer4.2.bn2.running_mean                                                   (512,)                    torch.float32
+layer4.2.bn2.running_var                                                    (512,)                    torch.float32
+layer4.2.bn2.num_batches_tracked                                            ()                        torch.int64
+layer4.2.conv3.weight                                                       (2048, 512, 1, 1)         torch.float32
+layer4.2.bn3.weight                                                         (2048,)                   torch.float32
+layer4.2.bn3.bias                                                           (2048,)                   torch.float32
+layer4.2.bn3.running_mean                                                   (2048,)                   torch.float32
+layer4.2.bn3.running_var                                                    (2048,)                   torch.float32
+layer4.2.bn3.num_batches_tracked                                            ()                        torch.int64
+fc.weight                                                                   (4, 2048)                 torch.float32
+fc.bias                                                                     (4,)                      torch.float32
+
+[CLASSIFIER / FINAL LAYER CANDIDATES]
+fc.weight (4, 2048)
+fc.bias (4,)
+
+[OUTPUT DIMENSION CANDIDATES]
+fc.weight: possible output dimension = 4
+
+[OTHER NESTED CHECKPOINT INFORMATION]
+
+Nested item: teacher_ensemble
+    resnet50_teacher_path: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\selfSupervisedLearning\final_models\resnet50_finetuned_from_simclr_final.pth
+    b1_teacher_path: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\selfSupervisedLearning\SSL_Reporter\b1_finetune\b1_finetuned_final.pth
+    ensemble_weight_resnet: 0.65
+    ensemble_weight_b1: 0.35
+
+Nested item: kd_config
+    alpha: 0.5
+    temperature: 2.0
+    kd_epochs: 100
+    polish_epochs: 50
+
+Nested item: test_metrics_tta
+    accuracy: 0.7735849056603774
+    precision: 0.8107035904219082
+    recall: 0.7735849056603774
+    f1_score: 0.7841371925574434
+    f1_macro: 0.7149477005843465
+    balanced_accuracy: 0.7647619360948638
+    roc_auc: dict
+        0: 0.9634508128634153
+        1: 0.8877324010805656
+        2: 0.9511616880037933
+        3: 0.9778516057585825
+    roc_auc_mean: 0.9450491269265893
+    num_samples: 265
+
+Nested item: test_confusion_matrix
+    Length: 4
+    [0]
+        Length: 4
+        [0]
+        [1]
+        [2]
+        [3]
+    [1]
+        Length: 4
+        [0]
+        [1]
+        [2]
+        [3]
+    [2]
+        Length: 4
+        [0]
+        [1]
+        [2]
+        [3]
+    [3]
+        Length: 4
+        [0]
+        [1]
+        [2]
+        [3]
+
+Nested item: test_classification_report
+    NL: dict
+        precision: 0.9416058394160584
+        recall: 0.8113207547169812
+        f1-score: 0.8716216216216216
+        support: 159.0
+    G1: dict
+        precision: 0.5411764705882353
+        recall: 0.7419354838709677
+        f1-score: 0.6258503401360545
+        support: 62.0
+    G2: dict
+        precision: 0.75
+        recall: 0.6486486486486487
+        f1-score: 0.6956521739130435
+        support: 37.0
+    G3: dict
+        precision: 0.5454545454545454
+        recall: 0.8571428571428571
+        f1-score: 0.6666666666666666
+        support: 7.0
+    accuracy: 0.7735849056603774
+    macro avg: dict
+        precision: 0.6945592138647098
+        recall: 0.7647619360948638
+        f1-score: 0.7149477005843465
+        support: 265.0
+    weighted avg: dict
+        precision: 0.8107035904219082
+        recall: 0.7735849056603774
+        f1-score: 0.7841371925574434
+        support: 265.0
+
+Nested item: cv_summary
+    fold_results: list
+        Length: 5
+        [0]
+            fold: 1
+            accuracy: 0.888468809073724
+            f1_score: 0.8923173808074529
+            precision: 0.9069307125951104
+            recall: 0.888468809073724
+            balanced_accuracy: 0.9086376892836077
+            roc_auc_mean: 0.9717416326236934
+            confusion_matrix: list
+                ... (maximum depth reached)
+        [1]
+            fold: 2
+            accuracy: 0.9054820415879017
+            f1_score: 0.9085933705837796
+            precision: 0.9218468042008717
+            recall: 0.9054820415879017
+            balanced_accuracy: 0.9378364237901053
+            roc_auc_mean: 0.989594737690719
+            confusion_matrix: list
+                ... (maximum depth reached)
+        [2]
+            fold: 3
+            accuracy: 0.8882575757575758
+            f1_score: 0.8925536618014785
+            precision: 0.9073048238644705
+            recall: 0.8882575757575758
+            balanced_accuracy: 0.9034386458725809
+            roc_auc_mean: 0.9824041063096869
+            confusion_matrix: list
+                ... (maximum depth reached)
+        [3]
+            fold: 4
+            accuracy: 0.9090909090909091
+            f1_score: 0.9125454727507545
+            precision: 0.92779806998557
+            recall: 0.9090909090909091
+            balanced_accuracy: 0.9443795142300597
+            roc_auc_mean: 0.9893527530792029
+            confusion_matrix: list
+                ... (maximum depth reached)
+        [4]
+            fold: 5
+            accuracy: 0.8958333333333334
+            f1_score: 0.8987523785513453
+            precision: 0.9088311223070722
+            recall: 0.8958333333333334
+            balanced_accuracy: 0.9314219923844809
+            roc_auc_mean: 0.9848245024840689
+            confusion_matrix: list
+                ... (maximum depth reached)
+    mean_accuracy: 0.8974265337686888
+    std_accuracy: 0.008576686635648667
+    mean_f1: 0.9009524528989621
+    std_f1: 0.00827920553446985
+    mean_auc: 0.9835835464374743
+    std_auc: 0.006520431569392955
+
+Nested item: ci95
+    accuracy: dict
+        mean: 0.774022641509434
+        std: 0.02627633202670232
+        ci95_low: 0.720754716981132
+        ci95_high: 0.8264150943396227
+    f1_score: dict
+        mean: 0.7849661474375996
+        std: 0.02435895599047421
+        ci95_low: 0.7362882102788754
+        ci95_high: 0.834163784067086
+    precision: dict
+        mean: 0.8141883639302464
+        std: 0.023076164666702953
+        ci95_low: 0.7671912249448011
+        ci95_high: 0.8572476845878672
+    recall: dict
+        mean: 0.774022641509434
+        std: 0.02627633202670232
+        ci95_low: 0.720754716981132
+        ci95_high: 0.8264150943396227
+
+Nested item: kd_history
+    train_loss: list
+        Length: 100
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    val_loss: list
+        Length: 100
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    train_acc: list
+        Length: 100
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    val_acc: list
+        Length: 100
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    train_f1: list
+        Length: 100
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    val_f1: list
+        Length: 100
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    kd_loss: list
+        Length: 0
+    focal_loss: list
+        Length: 0
+    learning_rates: list
+        Length: 100
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+
+Nested item: polish_history
+    train_loss: list
+        Length: 50
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    val_loss: list
+        Length: 50
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    train_f1: list
+        Length: 50
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    val_f1: list
+        Length: 50
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+    val_acc: list
+        Length: 50
+        [0]
+        [1]
+        [2]
+        [3]
+        [4]
+==========================================================================================
+CHECKPOINT: KD_Seed_42
+==========================================================================================
+[SKIPPED] Please provide the actual checkpoint path.
+==========================================================================================
+CHECKPOINT: KD_Seed_123
+==========================================================================================
+[SKIPPED] Please provide the actual checkpoint path.
+==========================================================================================
+CHECKPOINT: KD_Seed_2024
+==========================================================================================
+[SKIPPED] Please provide the actual checkpoint path.
+==========================================================================================
+CHECKPOINT: KD_Best_Ensemble
+==========================================================================================
+[NOT FOUND]
+Path: C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\best_ensemble_models.pth
+==========================================================================================
+INSPECTION FINISHED
+==========================================================================================

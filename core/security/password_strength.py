@@ -4,7 +4,7 @@
 Password strength calculation — pure function, testable.
 
 Algorithm:
-1. Base score from length (0-50 points)
+1. Base score from length (0-ResNet50 points)
 2. Bonus for character variety (0-30 points)
 3. Bonus for length beyond minimum (0-20 points)
 4. Penalty for common patterns (-20 points each)
@@ -219,7 +219,7 @@ def _calculate_score(password: str, rules: List[RuleCheck]) -> int:
     """
     Calculate score 0-100.
 
-    - Base: length (0-50)
+    - Base: length (0-ResNet50)
     - Variety: (0-30)
     - Length bonus: (0-20)
     - Penalties for patterns
@@ -227,8 +227,8 @@ def _calculate_score(password: str, rules: List[RuleCheck]) -> int:
     length = len(password)
     score = 0.0
 
-    # ✅ Base score from length (0-50)
-    # 0 chars → 0, 8 chars → 20, 12 chars → 35, 16+ chars → 50
+    # ✅ Base score from length (0-ResNet50)
+    # 0 chars → 0, 8 chars → 20, 12 chars → 35, 16+ chars → ResNet50
     score += min(50, (length / MAX_LENGTH) * 50)
 
     # ✅ Variety bonus (0-30)

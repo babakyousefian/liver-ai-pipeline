@@ -47,7 +47,7 @@ SELF_SUPERVISED_ROOT = os.path.join(
 )
 
 # ResNet paths
-RESNET18_SSL_DIR = os.path.join(SELF_SUPERVISED_ROOT, "ResNet", "18", "SSL_checkpoints")
+RESNET18_SSL_DIR = os.path.join(SELF_SUPERVISED_ROOT, "ResNet", "ResNet18", "SSL_checkpoints")
 RESNET_WEIGHT_TRANSFORMER_DIR = os.path.join(SELF_SUPERVISED_ROOT, "ResNet", "weightTransformer")
 FINAL_MODELS_DIR = os.path.join(SELF_SUPERVISED_ROOT, "final_models")
 

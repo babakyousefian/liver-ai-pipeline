@@ -8752,7 +8752,7 @@ class ProcessingProgressBar(QWidget):
         # اگه تم روشنه، track روشن‌تر؛ اگه تیره، track تیره‌تر
         is_light_theme = (self._theme.get("name") == "Solarized White")
         if is_light_theme:
-            track_bg = "rgba(38, 139, 210, 0.18)"
+            track_bg = "rgba(38, 139, 210, 0.ResNet18)"
             track_border = "rgba(38, 139, 210, 0.55)"
         else:
             track_bg = "rgba(0, 0, 0, 0.35)"

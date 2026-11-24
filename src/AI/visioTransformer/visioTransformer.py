@@ -67,9 +67,12 @@ DEVICE = get_device()
 torch.set_num_threads(4)
 set_seed(42)
 
-# ✅ VisioTransformer output dir
-VIT_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "..", "visioTransformer")
-VIT_OUTPUT_DIR = os.path.abspath(VIT_OUTPUT_DIR)
+# ✅ VisioTransformer output dir — absolute path (تضمینی)
+# مسیر دقیقاً:
+# finalReports/AI_Comparisons/visioTransformer/
+VIT_OUTPUT_DIR = os.path.abspath(
+    r"C:\Users\liana\Documents\pythonProjects\FinalTasks\finalReports\AI_Comparisons\visioTransformer"
+)
 
 # =====================================================
 # EARLY STOPPING (with best weights restoration)
@@ -78,7 +81,7 @@ class EarlyStopping:
     """
     Early stopping with best weights restoration.
 
-    - patience=15: به مدل فرصت می‌ده تا epoch 50 به بهترین دقت برسه
+    - patience=15: به مدل فرصت می‌ده تا epoch ResNet50 به بهترین دقت برسه
     - min_delta=1e-4: فقط بهبودهای واقعی رو در نظر می‌گیره
     - restore_best_weights=True: وزن بهترین epoch رو ذخیره می‌کنه
     """
@@ -171,12 +174,12 @@ class VisioTransformerTrainer:
         DEFAULT_HP = {
             "batch_size": 16,
             "lr": 1e-4,
-            "weight_decay": 0.05,           # ✅ نگه دار (استاندارد ViT)
-            "dropout": 0.3,                  # ← 0.15 → 0.3 (Transformer)
-            "label_smoothing": 0.12,         # ← 0.15 → 0.12
+            "weight_decay": 0.02,
+            "dropout": 0.25,
+            "label_smoothing": 0.12,
             "accumulation_steps": 2,
-            "warmup_epochs": 10,             # ← 12 → 10
-            "epochs_per_phase": [5, 35],     # ← 30 → 35
+            "warmup_epochs": 8,
+            "epochs_per_phase": [5, 20],
         }
         hp = DEFAULT_HP
 
@@ -406,15 +409,11 @@ class VisioTransformerTrainer:
 
         # ✅ Replace head with custom classifier
         model.heads = nn.Sequential(
-            nn.Dropout(self.dropout_rate),
-            nn.Linear(num_features, 512),
-            nn.BatchNorm1d(512),
-            nn.GELU(),
-            nn.Dropout(self.dropout_rate * 0.5),
-            nn.Linear(512, 256),
+            nn.Dropout(self.dropout_rate),  # 0.25
+            nn.Linear(num_features, 256),
             nn.BatchNorm1d(256),
             nn.GELU(),
-            nn.Dropout(self.dropout_rate * 0.3),
+            nn.Dropout(self.dropout_rate * 0.5),  # 0.125
             nn.Linear(256, len(CLASS_NAMES)),
         )
 
@@ -524,6 +523,54 @@ class VisioTransformerTrainer:
         print(f"✅ Backbone FROZEN (head only)")
         print(f"   Trainable: {trainable:,} / {total:,} ({trainable/total*100:.2f}%)")
 
+    def unfreeze_last_blocks(self):
+        """
+        Unfreeze last 6 transformer blocks (6..11) + final LayerNorm + head.
+
+        ✅ We match BOTH naming conventions:
+           - `encoder.layers.encoder_layer_N`  (torchvision native)
+           - `encoder.layers.N`                 (older versions)
+        """
+        unfreeze_indices = {6, 7, 8, 9, 10, 11}
+
+        for name, param in self.model.named_parameters():
+            should_train = False
+
+            # 1) Head is always trainable
+            if name.startswith("heads."):
+                should_train = True
+
+            # 2) Final LayerNorm (encoder.ln.*)
+            elif name.startswith("encoder.ln."):
+                should_train = True
+
+            # 3) Encoder blocks 6..11 — try both naming conventions
+            elif "encoder.layers." in name:
+                for idx in unfreeze_indices:
+                    # torchvision native
+                    if f"encoder.layers.encoder_layer_{idx}." in name:
+                        should_train = True
+                        break
+                    # older naming
+                    if f"encoder.layers.{idx}." in name:
+                        should_train = True
+                        break
+
+            param.requires_grad = should_train
+
+        trainable = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        total = sum(p.numel() for p in self.model.parameters())
+        print(f"✅ Partial UNFREEZE (blocks 6..11 + encoder.ln + heads)")
+        print(f"   Trainable: {trainable:,} / {total:,} ({trainable / total * 100:.2f}%)")
+
+        # ✅ Sanity checks
+        if trainable / total < 0.25:
+            print(f"   ⚠️ WARNING: Trainable ratio < 25% — names may not match!")
+        elif trainable / total > 0.85:
+            print(f"   ⚠️ WARNING: Trainable ratio > 85% — unfreeze is too broad!")
+        else:
+            print(f"   ✅ Trainable ratio OK ({trainable / total * 100:.1f}%)")
+
     def unfreeze_all(self):
         """Unfreeze all layers."""
         for param in self.model.parameters():
@@ -605,11 +652,11 @@ class VisioTransformerTrainer:
             val_loss, val_acc = self.evaluate(return_loss=True)
             current_lr = self.scheduler.step()
 
-            # ✅ Early Stopping Check (monitor val_loss)
+            # ✅ Early Stopping Check (monitor val_acc)
             if hasattr(self, 'early_stopping'):
-                if self.early_stopping(val_loss, epoch, self.model):
+                if self.early_stopping(val_acc, epoch, self.model):
                     print(f"\n🛑 Early Stopping at epoch {epoch + 1}")
-                    print(f"   Best Val Loss: {self.early_stopping.best_score:.4f}")
+                    print(f"   Best Val Acc: {self.early_stopping.best_score:.4f}")
                     print(f"   Best Epoch: {self.early_stopping.best_epoch + 1}")
                     break
 
@@ -676,18 +723,18 @@ class VisioTransformerTrainer:
         self.freeze_backbone()
         self.train_epoch(epochs=self.epochs_per_phase[0], desc="Stage 1")
 
-        # ---- Stage 2: Full fine-tune ----
+        # ---- Stage 2: Partial fine-tune (blocks 6..11 + head) ----
         print(
-            f"\n📌 STAGE 2: Full fine-tune ({self.epochs_per_phase[1]} epochs) - LR: {phase_lrs.get(1, self.lr * 0.2)}")
+            f"\n📌 STAGE 2: Partial fine-tune ({self.epochs_per_phase[1]} epochs) - LR: {phase_lrs.get(1, self.lr * 0.2)}")
         print("-" * 40)
         self._set_phase_lr(phase_lrs.get(1, self.lr * 0.2))
-        self.unfreeze_all()
+        self.unfreeze_last_blocks()
 
         # ✅ Early Stopping Setup — patience=15 برای رسیدن به بهترین دقت
         self.early_stopping = EarlyStopping(
-            patience=15,
-            min_delta=1e-4,
-            mode='min',  # چون val_loss رو monitor می‌کنیم
+            patience=9,
+            min_delta=1e-3,
+            mode='max',
             verbose=True,
         )
 
@@ -848,8 +895,12 @@ class VisioTransformerTrainer:
             reports_dir = os.path.join(self.base_dir, "reports")
             os.makedirs(reports_dir, exist_ok=True)
             output_path = os.path.join(reports_dir, "visioTransformer_Report.pdf")
+        else:
+            reports_dir = os.path.dirname(output_path)
+            os.makedirs(reports_dir, exist_ok=True)
 
         print(f"\n📄 Generating Vision Transformer report: {output_path}")
+        print(f"📁 Reports dir: {reports_dir}")
 
         # ✅ اگه test_metrics نداریم، روی test ارزیابی کن
         if self.test_metrics is None:
@@ -910,7 +961,7 @@ class VisioTransformerTrainer:
                 "training_time_sec": sum(self.history["epoch_times"]) if self.history["epoch_times"] else 0,
             })
 
-            reporter.generate_all(report_dir=os.path.dirname(output_path))
+            reporter.generate_all(report_dir=reports_dir)
             print(f"✅ PDF Report saved: {output_path}")
 
         except Exception as e:

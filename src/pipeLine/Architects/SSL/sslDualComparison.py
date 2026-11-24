@@ -64,7 +64,7 @@ SELF_SUPERVISED_ROOT = os.path.join(PROJECT_ROOT, "finalReports", "selfSupervise
 MODEL_PATHS = {
     # Pair 1: BYOL
     "resnet18_byol": os.path.join(
-        SELF_SUPERVISED_ROOT, "../Resnet", "18", "SSL_checkpoints",
+        SELF_SUPERVISED_ROOT, "../Resnet", "ResNet18", "SSL_checkpoints",
         "architecture", "byol", "resnet18_best_update_byol.pth",
     ),
     "b0_byol": os.path.join(
@@ -73,7 +73,7 @@ MODEL_PATHS = {
     ),
     # Pair 2: MAE
     "resnet18_mae": os.path.join(
-        SELF_SUPERVISED_ROOT, "../Resnet", "18", "SSL_checkpoints",
+        SELF_SUPERVISED_ROOT, "../Resnet", "ResNet18", "SSL_checkpoints",
         "architecture", "mae", "resnet18_best_update_mae.pth",
     ),
     "b0_mae": os.path.join(
@@ -82,7 +82,7 @@ MODEL_PATHS = {
     ),
     # Pair 3: SimCLR
     "resnet18_simclr": os.path.join(
-        SELF_SUPERVISED_ROOT, "../Resnet", "18", "SSL_checkpoints",
+        SELF_SUPERVISED_ROOT, "../Resnet", "ResNet18", "SSL_checkpoints",
         "architecture", "simclr", "resnet18_best_update_simclr.pth",
     ),
     "b0_simclr": os.path.join(

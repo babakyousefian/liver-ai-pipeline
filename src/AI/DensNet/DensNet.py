@@ -66,15 +66,21 @@ torch.set_num_threads(4)
 set_seed(42)
 
 # ✅ DenseNet output dir
-DENSENET_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "..", "DensNet")
-DENSENET_OUTPUT_DIR = os.path.abspath(DENSENET_OUTPUT_DIR)
+# ✅ مسیر قطعی — همیشه توی finalReports/AI_Comparisons/DensNet
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))
+)))
+DENSENET_OUTPUT_DIR = os.path.join(
+    _PROJECT_ROOT, "finalReports", "AI_Comparisons", "DensNet"
+)
+os.makedirs(DENSENET_OUTPUT_DIR, exist_ok=True)
 
 
 # =====================================================
 # EARLY STOPPING
 # =====================================================
 class EarlyStopping:
-    def __init__(self, patience=15, min_delta=1e-4, mode='min', verbose=True):
+    def __init__(self, patience=15, min_delta=3e-4, mode='min', verbose=True):
         self.patience = patience
         self.min_delta = min_delta
         self.mode = mode
@@ -146,8 +152,8 @@ class DensNetTrainer:
         DEFAULT_HP = {
             "batch_size": 32,
             "lr": 1e-4,
-            "weight_decay": 0.01,           # ← استاندارد DenseNet
-            "dropout": 0.3,
+            "weight_decay": 0.02,           # ← افزایش از 0.01 به 0.02
+            "dropout": 0.35,                 # ← افزایش از 0.3 به 0.35
             "label_smoothing": 0.15,
             "accumulation_steps": 1,
             "warmup_epochs": 8,
@@ -421,6 +427,8 @@ class DensNetTrainer:
             "use_sampler": self.use_sampler,
             "device": str(DEVICE),
             "created_at": datetime.now().isoformat(),
+            "model_dir": self.model_dir,  # ← این خط اضافه شد
+            "base_dir": self.base_dir,  # ← این خط اضافه شد
         }
         with open(self.config_path, "w") as f:
             json.dump(config, f, indent=4)
@@ -565,11 +573,11 @@ class DensNetTrainer:
             val_loss, val_acc = self.evaluate(return_loss=True)
             current_lr = self.scheduler.step()
 
-            # ✅ Early Stopping Check (monitor val_loss)
+            # ✅ Early Stopping Check (monitor val_acc)
             if hasattr(self, 'early_stopping'):
-                if self.early_stopping(val_loss, epoch, self.model):
+                if self.early_stopping(val_acc, epoch, self.model):
                     print(f"\n🛑 Early Stopping at epoch {epoch + 1}")
-                    print(f"   Best Val Loss: {self.early_stopping.best_score:.4f}")
+                    print(f"   Best Val Acc: {self.early_stopping.best_score:.4f}")
                     print(f"   Best Epoch: {self.early_stopping.best_epoch + 1}")
                     break
 
@@ -642,11 +650,11 @@ class DensNetTrainer:
         self._set_phase_lr(phase_lrs.get(1, self.lr * 0.2))
         self.unfreeze_all()
 
-        # ✅ Early Stopping Setup — patience=15
+        # ✅ Early Stopping Setup — on val_acc (not val_loss)
         self.early_stopping = EarlyStopping(
-            patience=15,
-            min_delta=1e-4,
-            mode='min',
+            patience=4,             # ← کاهش از 5 به 4
+            min_delta=3e-4,         # ← افزایش از 2e-4 به 3e-4
+            mode='max',             # ← max (val_acc)
             verbose=True,
         )
 
@@ -655,9 +663,27 @@ class DensNetTrainer:
         # ✅ Restore بهترین وزن‌ها
         if hasattr(self, 'early_stopping') and self.early_stopping.best_weights is not None:
             self.early_stopping.restore_best_weights(self.model)
+            self.model.eval()
+            print(f"✅ Restored best weights from epoch {self.early_stopping.best_epoch + 1}")
 
-        print("\n📥 Loading best model...")
-        self.load(self.save_path)
+            # ✅✅✅ ذخیره بهترین وزن‌ها روی دیسک
+            save_model_checkpoint(
+                model=self.model,
+                optimizer=self.optimizer,
+                epoch=self.early_stopping.best_epoch,
+                metrics={
+                    "val_acc": self.early_stopping.best_score,
+                    "val_loss": self.early_stopping.best_score,
+                },
+                filename="DensNet_best.pth",
+                scheduler=self.scheduler,
+                extra_info={"best_accuracy": self.early_stopping.best_score},
+                save_dir=self.model_dir,
+            )
+            print(f"✅ Best weights saved to DensNet_best.pth (epoch {self.early_stopping.best_epoch + 1})")
+        else:
+            print("\n📥 Loading best model from disk...")
+            self.load(self.save_path)
 
         print("\n📊 Evaluating on TEST set...")
         self.evaluate_on_test()

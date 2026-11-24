@@ -34,6 +34,24 @@
                 "settings_hint"
             ],
             "last_seen": "2026-11-06T11:37:38.904506"
+        },
+        "username": {
+            "shown": [
+                "pdf_ready",
+                "repeated_grid",
+                "history_hint",
+                "dashboard_hint",
+                "settings_hint",
+                "gradcam_hint"
+            ],
+            "ignored": [
+                "pdf_ready",
+                "repeated_grid",
+                "history_hint",
+                "dashboard_hint",
+                "settings_hint"
+            ],
+            "last_seen": "2026-11-07T07:13:57.005146"
         }
     }
 }

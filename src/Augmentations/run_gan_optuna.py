@@ -3,7 +3,7 @@
 Optuna-based hyperparameter optimization for Ultimate GAN.
 
 Usage:
-    python run_gan_optuna.py --class_name G3 --n_trials 20 --max_epochs 50
+    python run_gan_optuna.py --class_name G3 --n_trials 20 --max_epochs ResNet50
 
 Author: Babak Yousefian
 Version: 1.0.0

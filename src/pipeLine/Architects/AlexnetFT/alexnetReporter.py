@@ -25,7 +25,7 @@ Pages:
   15. 5-Fold CV — Best Fold Confusion Matrix
   16. Bootstrap 95% Confidence Intervals
   17. TTA Analysis
-  18. Captum Interpretability
+  ResNet18. Captum Interpretability
   19. LIME Explanations
   20. SHAP Summary
   21. Model Architecture (Netron)
@@ -1302,7 +1302,7 @@ def _build_pdf(
     story.append(PageBreak())
 
     # ═════════════════════════════════════════════════════════════
-    # PAGE 18 (NEW): SSL METHODS COMPARISON (BYOL / SimCLR / MAE)
+    # PAGE ResNet18 (NEW): SSL METHODS COMPARISON (BYOL / SimCLR / MAE)
     # ═════════════════════════════════════════════════════════════
     story.append(Paragraph("17. SSL Methods Comparison", S["h1"]))
     story.append(Paragraph(
@@ -1380,15 +1380,15 @@ def _build_pdf(
     # ═════════════════════════════════════════════════════════════
     # PAGE 19: CAPTUM INTERPRETABILITY
     # ═════════════════════════════════════════════════════════════
-    story.append(Paragraph("18. Captum Interpretability", S["h1"]))
+    story.append(Paragraph("ResNet18. Captum Interpretability", S["h1"]))
     story.append(Paragraph(
         "<b>Grad-CAM</b> highlights spatial regions with high gradient activation. "
         "<b>Integrated Gradients</b> computes per-pixel attribution via a path "
         "integral from a baseline (zeros) to the input. Both are class-discriminative.",
         S["body"],
     ))
-    safe_img(interp_paths.get("gradcam_path"), "18.1 Grad-CAM")
-    safe_img(interp_paths.get("ig_path"), "18.2 Integrated Gradients")
+    safe_img(interp_paths.get("gradcam_path"), "ResNet18.1 Grad-CAM")
+    safe_img(interp_paths.get("ig_path"), "ResNet18.2 Integrated Gradients")
     story.append(PageBreak())
 
     # ═════════════════════════════════════════════════════════════
